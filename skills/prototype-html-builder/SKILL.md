@@ -1,6 +1,6 @@
 ---
 name: prototype-html-builder
-description: 生成 .prototype.html 单文件高保真原型（内置可编辑的 MasterGo 风格编辑器）。当用户要求"画原型 / 做高保真原型 / 生成 prototype.html / 移动端或大屏界面原型 / 带交互跳转的原型"时使用。图标一律使用 Element Plus / Ant Design 官方 SVG 路径（矢量、可重着色），组件通过母版 + 实例复用，输出文件可直接在浏览器打开编辑与演示。
+description: 生成 .prototype.html 单文件高保真原型（内置自研画布编辑器，纯 Canvas 渲染，零外部依赖）。当用户要求"画原型 / 做高保真原型 / 生成 prototype.html / 移动端或大屏界面原型 / 带交互跳转的原型"时使用。图标一律使用 Element Plus / Ant Design 官方 SVG 路径（矢量、可重着色），组件通过母版 + 实例复用，输出文件可直接在浏览器打开编辑与演示。
 ---
 
 # Prototype HTML Builder

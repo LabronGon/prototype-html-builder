@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>公众号排版稿 · prototype-html-builder</title>
+</head>
+<body style="margin:0;padding:24px 12px 48px;background:#EDEDED;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;-webkit-font-smoothing:antialiased;">
+
+<!-- ============ 使用说明（复制正文时不要选中这一块） ============ -->
+<div style="max-width:677px;margin:0 auto 22px;background:#1F2329;color:#C9CDD4;border-radius:10px;padding:18px 20px;font-size:12.5px;line-height:1.85;">
+  <p style="margin:0 0 10px;color:#fff;font-size:13.5px;font-weight:700;letter-spacing:.3px;">发布说明（本节不复制）</p>
+  <p style="margin:0 0 6px;"><span style="color:#7EA6FF;font-weight:700;">标题</span>　prototype-html-builder：把整个原型编辑器，塞进一份 HTML 文件</p>
+  <p style="margin:0 0 6px;"><span style="color:#7EA6FF;font-weight:700;">摘要</span>　不做账号、不做云、不装客户端。双击打开就是一个画布编辑器，改完保存，还是同一个文件。</p>
+  <p style="margin:0 0 6px;"><span style="color:#7EA6FF;font-weight:700;">操作</span>　① 从下方「正文」开始全选复制，粘贴到公众号草稿；② 四张配图在 wechat/assets/，若粘贴后丢失，按图注位置用编辑器重新上传；③ 「阅读原文」填 GitHub 地址。</p>
+  <p style="margin:0;"><span style="color:#7EA6FF;font-weight:700;">备选标题</span>　① 不装软件、不要账号：一份 505 KB 的 HTML，就是你的原型编辑器　② 我把一整个原型编辑器塞进了一个 HTML 文件</p>
+</div>
+
+<!-- ============ 正文开始 ============ -->
+<div style="max-width:677px;margin:0 auto;background:#FFFFFF;padding:30px 22px 34px;border-radius:10px;">
+
+  <!-- 标题（公众号正文内标题头） -->
+  <p style="margin:0 0 6px;font-size:12px;letter-spacing:.16em;color:#B0B6BF;font-weight:600;">PROTOTYPE · 单文件原型引擎</p>
+  <p style="margin:0 0 22px;font-size:22px;line-height:1.5;font-weight:800;color:#111827;letter-spacing:.3px;">prototype-html-builder：<br>把整个原型编辑器，塞进一份 HTML 文件</p>
+
+  <!-- 导读 -->
+  <div style="margin:0 0 30px;background:#F7F9FC;border-left:4px solid #3670F7;border-radius:0 8px 8px 0;padding:14px 16px;">
+    <p style="margin:0;font-size:13px;letter-spacing:.12em;color:#3670F7;font-weight:700;line-height:1;">导读</p>
+    <p style="margin:8px 0 0;font-size:14px;line-height:1.85;color:#4E5969;letter-spacing:.2px;">一个 <span style="font-family:Menlo,Consolas,monospace;font-size:13px;background:#EBF1FE;color:#2A5FE8;padding:1px 4px;border-radius:3px;">.prototype.html</span> 文件，双击打开是编辑器：左边页面树，中间画板，右边属性面板。改完点保存，写回同一个文件。没有账号，没有云端，没有订阅——发给谁，谁都能改。</p>
+  </div>
+
+  <!-- 一 -->
+  <p style="margin:34px 0 16px;font-size:17px;line-height:1.5;font-weight:800;color:#111827;padding-left:11px;border-left:3px solid #3670F7;">网页本身就是软件</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">做过原型的人都碰到过同一个问题：文件在别人电脑上打不开。</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">在线工具要账号和网络，桌面工具要装客户端，导出的 PNG 只是一张图，改一个错别字得回到原文件。</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">prototype-html-builder 走的是另一条路：<span style="font-weight:700;color:#111827;">交付物不是源文件，也不是截图，而是一个 HTML。</span></p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">双击打开，它就是一个画布编辑器。选中、拖拽、改字、改色、复制粘贴、缩放、播放交互，操作手感和设计工具一致。</p>
+
+  <p style="margin:0 0 20px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">唯一的区别是：这个「软件」的安装包，<span style="font-weight:800;color:#2A5FE8;white-space:nowrap;">505 KB</span>。</p>
+
+  <img src="assets/editor.jpg" alt="编辑器界面：左侧页面树与图层，中间三块手机画板，右侧属性面板" style="display:block;width:100%;height:auto;border-radius:6px;">
+  <p style="margin:8px 0 28px;font-size:12px;line-height:1.6;color:#9AA3AF;text-align:center;">▲ 编辑器：左侧页面树与图层，中间三块手机画板，右侧属性面板</p>
+
+  <!-- 二 -->
+  <p style="margin:34px 0 16px;font-size:17px;line-height:1.5;font-weight:800;color:#111827;padding-left:11px;border-left:3px solid #3670F7;">505 KB 里装着什么</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">拆开看，只有两样东西。</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">一是编辑器壳：Canvas 渲染、选择框、参考线、评论、属性面板、演示模式，全部原生 JS 写的，没有框架、没有 CDN、没有任何外部请求。</p>
+
+  <p style="margin:0 0 12px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">二是一段 JSON：</p>
+
+  <div style="margin:0 0 18px;background:#F5F7FA;border:1px solid #EAEDF2;border-radius:6px;padding:12px 13px;">
+    <p style="margin:0;font-family:Menlo,Consolas,'Courier New',monospace;font-size:12px;line-height:1.8;color:#2F3542;word-break:break-all;">&lt;script type="application/json"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id="__doc"&gt;<br>{ "version": 1, "name": "选矿设备管理",<br>&nbsp;&nbsp;"pages": [ … ] }<br>&lt;/script&gt;</p>
+  </div>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">文档就在这一段里。页面、画板、节点、交互、组件，全是 JSON 字段。数组顺序就是图层顺序，和设计工具左侧的图层面板一一对应。</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">换句话说：你看到的画布，是这份 JSON 的一次渲染；你点保存，只是把 JSON 换成了新的。</p>
+
+  <!-- 三 -->
+  <p style="margin:34px 0 16px;font-size:17px;line-height:1.5;font-weight:800;color:#111827;padding-left:11px;border-left:3px solid #3670F7;">写一段 JSON，画一屏手机</p>
+
+  <p style="margin:0 0 12px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">规格是文档的声明式子集：只写人关心的字段，id、父子关系、实例快照由编译器生成。一个导航栏、一个图标、一行说明，就这样：</p>
+
+  <div style="margin:0 0 18px;background:#F5F7FA;border:1px solid #EAEDF2;border-radius:6px;padding:12px 13px;">
+    <p style="margin:0;font-family:Menlo,Consolas,'Courier New',monospace;font-size:12px;line-height:1.8;color:#2F3542;word-break:break-all;">{ "type": "instance",<br>&nbsp;&nbsp;"comp": "navbar", "x": 0,<br>&nbsp;&nbsp;"y": 44,<br>&nbsp;&nbsp;"overrides": {<br>&nbsp;&nbsp;&nbsp;&nbsp;"标题": { "text": "设备管理" }<br>&nbsp;&nbsp;} },<br>{ "type": "icon",<br>&nbsp;&nbsp;"icon": "ep/search", "size": 24 },<br>{ "type": "text", "x": 16,<br>&nbsp;&nbsp;"text": "运行中的设备" }</p>
+  </div>
+
+  <p style="margin:0 0 12px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">编译一行命令：</p>
+
+  <div style="margin:0 0 18px;background:#F5F7FA;border:1px solid #EAEDF2;border-radius:6px;padding:12px 13px;">
+    <p style="margin:0;font-family:Menlo,Consolas,'Courier New',monospace;font-size:12px;line-height:1.8;color:#2F3542;word-break:break-all;">node scripts/build-prototype.mjs \<br>&nbsp;&nbsp;spec.json -o demo.prototype.html</p>
+  </div>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">示例文档「选矿设备管理」：3 个画板、31 个节点、18 个组件实例、9 条交互，编译后 <span style="font-weight:700;color:#111827;white-space:nowrap;">535 KB</span>。</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">校验也没有省：<span style="font-family:Menlo,Consolas,monospace;font-size:13px;background:#F2F4F7;padding:1px 4px;border-radius:3px;color:#2F3542;">validate-doc.mjs</span> 会检查图标是否存在、id 是否唯一、交互目标是否存在、实例是否完整，退出码 0 / 1，可以直接接进 CI。</p>
+
+  <!-- 四 -->
+  <p style="margin:34px 0 16px;font-size:17px;line-height:1.5;font-weight:800;color:#111827;padding-left:11px;border-left:3px solid #3670F7;">图标是真图标</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">原型里最容易露怯的是图标：截图贴上去、emoji 顶上、iconfont 塞字体、拿几个方块拼。</p>
+
+  <p style="margin:0 0 12px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">这里只有一种写法：</p>
+
+  <div style="margin:0 0 18px;background:#F5F7FA;border:1px solid #EAEDF2;border-radius:6px;padding:12px 13px;">
+    <p style="margin:0;font-family:Menlo,Consolas,'Courier New',monospace;font-size:12px;line-height:1.8;color:#2F3542;word-break:break-all;">{ "type": "icon", "icon": "ep/search",<br>&nbsp;&nbsp;"size": 24, "color": "#1F2329" }</p>
+  </div>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">内置 <span style="font-weight:700;color:#111827;">218 个图标</span>：Element Plus 125 个，Ant Design 93 个，全部是官方 SVG 路径，1024 网格，渲染走 Canvas 的 Path2D。</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">好处很实际：放大不糊，换色不用重新导图，同一个搜索图标在深色导航栏和浅色卡片里可以是两种颜色。</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">规范也一并写进了设计 Token：主色 <span style="font-family:Menlo,Consolas,monospace;font-size:13px;background:#F2F4F7;padding:1px 4px;border-radius:3px;color:#2F3542;">#3670F7</span>，正文 <span style="font-family:Menlo,Consolas,monospace;font-size:13px;background:#F2F4F7;padding:1px 4px;border-radius:3px;color:#2F3542;">#1F2329</span>，辅助 <span style="font-family:Menlo,Consolas,monospace;font-size:13px;background:#F2F4F7;padding:1px 4px;border-radius:3px;color:#2F3542;">#86909C</span>，分割线 <span style="font-family:Menlo,Consolas,monospace;font-size:13px;background:#F2F4F7;padding:1px 4px;border-radius:3px;color:#2F3542;">#E5E6EB</span>。</p>
+
+  <!-- 五 -->
+  <p style="margin:34px 0 16px;font-size:17px;line-height:1.5;font-weight:800;color:#111827;padding-left:11px;border-left:3px solid #3670F7;">组件是母版，不是复制粘贴</p>
+
+  <p style="margin:0 0 12px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">导航栏、标签栏、卡片、列表行、分页器、对话框……重复出现的 UI，一律母版 + 实例：</p>
+
+  <div style="margin:0 0 18px;background:#F5F7FA;border:1px solid #EAEDF2;border-radius:6px;padding:12px 13px;">
+    <p style="margin:0;font-family:Menlo,Consolas,'Courier New',monospace;font-size:12px;line-height:1.8;color:#2F3542;word-break:break-all;">{ "type": "instance",<br>&nbsp;&nbsp;"comp": "device-row",<br>&nbsp;&nbsp;"x": 16, "y": 310,<br>&nbsp;&nbsp;"overrides": {<br>&nbsp;&nbsp;&nbsp;&nbsp;"名称": { "text": "1# 球磨机" },<br>&nbsp;&nbsp;&nbsp;&nbsp;"状态": {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"text": "告警 · 温度偏高",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"color": "#F53F3F"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;} }</p>
+  </div>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">内置 <span style="font-weight:700;color:#111827;">27 个母版</span>，从状态栏到分页器。覆盖只写差异：改母版，所有实例同步；单个实例只改文字、颜色、图标这些白名单字段。</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">这是主流设计工具的组件逻辑，只是它写在 JSON 里。</p>
+
+  <img src="assets/editor-select.jpg" alt="选中一个组件实例后，右侧属性面板显示替换主组件、更新实例、解除关联" style="display:block;width:100%;height:auto;border-radius:6px;">
+  <p style="margin:8px 0 22px;font-size:12px;line-height:1.6;color:#9AA3AF;text-align:center;">▲ 选中一个实例：右侧直接出现「替换主组件 / 更新实例 / 解除关联」</p>
+
+  <img src="assets/kit-crop.jpg" alt="组件库页面：27 个组件母版平铺在画布上" style="display:block;width:100%;height:auto;border-radius:6px;">
+  <p style="margin:8px 0 28px;font-size:12px;line-height:1.6;color:#9AA3AF;text-align:center;">▲ 组件库页：27 个母版平铺，拖进画板就是实例</p>
+
+  <!-- 六 -->
+  <p style="margin:34px 0 16px;font-size:17px;line-height:1.5;font-weight:800;color:#111827;padding-left:11px;border-left:3px solid #3670F7;">交互也写在 JSON 里</p>
+
+  <div style="margin:0 0 18px;background:#F5F7FA;border:1px solid #EAEDF2;border-radius:6px;padding:12px 13px;">
+    <p style="margin:0;font-family:Menlo,Consolas,'Courier New',monospace;font-size:12px;line-height:1.8;color:#2F3542;word-break:break-all;">{ "click": { "action": "打开画板",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"target": "设备详情",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"anim": "左滑" } }</p>
+  </div>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">5 类触发（单击 / 悬停 / 按下 / 拖拽 / 滚动），5 种动作（打开画板 / 打开弹层 / 关闭弹层 / 返回上一页 / 切换变体）。弹层位置、遮罩浓度、转场动画、时长，都能写。</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">写完之后点右上角播放，就是一个能点的原型——不是一段录屏，也不是一条改不动的时间轴。</p>
+
+  <img src="assets/demo.jpg" alt="演示模式：屏幕上只显示一块手机画板，底部显示 1/3，点击即可跳转" style="display:block;width:100%;height:auto;border-radius:6px;">
+  <p style="margin:8px 0 28px;font-size:12px;line-height:1.6;color:#9AA3AF;text-align:center;">▲ 演示模式：一屏一块画板，点一下跳转，底部显示 1 / 3</p>
+
+  <!-- 七 -->
+  <p style="margin:34px 0 16px;font-size:17px;line-height:1.5;font-weight:800;color:#111827;padding-left:11px;border-left:3px solid #3670F7;">保存它自己会做</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">这一层听起来像魔术，其实用的是最朴素的办法。</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">保存时，编辑器用原始壳重建整个文件：只替换那段 JSON，其余字节原样保留，然后写回同一个文件。</p>
+
+  <div style="margin:0 0 22px;background:#F7F9FC;border-left:4px solid #3670F7;border-radius:0 8px 8px 0;padding:14px 16px;">
+    <p style="margin:0;font-size:15px;line-height:1.85;color:#4E5969;font-weight:700;letter-spacing:.2px;">副作用是：文件本身就是你的回滚点。</p>
+  </div>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">版本固定在你手上那份文件里，更新只在你主动点的时候发生。更关键的是：打开它不需要网络。断网、内网、发给客户，都一样。</p>
+
+  <!-- 八 -->
+  <p style="margin:34px 0 16px;font-size:17px;line-height:1.5;font-weight:800;color:#111827;padding-left:11px;border-left:3px solid #3670F7;">怎么拿到它</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">两种方式，拿到的都是同一个文件。</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">一是<span style="font-weight:700;color:#111827;">直接下初始文件</span>，双击即用，不装任何东西；想先看效果，就打开示例文档。</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">二是<span style="font-weight:700;color:#111827;">装成 Skill</span>：把目录放进 agent 的 skills 里，让它读 references/spec.md，写 spec.json，跑编译和校验，交付一份能改的原型。</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">SKILL.md 第一屏就写死了三条硬约束：图标必须是 SVG、重复 UI 必须用母版实例、颜色字号间距必须取 Element Plus / Ant Design 的 token。</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">换句话说，它约束的不是 AI 的自由度，是产物的下限。</p>
+
+  <!-- 九 -->
+  <p style="margin:34px 0 16px;font-size:17px;line-height:1.5;font-weight:800;color:#111827;padding-left:11px;border-left:3px solid #3670F7;">不装的地方</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">诚实地说几句。</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">它是 Canvas 渲染，不是 DOM，长文排版和富文本编辑不如浏览器原生；没有多人实时协作，协作方式就是把文件发过去；位图插画和复杂视觉仍要用 image 节点。</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">它是一个给人和 agent 改原型的工具，不是设计系统本身。</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">一个愿意把短板写进文档的项目，通常对自己的长处也更有底气。</p>
+
+  <!-- 十 -->
+  <p style="margin:34px 0 16px;font-size:17px;line-height:1.5;font-weight:800;color:#111827;padding-left:11px;border-left:3px solid #3670F7;">回到那句话</p>
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">一个反复被提起的标准：你能离开 AI 直接改产物，才谈得上真正拥有。</p>
+
+  <p style="margin:0 0 24px;font-size:15px;line-height:1.9;color:#3F3F3F;letter-spacing:.3px;text-align:justify;">prototype-html-builder 把它做成了文件——交到你手里的不是一个截图稿，是一个编辑器。</p>
+
+  <!-- 仓库 -->
+  <div style="margin:0 0 26px;border:1px solid #EAEDF2;background:#FCFCFD;border-radius:8px;padding:13px 12px;">
+    <p style="margin:0 0 4px;font-size:12px;color:#9AA3AF;letter-spacing:.08em;">GITHUB · 欢迎 Star</p>
+    <p style="margin:0;font-family:Menlo,Consolas,'Courier New',monospace;font-size:11px;line-height:1.7;color:#2A5FE8;word-break:break-all;">github.com/LabronGon/prototype-html-builder</p>
+  </div>
+
+  <!-- 文末标记 -->
+  <p style="margin:0;padding-top:18px;border-top:1px solid #EEF0F3;font-size:11px;letter-spacing:.14em;line-height:1.9;color:#98A2B3;text-align:center;">PROTOTYPE-HTML-BUILDER · 单文件原型引擎<br>218 图标 / 27 母版 / 0 外部依赖</p>
+
+</div>
+<!-- ============ 正文结束 ============ -->
+
+</body>
+</html>

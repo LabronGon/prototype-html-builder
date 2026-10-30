@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MasterGo 编辑器原型 · 1:1 像素复刻</title>
+<title>Prototype HTML 画布编辑器</title>
 <style>
-/* ============ 设计 Token（全部来自实测规格） ============ */
+/* ============ 设计 Token（统一设计规范） ============ */
 :root{
   --brand:#3670F7;
   --brand-ai:#3662EC;
@@ -72,7 +72,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)}
 .chev-btn{width:24px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-sm);color:var(--text-2)}
 .chev-btn:hover{background:var(--hover)}
 
-/* 中间工具组：555px 居中，中心偏移 -2px【实测】 */
+/* 中间工具组：555px 居中，中心偏移 -2px */
 .nav-tools{
   position:absolute;left:50%;top:8px;transform:translateX(-50%);margin-left:-2px;
   height:32px;display:flex;align-items:center;gap:4px;
@@ -90,7 +90,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)}
 .tool-btn:disabled{color:var(--text-dis)}
 .tool-btn:disabled:hover{background:transparent}
 .tool-divider{width:1px;height:16px;background:rgba(0,0,0,.12);margin:0 8px;flex:none}
-/* 矩形子工具角标 + 形状子菜单（对齐 MasterGo） */
+/* 矩形子工具角标 + 形状子菜单 */
 .sub-chev{
   position:absolute;right:2px;bottom:2px;width:10px;height:10px;border-radius:3px;
   display:flex;align-items:center;justify-content:center;color:var(--text-3);
@@ -119,7 +119,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)}
   pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .1s ease;
 }
 #tip.show{opacity:1}
-/* 评论 pin 与输入气泡（对齐 MasterGo 评论） */
+/* 评论 pin 与输入气泡（评论） */
 #commentBox{
   position:absolute;z-index:30;width:240px;background:#fff;border-radius:10px;
   box-shadow:var(--shadow-modal);border:1px solid var(--line-06);padding:10px;display:none;
@@ -141,7 +141,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)}
 #commentBox .cb-empty{padding:6px 0;font-size:11px;color:var(--text-3)}
 .tool-btn.ai{color:var(--brand-ai)}
 
-/* 右侧组【实测位置】 */
+/* 右侧组 */
 .nav-right{margin-left:auto;display:flex;align-items:center;gap:0}
 .btn-share{
   width:48px;height:30px;margin-left:38px;border-radius:var(--r-sm);
@@ -151,7 +151,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)}
 .btn-play{width:32px;height:32px;margin-left:20px;color:var(--text-1)}
 .zoom-btn{
   width:70px;height:32px;margin-left:8px;border-radius:var(--r-sm);
-  background:rgba(0,0,0,.04); /* V3 对齐 MasterGo：浅灰胶囊底 */
+  background:rgba(0,0,0,.04); /* V3 ：浅灰胶囊底 */
   display:flex;align-items:center;justify-content:center;gap:6px;
   font-size:12px;font-weight:500;color:var(--text-1);flex:none;
 }
@@ -246,7 +246,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)}
 .lrow .acts button{width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--text-2)}
 .lrow .acts button:hover{color:var(--text-1);background:var(--hover)}
 .lrow .acts button.on{color:var(--brand)}
-/* P12-B：图层拖拽排序（Penpot 三段落点：上/中/下） */
+/* P12-B：图层拖拽排序（三段落点：上/中/下） */
 .lrow{user-select:none}
 .lrow.dragging{opacity:.45}
 .lrow.drop-before{box-shadow:inset 0 2px 0 var(--brand)}
@@ -277,7 +277,7 @@ body.lay-drag{cursor:grabbing!important;user-select:none}
 #ctxBar .tool-btn:disabled{color:var(--text-dis)}
 #ctxBar i{width:1px;height:16px;background:rgba(0,0,0,.12);margin:0 3px;flex:none}
 
-/* 帮助按钮：视口右下内缩 18px【实测 1390,850】 */
+/* 帮助按钮：视口右下内缩 18px */
 .help-btn{
   position:fixed;right:18px;bottom:18px;width:32px;height:32px;z-index:20;
   border-radius:50%;background:#fff;border:1px solid var(--line-06);
@@ -305,7 +305,7 @@ body.lay-drag{cursor:grabbing!important;user-select:none}
 .file-menu button:hover{background:var(--fill)}
 .file-menu button i{margin-left:auto;font-style:normal;font-size:11px;color:var(--text-3);padding-left:24px}
 .file-menu hr{border:0;border-top:1px solid var(--line-06);margin:4px 8px}
-/* 主菜单（对齐 MasterGo：分组导航 + 二级子面板） */
+/* 主菜单（分组导航 + 二级子面板） */
 .file-menu.mmain{width:234px;padding:6px}
 .file-menu.mmain .mback{gap:8px;margin-bottom:2px}
 .file-menu .arr{margin-left:auto;color:var(--text-3);display:flex;align-items:center;flex:none}
@@ -321,11 +321,11 @@ body.lay-drag{cursor:grabbing!important;user-select:none}
 .file-menu .mrow.dis{color:var(--text-dis);cursor:default}
 /* 右键菜单（复用 file-menu 行样式） */
 .file-menu.cmenu{min-width:206px;z-index:85}
-/* P16：右键菜单分组标题 / 危险项（对齐 Penpot 分区） */
+/* P16：右键菜单分组标题 / 危险项（分区） */
 .file-menu.cmenu .mhead{padding:6px 12px 2px;font-size:11px;line-height:16px;font-weight:600;color:var(--text-3);letter-spacing:.02em}
 .file-menu.cmenu .mrow.danger{color:#F53F3F}
 .file-menu.cmenu .mrow.danger:hover{background:rgba(245,63,63,.08)}
-/* 左栏宽度拖拽（对齐 MasterGo：边缘拖拽调宽） */
+/* 左栏宽度拖拽（边缘拖拽调宽） */
 .left{position:relative}
 .vsplitter{position:absolute;top:0;right:-3px;width:7px;height:100%;cursor:col-resize;z-index:6}
 .vsplitter::after{content:"";position:absolute;top:0;bottom:0;left:3px;width:1px;background:transparent;transition:background .12s ease}
@@ -355,7 +355,7 @@ body.hide-ui .help-btn{display:none}
 /* ============ P2 演示模式 ============ */
 body.demo-mode .nav,body.demo-mode .left,body.demo-mode .right,
 body.demo-mode .help-btn{display:none}
-/* P20：演示顶栏（对齐 Penpot viewer header：返回 / 面包屑 / sitemap / 缩放 / 全屏 / 翻页） */
+/* P20：演示顶栏（返回 / 面包屑 / sitemap / 缩放 / 全屏 / 翻页） */
 #demoTop{display:none;position:fixed;top:0;left:0;right:0;height:48px;z-index:42;
   background:rgba(255,255,255,.96);box-shadow:0 1px 0 rgba(0,0,0,.08);
   align-items:center;gap:8px;padding:0 12px;backdrop-filter:blur(10px)}
@@ -381,7 +381,7 @@ body.demo-mode #demoTop{display:flex}
 #demoSitemap .ds-item{display:flex;align-items:center;gap:8px;width:100%;height:32px;padding:0 10px;border-radius:6px;font-size:12px;cursor:pointer;white-space:nowrap;text-align:left}
 #demoSitemap .ds-item:hover{background:var(--fill)}
 #demoSitemap .ds-item.on{color:var(--brand);font-weight:600}
-/* 底部缩略图条（对齐 Penpot viewer thumbnails） */
+/* 底部缩略图条 */
 #demoThumbsBar{display:none;position:fixed;left:0;right:0;bottom:0;height:82px;z-index:41;
   background:rgba(255,255,255,.96);box-shadow:0 -1px 0 rgba(0,0,0,.08);align-items:center;gap:8px;padding:0 12px}
 body.demo-mode #demoThumbsBar.open{display:flex}
@@ -453,7 +453,7 @@ body.demo-mode.thumbs-open #demoPageIdx{bottom:98px}
 }
 .panel{
   flex:1;min-height:0;overflow-y:auto;
-  padding:0 6px 90px 12px;   /* 内容区宽 234，底部留 90【实测】 */
+  padding:0 6px 90px 12px;   /* 内容区宽 234，底部留 90 */
 }
 .pw{padding:12px 0;border-bottom:1px solid var(--line-04)}
 .pw:last-child{border-bottom:0}
@@ -501,7 +501,7 @@ body.demo-mode.thumbs-open #demoPageIdx{bottom:98px}
 .fx-name{font-size:11px;font-weight:600;color:var(--text-2);flex:1}
 .fx-row{display:flex;align-items:center;gap:6px}
 
-/* 封面：234×132 直角【实测】 */
+/* 封面：234×132 直角 */
 .cover-thumb{
   width:234px;height:132px;position:relative;overflow:hidden;
   background:#F5F7FA;border-radius:0;
@@ -511,13 +511,13 @@ body.demo-mode.thumbs-open #demoPageIdx{bottom:98px}
 .cover-link button{font-size:12px;font-weight:600;color:var(--text-2)}
 .cover-link button:hover{color:var(--text-1)}
 
-/* 标签色点：24 容器 + 14 内圆，节距 34.2【实测】 */
+/* 标签色点：24 容器 + 14 内圆，节距 34.2 */
 .dots{display:flex;flex-wrap:wrap;gap:10px;padding:3px 0}
 .dot24{width:24px;height:24px;padding:5px;border-radius:50%;cursor:pointer}
 .dot24:hover{background:var(--fill)}
 .dot24 i{display:block;width:14px;height:14px;border-radius:50%}
 
-/* P24：数值输入（对齐 MasterGo：图标区可拖拽，文本区只输入） */
+/* P24：数值输入（图标区可拖拽，文本区只输入） */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .fld{
   position:relative;height:28px;border-radius:4px;
@@ -605,7 +605,7 @@ body.demo-mode.thumbs-open #demoPageIdx{bottom:98px}
 /* P23：顶栏保存按钮间距 */
 #btnSave{margin-left:8px}
 #btnSaveAs{margin-left:2px}
-/* P23：原型交互卡片（对齐 Penpot 分段式表单） */
+/* P23：原型交互卡片（分段式表单） */
 .proto-card{border:1px solid var(--line-06);border-radius:6px;padding:8px;margin-bottom:8px;display:flex;flex-direction:column;gap:6px}
 .proto-card .pc-head{display:flex;align-items:center;gap:6px}
 .proto-card .pc-head b{flex:1;font-size:11px;font-weight:600;color:var(--text-2)}
@@ -633,7 +633,7 @@ select.fld-sel:focus{background:#fff;box-shadow:inset 0 0 0 1px var(--brand)}
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* 滚动条 8px【实测】 */
+/* 滚动条 8px */
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-thumb{background:rgba(0,0,0,.2);border-radius:4px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -1277,8 +1277,7 @@ body[data-theme=dark] ::-webkit-scrollbar-thumb:active{background:rgba(255,255,2
 <script>
 'use strict';
 /* ================================================================
- * MasterGo 编辑器 1:1 像素复刻原型
- * 规格来源：MasterGo-编辑器-像素级UI规格.md（全部实测值）
+ * Prototype HTML 画布编辑器
  * ================================================================ */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const BRAND='#3670F7', PINK='#F24E8A';
@@ -1657,7 +1656,7 @@ function updateBoolTools(){
 }
 buildTools();
 
-/* ---------------- 工具下拉子菜单（形状/文本，对齐 MasterGo：长按/角标/键盘导航） ---------------- */
+/* ---------------- 工具下拉子菜单（形状/文本，长按/角标/键盘导航） ---------------- */
 const SUB_SHAPES=[
   {k:'rect',ic:'rect',nm:'矩形',key:'R'},
   {k:'line',ic:'line',nm:'直线',key:'L'},
@@ -1702,7 +1701,7 @@ function pickFrom(menu,items,k){
   if(menu===shapeMenu)curShape=k;else curText=k;
   anchor.innerHTML=icon(s.ic,16)+'<span class="sub-chev">'+icon('chevD',9)+'</span>';
   anchor.dataset.tip=s.nm+' '+(s.key||'');
-  setTool(k);anchor.classList.add('active');closeMenu(); // 子项切换后主按钮保持高亮（对齐 MasterGo）
+  setTool(k);anchor.classList.add('active');closeMenu(); // 子项切换后主按钮保持高亮
 }
 function pickShape(k){pickFrom(shapeMenu,SUB_SHAPES,k)}
 function pickText(k){pickFrom(textMenu,SUB_TEXTS,k)}
@@ -1714,7 +1713,7 @@ document.addEventListener('click',e=>{
   if(!activeMenu)return;
   if(!e.target.closest('#shapeMenu,#textMenu')&&!e.target.closest('[data-tool="rect"],[data-tool="text"]'))closeMenu();
 });
-/* 长按带子菜单的按钮 350ms 展开（对齐 MasterGo 长按行为） */
+/* 长按带子菜单的按钮 350ms 展开（长按行为） */
 let holdT=null,holdFired=false;
 document.addEventListener('pointerdown',e=>{
   const rb=e.target.closest('[data-tool="rect"],[data-tool="text"]');
@@ -1727,7 +1726,7 @@ document.addEventListener('pointerdown',e=>{
   },350);
 });
 document.addEventListener('pointerup',()=>{clearTimeout(holdT)});
-/* 主按钮点击：长按已展开则抑制本次 click；点击角标（MasterGo 交互）展开/收起子菜单 */
+/* 主按钮点击：长按已展开则抑制本次 click；点击角标（交互）展开/收起子菜单 */
 $('#tools').addEventListener('click',e=>{
   const rb=e.target.closest('[data-tool="rect"],[data-tool="text"]');
   if(!rb)return;
@@ -1739,7 +1738,7 @@ $('#tools').addEventListener('click',e=>{
   }
 },true);
 
-/* ---------------- 图片子项：文件选择 → 插入画布（对齐 MasterGo） ---------------- */
+/* ---------------- 图片子项：文件选择 → 插入画布 ---------------- */
 const imgInput=document.createElement('input');
 imgInput.type='file';imgInput.accept='image/*';imgInput.style.display='none';
 document.body.appendChild(imgInput);
@@ -1769,7 +1768,7 @@ function insertImage(src){
   state.sel.clear();state.sel.add(n.id);setTool('select');syncSelection();snapshot();drawSoon();
 }
 
-/* ---------------- 评论工具（对齐 MasterGo：画布打点 pin + 输入气泡） ---------------- */
+/* ---------------- 评论工具（画布打点 pin + 输入气泡） ---------------- */
 /* P27：评论按页面存放在 page.comments 中，随 __doc 一起保存/撤销，不再只是运行时数据 */
 const pageComments=()=>{const pg=curPage();if(!Array.isArray(pg.comments))pg.comments=[];return pg.comments};
 let cmtOpen=null;
@@ -1851,7 +1850,7 @@ $('#cmtDel').addEventListener('click',()=>{
   cmtOpen=null;$('#commentBox').style.display='none';snapshot();drawSoon(); // P27：删除持久化
 });
 
-/* ---------------- 自定义 tooltip（对齐 MasterGo 深色延迟气泡） ---------------- */
+/* ---------------- 自定义 tooltip（深色延迟气泡） ---------------- */
 const tipEl=document.createElement('div');
 tipEl.id='tip';
 document.body.appendChild(tipEl);
@@ -1977,7 +1976,7 @@ bindSearchClear($('#layerSearch').closest('.search-box'));
   });
 })();
 
-/* ---------------- 右键菜单（对齐 MasterGo：空白/元素/画板/页面树 各自不同项，仅收录已实现能力） ---------------- */
+/* ---------------- 右键菜单（空白/元素/画板/页面树 各自不同项，仅收录已实现能力） ---------------- */
 const ctxMenu=$('#ctxMenu');
 function ctxClose(){ctxMenu.hidden=true}
 function ctxShow(x,y,items){
@@ -2115,7 +2114,7 @@ function renameNodeInline(n){
   });
   inp.addEventListener('blur',()=>commit(true));
 }
-/* P21：复制/粘贴图层属性（对齐 Penpot Copy / Paste properties） */
+/* P21：复制/粘贴图层属性（Copy / Paste properties） */
 let propClip=null;
 const PROP_KEYS=['fill','fills','stroke','strokeW','strokeAlign','opacity','radius','rc','effects'];
 const PROP_TEXT_KEYS=['fontSize','fontWeight','color','align'];
@@ -2138,7 +2137,7 @@ function pasteProps(){
   afterChange();renderPanel();toast('已粘贴属性');
 }
 
-/* P21：查找 / 替换浮层（对齐 Penpot Edit > Find） */
+/* P21：查找 / 替换浮层（Edit > Find） */
 const findBar=$('#findBar'),findQ=$('#findQ'),findR=$('#findR'),findCount=$('#findCount');
 let findHits=[],findIdx=-1;
 function findMatches(q){
@@ -2203,7 +2202,7 @@ $('#findNext').addEventListener('click',()=>findStep(1));
 $('#findAll').addEventListener('click',replaceAll);
 $('#findClose').innerHTML=icon('x',14);
 $('#findClose').addEventListener('click',closeFind);
-/* P21：隐藏 UI（对齐 Penpot View > Hide UI） */
+/* P21：隐藏 UI（View > Hide UI） */
 function toggleHideUI(){
   state.hideUI=!state.hideUI;
   document.body.classList.toggle('hide-ui',state.hideUI);
@@ -2214,7 +2213,7 @@ function toggleHideUI(){
 function nodeContextItems(n){
   const isAb=n.type==='artboard';
   const canGroup=selNodes().filter(x=>x.type!=='artboard').length>1;
-  /* P16：按 Penpot 分区（层级 / 组织 / 显示 / 视图导出 / 危险操作），仅收录已实现能力 */
+  /* P16：按功能分区（层级 / 组织 / 显示 / 视图导出 / 危险操作），仅收录已实现能力 */
   const items=[{head:'编辑'},
     {label:'剪切',kbds:['Ctrl','X'],act:()=>copySel(true)},
     {label:'复制',kbds:['Ctrl','C'],act:()=>copySel()},
@@ -2377,7 +2376,7 @@ function layerRow(n,depth,hasKids,open,onToggle){
       afterChange();return;
     }
     if(e.target.closest('.lc')&&hasKids&&onToggle){onToggle();return}
-    // P14：Ctrl 加选 / Shift 范围选择（对齐 Penpot 图层面板）
+    // P14：Ctrl 加选 / Shift 范围选择（图层面板）
     if(e.shiftKey){
       const ids=[...$$('#layerList .lrow')].map(r=>r.dataset.nid);
       if(layerAnchor&&ids.includes(layerAnchor)){
@@ -2434,7 +2433,7 @@ window.addEventListener('pointermove',e=>{
   if(!row||row===layerDrag.row)return;
   const t=nodeById(row.dataset.nid);if(!t)return;
   const r=row.getBoundingClientRect(),ratio=(e.clientY-r.top)/r.height;
-  // 画板整行都是"拖入"；组中间区域=拖入组，上下 1/4=插入；普通图层按上下半区分（对齐 Penpot dnd-over）
+  // 画板整行都是"拖入"；组中间区域=拖入组，上下 1/4=插入；普通图层按上下半区分（dnd-over）
   const zone=t.type==='artboard'?'inside':
     t.type==='group'?(ratio>.25&&ratio<.75?'inside':(ratio<=.25?'before':'after')):
     (ratio<.5?'before':'after');
@@ -2856,7 +2855,7 @@ function renderPanel(){
     return;
   }
   if(rtab==='proto'){
-    /* P23：原型面板对齐 Penpot——交互卡片分段（触发/动作/目标/动画），画板支持流程起点 */
+    /* P23：原型面板——交互卡片分段（触发/动作/目标/动画），画板支持流程起点 */
     const n=single();
     const isLayer=!!(n&&n.type!=='artboard'&&(n.type!=='group'||isInstanceContainer(n))); // P32：实例容器可作为交互热区
     const abs=curPage().artboards;
@@ -3044,7 +3043,7 @@ function renderPanel(){
       `<div class="corner-grid"><div class="fld"><b>↖</b><input data-k="rtl" value="${Math.round(rs[0])}"></div><div class="fld"><b>↗</b><input data-k="rtr" value="${Math.round(rs[1])}"></div>`+
       `<div class="fld"><b>↙</b><input data-k="rbl" value="${Math.round(rs[3])}"></div><div class="fld"><b>↘</b><input data-k="rbr" value="${Math.round(rs[2])}"></div></div>`);
   })():'';
-  /* P10：类型专属字段（对齐 MasterGo）——线类：方向；多边形：边数；星形：角数；线类无填充 */
+  /* P10：类型专属字段——线类：方向；多边形：边数；星形：角数；线类无填充 */
   const isLine=n.type==='line'||n.type==='arrow';
   const isIcon=n.type==='svg';
   const noFill=isLine||n.type==='image'||isIcon; // 线类、图片与图标无填充区段
@@ -3052,7 +3051,7 @@ function renderPanel(){
     ?sec('方向',`<div class="grid2"><select class="fld-sel" data-k="dir"><option value="\\" ${n.dir!=='/'?'selected':''}>↘ 左上-右下</option><option value="/" ${n.dir==='/'?'selected':''}>↗ 左下-右上</option></select></div>`)
     :n.type==='polygon'?sec('边数',`<div class="grid2">${fld('sides','S',n.sides||3)}</div>`)
     :n.type==='star'?sec('角数',`<div class="grid2">${fld('points','P',n.points||5)}</div>`):'';
-  /* 文本：字号/字重/对齐（MasterGo 文本区段，仅保留已实现能力） */
+  /* 文本：字号/字重/对齐（文本区段，仅保留已实现能力） */
   const textHtml=isText?sec('文本',
     `<div class="grid2">${fld('fontSize',icon('fsz',14),n.fontSize)}<select class="fld-sel" data-k="fontWeight">${
       [[400,'常规'],[500,'中等'],[600,'半粗'],[700,'粗体']].map(([w,t])=>`<option value="${w}" ${(+n.fontWeight===w)?'selected':''}>${t}</option>`).join('')
@@ -3568,7 +3567,7 @@ function bindScrub(inp,k,n,nodes){
   });
 }
 function applyField(k,v,n,nodes){
-  /* P20：数值表达式（对齐 Penpot 的 + - * / 与括号） */
+  /* P20：数值表达式（的 + - * / 与括号） */
   const raw=String(v==null?'':v).trim();
   let num=parseFloat(raw);
   if(/^[\d+\-*/().\s]+$/.test(raw)&&/[+\-*/]/.test(raw)){
@@ -3687,7 +3686,7 @@ $$('[data-rtab]').forEach(b=>b.addEventListener('click',()=>{
   window.addEventListener('pointermove',e=>{if(!on)return;tree.style.height=Math.max(120,Math.min(700,sh+e.clientY-sy))+'px'});
   window.addEventListener('pointerup',()=>on=false);
 })();
-/* 左栏宽度拖拽（对齐 MasterGo：拖动面板右缘调宽，画布自动回流） */
+/* 左栏宽度拖拽（拖动面板右缘调宽，画布自动回流） */
 (()=>{
   const vs=$('#vsplitter'),left=document.querySelector('.left');let sx=0,sw=0,on=false;
   vs.addEventListener('pointerdown',e=>{on=true;sx=e.clientX;sw=left.offsetWidth;e.preventDefault()});
@@ -3776,7 +3775,7 @@ function setViewRot(deg){
 /* ---------------- P12-C：标尺 / 参考线 / 像素网格 ---------------- */
 const RULER=20, GUIDE_COL='#00B6EB', GRID_Z=5; // 标尺条宽；参考线颜色；像素网格触发缩放
 function pageGuides(){const p=curPage();if(!p.guides)p.guides=[];return p.guides}
-/* 标尺主刻度：保证标签间距 ≥64px（Penpot 同思路，取 1/2/5×10^n） */
+/* 标尺主刻度：保证标签间距 ≥64px（同思路，取 1/2/5×10^n） */
 function rulerStep(){
   const steps=[1,2,5,10,20,50,100,200,500,1000,2000,5000,10000];
   for(const s of steps)if(s*cam.z>=64)return s;
@@ -3898,7 +3897,7 @@ function drawPixelGrid(w,h){
     let col='0,0,0';
     if(m6){const v=parseInt(m6[1],16),r=(v>>16)&255,g=(v>>8)&255,b=v&255;
       if((r*299+g*587+b*114)/1000<128)col='255,255,255'}
-    /* 细线每 step，主网格线每 5×step（Penpot 同款深浅分层） */
+    /* 细线每 step，主网格线每 5×step（同款深浅分层） */
     for(const [mul,alpha] of [[1,.07],[5,.16]]){
       const st=step*mul;
       ctx.strokeStyle=`rgba(${col},${alpha})`;ctx.lineWidth=1;ctx.beginPath();
@@ -4029,7 +4028,7 @@ function measureText(t){
   if('letterSpacing' in ctx)ctx.letterSpacing='0px';
   return{w,h:lines.length*lineHeightOf(t),lines};
 }
-/* 画板名称标签：命中区 + 悬停/选中 chip（拖标签移动整块画板，对齐 MasterGo） */
+/* 画板名称标签：命中区 + 悬停/选中 chip（拖标签移动整块画板，） */
 let hoverLabelId=null;
 function abLabelRect(ab){
   const s=w2s(ab.x,ab.y);
@@ -4065,7 +4064,7 @@ function draw(){
     if(ab.hidden)continue; // 隐藏画板整块不绘制（含名称标签）
     const s=w2s(ab.x,ab.y),sw=ab.w*cam.z,sh=ab.h*cam.z;
     if(s.x>w+cullM||s.y>h+cullM||s.x+sw<-cullM||s.y+sh<-cullM)continue;
-    // 画板标签：上方 6px，12px；选中/悬停淡蓝 chip 底（对齐 MasterGo）
+    // 画板标签：上方 6px，12px；选中/悬停淡蓝 chip 底
     ctx.font=`500 12px ${FONT}`;
     const lblSel=state.sel.has(ab.id),lblHov=hoverLabelId===ab.id;
     if(lblSel||lblHov){
@@ -4188,7 +4187,7 @@ function draw(){
   const zl=$('#zoomLabel'),txt=Math.round(cam.z*100)+'%';
   if(zl.textContent!==txt)zl.textContent=txt;
 }
-/* ---------------- P12-A：画布徽标 / 移动间距（对齐 Penpot measurements / snap-distances） ---------------- */
+/* ---------------- P12-A：画布徽标 / 移动间距（measurements / snap-distances） ---------------- */
 function drawBadge(cx,cy,text,bg){
   ctx.font=`500 11px ${FONT}`;
   const bw=Math.round(ctx.measureText(text).width)+12,bh=16;
@@ -4592,7 +4591,7 @@ function drawHandlesRect(r,rot){
     ctx.fillRect(h.x-4,h.y-4,8,8);ctx.strokeRect(h.x-4,h.y-4,8,8);
   }
 }
-/* 旋转光标：角外 20px 热区（对齐 Penpot rotation-handler-size） */
+/* 旋转光标：角外 20px 热区（rotation-handler-size） */
 const ROT_CURSOR=`url("data:image/svg+xml;charset=utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5.5" fill="none" stroke="#fff" stroke-width="3.2"/><circle cx="10" cy="10" r="5.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-dasharray="7.5 4"/><path d="M16.2 6.4l-1.9 1.1 2 1.4" fill="#1a1a1a"/></svg>')}") 10 10, crosshair`;
 /* P12-D：缩放工具光标（放大镜 + 十字） */
 const ZOOM_CURSOR=`url("data:image/svg+xml;charset=utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5" fill="rgba(255,255,255,.85)" stroke="#1a1a1a" stroke-width="1.6"/><path d="M15 15l5 5" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round"/><path d="M7 10h6M10 7v6" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round"/></svg>')}") 10 10, crosshair`;
@@ -4738,7 +4737,7 @@ function hitHandle(sx,sy){
   }
   return null;
 }
-/* P22：直线/箭头端点（世界坐标），对齐 Penpot 两端可拖拽调整长度与角度 */
+/* P22：直线/箭头端点（世界坐标）， 两端可拖拽调整长度与角度 */
 function lineEndsWorld(n){
   const r=worldRect(n),slash=n.dir==='/';
   return slash
@@ -4827,7 +4826,7 @@ function updateCursor(force){
 }
 
 canvas.addEventListener('mousedown',e=>{
-  // BUG-2 修复：阻止 mousedown 默认夺焦，保证文本工具单击创建后编辑气泡不被 blur 关闭（与 MasterGo/Figma 一致）
+  // BUG-2 修复：阻止 mousedown 默认夺焦，保证文本工具单击创建后编辑气泡不被 blur 关闭（与主流设计工具一致）
   e.preventDefault();
 });
 canvas.addEventListener('pointerdown',e=>{
@@ -4917,7 +4916,7 @@ canvas.addEventListener('pointerdown',e=>{
   // 选择工具
   const pinHit=hitComment(sx,sy);
   if(pinHit){openCommentBox(pinHit);return} // P11：选择工具下点击评论 pin 打开气泡
-  const lbl=hitAbLabel(sx,sy); // 画板名称标签：拖动移动整块画板（对齐 MasterGo）
+  const lbl=hitAbLabel(sx,sy); // 画板名称标签：拖动移动整块画板
   if(lbl){
     state.sel.clear();state.sel.add(lbl.id);syncSelection();
     mode='moveAb';
@@ -4971,7 +4970,7 @@ canvas.addEventListener('pointerdown',e=>{
     // P14：点到已进入组之外的对象时自动退出组
     if(state.enterGroup.length&&(hit.type==='artboard'||!insideEntered(hit)))state.enterGroup=[];
     /* BUG-3 修复：画板命中但未选中时不立即选中——先挂起 abPress：
-       单击（松手未拖）= 选中画板；按下后拖拽 = 框选（对齐 Figma/MasterGo 习惯） */
+       单击（松手未拖）= 选中画板；按下后拖拽 = 框选（/ 习惯） */
     if(hit.type==='artboard'&&!state.sel.has(hit.id)&&!e.shiftKey){
       mode='abPress';start={sx,sy,moved:false,ab:hit};return;
     }
@@ -5055,7 +5054,7 @@ canvas.addEventListener('pointermove',e=>{
   if(mode==='move'){
     let dwx=dxu/cam.z,dwy=dyu/cam.z;
     const nodes=selNodes();
-    /* P15：Shift 约束拖拽方向（锁定水平/垂直，对齐 Penpot） */
+    /* P15：Shift 约束拖拽方向（锁定水平/垂直，） */
     const lock=e.shiftKey;
     if(lock){
       if(Math.abs(dwx)>=Math.abs(dwy))dwy=0;else dwx=0;
@@ -5092,7 +5091,7 @@ canvas.addEventListener('pointermove',e=>{
     let mx=dxu/cam.z,my=dyu/cam.z;
     if(e.shiftKey){if(Math.abs(mx)>=Math.abs(my))my=0;else mx=0;} // P15：Shift 约束方向
     let x=start.ox+mx,y=start.oy+my;
-    /* P23：画板移动吸附其他画板的左/中/右、上/中/下，并显示吸附辅助线（对齐 Penpot） */
+    /* P23：画板移动吸附其他画板的左/中/右、上/中/下，并显示吸附辅助线 */
     let snapX=0,snapY=0,gt=[];guides=[];
     if(!e.altKey&&!e.shiftKey){
       const cand=abGuides(ab);
@@ -5769,7 +5768,7 @@ window.addEventListener('keydown',e=>{
     }
     if(e.code==='Digit0'){e.preventDefault();setViewRot(0);return}
   }
-  /* P10/P11：子菜单键盘导航（对齐 MasterGo：↑↓ 移动、Enter 选中、Esc 关闭），作用于当前打开的菜单 */
+  /* P10/P11：子菜单键盘导航（↑↓ 移动、Enter 选中、Esc 关闭），作用于当前打开的菜单 */
   if(activeMenu){
     const items=[...activeMenu.querySelectorAll('.smi')];
     if(e.key==='ArrowDown'||e.key==='ArrowUp'){
@@ -5791,7 +5790,7 @@ window.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&!findBar.hidden){closeFind();return}
   if(e.key==='Escape'&&!$('#exportDlg').hidden){closeExportDlg();return}
   if(e.key==='Escape'){
-    /* P15：Esc 取消进行中的拖拽/创建，恢复起始几何（对齐 Penpot） */
+    /* P15：Esc 取消进行中的拖拽/创建，恢复起始几何 */
     if(mode){
       if(mode==='create'||mode==='createAb'){preview=null;setTool('select')}
       else if(mode==='move'&&start&&start.pos){
@@ -5824,7 +5823,7 @@ window.addEventListener('keydown',e=>{
     else if(state.sel.size){state.sel.clear();syncSelection()}
     return;
   }
-  /* P12-A：方向键微调（1px，Shift/Alt 10px）——对齐 Penpot nudge */
+  /* P12-A：方向键微调（1px，Shift/Alt 10px）—— nudge */
   if(e.key.startsWith('Arrow')){
     const ns=effectiveSel();
     if(ns.length){
@@ -5847,11 +5846,11 @@ window.addEventListener('keydown',e=>{
   /* P12-C：Shift+G 像素网格 / Shift+R 参考线 */
   if(!e.ctrlKey&&!e.metaKey&&e.shiftKey&&key==='g'){state.pixelGrid=!state.pixelGrid;drawSoon();return}
   if(!e.ctrlKey&&!e.metaKey&&e.shiftKey&&key==='r'){state.showGuides=!state.showGuides;drawSoon();return}
-  /* P31：Shift+D 深浅主题 / Ctrl+Alt+K 创建组件（对齐 Penpot） */
+  /* P31：Shift+D 深浅主题 / Ctrl+Alt+K 创建组件 */
   if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&e.shiftKey&&key==='d'){e.preventDefault();toggleTheme();return}
   if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&e.shiftKey&&key==='h'){e.preventDefault();setHotspots(!protoShow);return}
   if((e.ctrlKey||e.metaKey)&&e.altKey&&key==='k'){e.preventDefault();createComponent(single());return}
-  /* P15：字母快捷键并轨 Penpot（V/B/R/E/T/P/L/C），并保留 F/O/A/H/Z 旧别名 */
+  /* P15：字母快捷键并轨主流设计工具（V/B/R/E/T/P/L/C），并保留 F/O/A/H/Z 旧别名 */
   const map={v:'select',b:'frame',f:'frame',r:'rect',e:'ellipse',o:'ellipse',t:'text',p:'para',a:'para',l:'line',h:'hand',z:'zoom',c:'comment'};
   if(map[key]&&!e.ctrlKey&&!e.metaKey){
     const k=map[key];
@@ -5864,7 +5863,7 @@ window.addEventListener('keydown',e=>{
   /* P14：Ctrl+G 编组 / Ctrl+Shift+G 解组 / Ctrl+A 全选（顶层图层） */
   if((e.ctrlKey||e.metaKey)&&key==='g'){e.preventDefault();e.shiftKey?ungroupSelection():groupSelection();return}
   if((e.ctrlKey||e.metaKey)&&key==='a'){e.preventDefault();selectAllAll();return}
-  /* P20：层级快捷键 Ctrl+] / Ctrl+[，加 Shift 直接置顶/置底（对齐 Penpot） */
+  /* P20：层级快捷键 Ctrl+] / Ctrl+[，加 Shift 直接置顶/置底 */
   if((e.ctrlKey||e.metaKey)&&(e.key===']'||e.key==='[')){
     e.preventDefault();
     zorder(e.key===']'?(e.shiftKey?'top':'up'):(e.shiftKey?'bottom':'down'));
@@ -6046,7 +6045,7 @@ function setFileName(n){
   fileName=n;
   refreshDocTitle();
 }
-/* 文件名点击重命名（对齐 MasterGo：仅标题，无团队面包屑） */
+/* 文件名点击重命名（仅标题，无团队面包屑） */
 (function initFileRename(){
   const span=$('#fileName'),inp=$('#fileRename');
   const open=()=>{inp.value=docTitle||DEFAULT_NAME;span.style.display='none';inp.style.display='block';inp.focus();inp.select()};
@@ -6396,7 +6395,7 @@ function demoExit(){
   if(document.fullscreenElement)document.exitFullscreen&&document.exitFullscreen();
   canvas.style.cursor='';
   state.sel.clear();syncSelection();
-  const pc=demo.preCam; // 恢复进入演示前的视角（对齐 MasterGo，不再停留在演示态缩放）
+  const pc=demo.preCam; // 恢复进入演示前的视角（，不再停留在演示态缩放）
   viewRot=demo.preRot||0; // P28：恢复视图旋转
   if(pc){cam.x=pc.x;cam.y=pc.y;cam.z=pc.z;drawSoon()}else fitView();
 }
@@ -6406,7 +6405,7 @@ function demoFit(){
 }
 /* P20：演示缩放（在 fit 基础上按倍率缩放，锚定画板中心） */
 function demoCamFor(ab,w,h){
-  /* 顶栏 48px + 底部缩略图条 82px 不遮挡画板（对齐 Penpot viewer 的可用视口） */
+  /* 顶栏 48px + 底部缩略图条 82px 不遮挡画板（viewer 的可用视口） */
   const top=52,bot=$('#demoThumbsBar').classList.contains('open')?86:8;
   const availH=Math.max(180,h-top-bot);
   const base=fitCam(ab,Math.max(200,w-24),availH),z=base.z*demo.zoom;
@@ -6459,7 +6458,7 @@ function demoHistPush(pos){
 function demoJumpTo(i,anim,dur,ease){
   const seq=demoSeq();
   if(i<0||i>=seq.length)return;
-  demo.overlays=[]; // 切换画板时关闭所有弹层（对齐 Penpot）
+  demo.overlays=[]; // 切换画板时关闭所有弹层
   demo.from=demo.pos;demo.pos=i;demo.hover=null;
   demo.dur=dur||DEMO_DUR;demo.ease=ease||'缓出';
   if(anim&&anim!=='无'){demo.anim=anim;demo.t0=performance.now()}
@@ -6571,7 +6570,7 @@ function demoPaintOverlay(g,w,h,p){
 }
 /* 演示帧绘制：active 画板满幅适配；过渡期间 old→new 屏幕位移/淡入 */
 function paintDeviceFrame(ab,s,sw,sh){
-  /* P26：按画板尺寸推断设备类型，在演示里绘制手机/桌面外框（参考 Penpot viewer） */
+  /* P26：按画板尺寸推断设备类型，在演示里绘制手机/桌面外框 */
   const phone=ab.w<=560;
   const b=phone?9:7;
   const r1=phone?Math.min(26,(sw+b*2)*.11):Math.max(6,Math.min(14,sh*.03));
