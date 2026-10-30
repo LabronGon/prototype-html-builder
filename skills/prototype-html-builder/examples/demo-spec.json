@@ -1,0 +1,104 @@
+{
+  "name": "选矿设备管理",
+  "theme": "light",
+  "kit": true,
+  "components": [
+    {
+      "id": "device-row",
+      "name": "设备行",
+      "w": 343,
+      "h": 64,
+      "nodes": [
+        { "type": "rect", "name": "底", "x": 0, "y": 0, "w": 343, "h": 64, "fill": "#FFFFFF", "radius": 8 },
+        { "type": "rect", "name": "图标底", "x": 12, "y": 12, "w": 40, "h": 40, "fill": "#EBF1FE", "radius": 8 },
+        { "type": "icon", "name": "图标", "icon": "ep/cpu", "size": 20, "x": 22, "y": 22, "color": "#3670F7" },
+        { "type": "text", "name": "名称", "x": 64, "y": 13, "text": "设备名称", "fontSize": 14, "fontWeight": 600, "color": "#1F2329" },
+        { "type": "text", "name": "状态", "x": 64, "y": 35, "text": "运行中 · 负载 72%", "fontSize": 12, "fontWeight": 400, "color": "#86909C" },
+        { "type": "icon", "name": "进入", "icon": "ep/arrow-right", "size": 16, "x": 315, "y": 24, "color": "#C9CDD4" }
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "设备总览",
+      "bg": "#F5F7FA",
+      "artboards": [
+        {
+          "name": "设备列表",
+          "x": 0, "y": 0, "w": 375, "h": 812, "bg": "#F5F7FA",
+          "nodes": [
+            { "type": "instance", "comp": "statusbar", "x": 0, "y": 0 },
+            { "type": "instance", "comp": "navbar", "x": 0, "y": 44,
+              "overrides": { "标题": { "text": "设备管理" } },
+              "click": { "action": "打开画板", "target": "设备详情" } },
+            { "type": "instance", "comp": "searchbar", "x": 16, "y": 112,
+              "overrides": { "占位": { "text": "搜索设备名称 / 编号" } } },
+            { "type": "instance", "comp": "stat-card", "x": 16, "y": 164,
+              "overrides": { "指标名": { "text": "设备总数" }, "数值": { "text": "1,286" } } },
+            { "type": "text", "name": "分组标题", "x": 16, "y": 284, "text": "运行中的设备", "fontSize": 13, "fontWeight": 600, "color": "#4E5969" },
+            { "type": "instance", "comp": "device-row", "x": 16, "y": 310,
+              "overrides": { "名称": { "text": "1# 球磨机 MQG-2130" }, "状态": { "text": "运行中 · 负载 72%" }, "图标": { "icon": "ep/cpu" } },
+              "click": { "action": "打开画板", "target": "设备详情" } },
+            { "type": "instance", "comp": "device-row", "x": 16, "y": 382,
+              "overrides": { "名称": { "text": "2# 破碎机 PE-750" }, "状态": { "text": "运行中 · 负载 64%" }, "图标": { "icon": "ep/operation" } },
+              "click": { "action": "打开画板", "target": "设备详情" } },
+            { "type": "instance", "comp": "device-row", "x": 16, "y": 454,
+              "overrides": { "名称": { "text": "3# 磁选机 CTB-1024" }, "状态": { "text": "待机 · 今日停机 2h" }, "图标": { "icon": "ep/connection" } },
+              "click": { "action": "打开画板", "target": "设备详情" } },
+            { "type": "instance", "comp": "device-row", "x": 16, "y": 526,
+              "overrides": { "名称": { "text": "4# 浮选机 XCF-8" }, "状态": { "text": "告警 · 温度偏高", "color": "#F53F3F" }, "图标": { "icon": "ep/warning" } },
+              "click": { "action": "打开画板", "target": "设备详情" } },
+            { "type": "instance", "comp": "tabbar", "x": 0, "y": 729 }
+          ]
+        },
+        {
+          "name": "设备详情",
+          "x": 480, "y": 0, "w": 375, "h": 812, "bg": "#FFFFFF",
+          "nodes": [
+            { "type": "instance", "comp": "statusbar", "x": 0, "y": 0 },
+            { "type": "instance", "comp": "navbar", "x": 0, "y": 44,
+              "overrides": { "标题": { "text": "设备详情" } } },
+            { "type": "rect", "name": "返回热区", "x": 0, "y": 44, "w": 56, "h": 56, "fill": "#00000000",
+              "click": { "action": "返回上一页" } },
+            { "type": "instance", "comp": "card", "x": 16, "y": 112,
+              "overrides": { "标题": { "text": "1# 球磨机 MQG-2130" }, "描述": { "text": "选矿一车间 · 2019 年投运" } } },
+            { "type": "icon", "name": "温度图标", "icon": "ep/sunny", "size": 16, "x": 32, "y": 288, "color": "#86909C" },
+            { "type": "text", "name": "温度", "x": 56, "y": 286, "text": "轴承温度 68℃", "fontSize": 13, "color": "#1F2329" },
+            { "type": "icon", "name": "转速图标", "icon": "ep/refresh", "size": 16, "x": 32, "y": 318, "color": "#86909C" },
+            { "type": "text", "name": "转速", "x": 56, "y": 316, "text": "转速 1,240 r/min", "fontSize": 13, "color": "#1F2329" },
+            { "type": "icon", "name": "负载图标", "icon": "ep/trend-charts", "size": 16, "x": 32, "y": 348, "color": "#86909C" },
+            { "type": "text", "name": "负载", "x": 56, "y": 346, "text": "负载率 72%", "fontSize": 13, "color": "#1F2329" },
+            { "type": "instance", "comp": "progress", "x": 16, "y": 380 },
+            { "type": "instance", "comp": "btn-primary", "x": 16, "y": 424,
+              "overrides": { "文字": { "text": "查看实时曲线" } },
+              "click": { "action": "打开弹层", "target": "实时曲线", "opos": "底部", "dim": 40, "anim": "上滑" } },
+            { "type": "instance", "comp": "list-item", "x": 0, "y": 484,
+              "overrides": { "标题": { "text": "维护记录（12）" } } },
+            { "type": "instance", "comp": "list-item", "x": 0, "y": 540,
+              "overrides": { "标题": { "text": "备件清单" } } },
+            { "type": "instance", "comp": "tabbar", "x": 0, "y": 729 }
+          ]
+        },
+        {
+          "name": "实时曲线",
+          "x": 960, "y": 0, "w": 375, "h": 420, "bg": "#FFFFFF",
+          "nodes": [
+            { "type": "rect", "name": "把手", "x": 167, "y": 8, "w": 40, "h": 4, "fill": "#E5E6EB", "radius": 2 },
+            { "type": "text", "name": "弹层标题", "x": 0, "y": 28, "w": 375, "h": 24, "align": "center", "text": "实时负载曲线", "fontSize": 16, "fontWeight": 600, "color": "#1F2329" },
+            { "type": "icon", "name": "关闭", "icon": "ep/close", "size": 20, "x": 339, "y": 28, "color": "#86909C",
+              "click": { "action": "关闭弹层" } },
+            { "type": "rect", "name": "图表", "x": 16, "y": 76, "w": 343, "h": 220, "fill": "#F7F9FC", "radius": 8 },
+            { "type": "text", "name": "图表说明", "x": 32, "y": 168, "text": "近 24 小时负载趋势（占位）", "fontSize": 12, "color": "#86909C" },
+            { "type": "instance", "comp": "btn-primary", "x": 16, "y": 332,
+              "overrides": { "文字": { "text": "关闭" } },
+              "click": { "action": "关闭弹层" } }
+          ]
+        }
+      ]
+    }
+  ],
+  "tree": [
+    { "label": "设备总览", "page": 0, "open": true },
+    { "label": "组件库", "page": 1 }
+  ]
+}
