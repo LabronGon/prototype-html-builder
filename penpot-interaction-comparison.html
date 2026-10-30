@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Penpot 2.18 交互对比与靠拢路线</title>
+<style>
+:root{
+  --brand:#3670F7;
+  --bg:#F5F6F8;
+  --card:#FFFFFF;
+  --ink:#111318;
+  --ink-2:#5A6070;
+  --ink-3:#8B91A0;
+  --line:#E7E9EE;
+  --line-2:#F0F2F6;
+  --p0:#E5484D;
+  --p0-bg:#FDECEC;
+  --p1:#C77700;
+  --p1-bg:#FFF4E0;
+  --p2:#6B7280;
+  --p2-bg:#F1F3F6;
+  --ok:#2F9E63;
+  --ok-bg:#E8F7EF;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:Inter,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC",sans-serif;
+  font-size:14px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1240px;margin:0 auto;padding:0 32px 96px}
+
+/* ---------- 头部 ---------- */
+.hero{
+  padding:64px 0 36px;border-bottom:1px solid var(--line);
+  display:flex;gap:48px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;
+}
+.hero .kicker{
+  font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--brand);margin-bottom:14px;
+}
+.hero h1{font-size:38px;line-height:1.22;font-weight:700;letter-spacing:-.02em}
+.hero h1 em{font-style:normal;color:var(--brand)}
+.hero .sub{margin-top:14px;color:var(--ink-2);font-size:14px;max-width:760px}
+.hero .meta{display:flex;gap:28px;flex-wrap:wrap;font-size:12px;color:var(--ink-3);margin-top:22px}
+.hero .meta b{display:block;color:var(--ink);font-size:13px;font-weight:600;margin-bottom:2px}
+.hero .stamp{
+  text-align:right;font-size:12px;color:var(--ink-3);line-height:1.9;
+}
+.hero .stamp .big{font-size:52px;font-weight:700;color:var(--ink);line-height:1.1;letter-spacing:-.03em}
+.hero .stamp .big span{font-size:16px;color:var(--ink-2);font-weight:500}
+
+/* ---------- 导航 ---------- */
+.tabs{
+  position:sticky;top:0;z-index:20;background:rgba(245,246,248,.92);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+  display:flex;gap:6px;overflow-x:auto;padding:10px 0;margin-bottom:40px;
+}
+.tabs a{
+  flex:none;padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:600;
+  color:var(--ink-2);border:1px solid transparent;
+}
+.tabs a:hover{background:#fff;border-color:var(--line);text-decoration:none;color:var(--ink)}
+
+/* ---------- 区块 ---------- */
+section{margin-bottom:52px;scroll-margin-top:64px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-head .no{
+  font-family:var(--mono);font-size:12px;font-weight:700;color:var(--brand);
+  background:#EAF0FE;border-radius:6px;padding:2px 8px;letter-spacing:.04em;
+}
+.sec-head h2{font-size:22px;font-weight:700;letter-spacing:-.01em}
+.sec-desc{color:var(--ink-2);font-size:13.5px;margin-bottom:20px;max-width:900px}
+
+/* ---------- 摘要卡 ---------- */
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:18px}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 18px 16px;
+}
+.card .n{font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.card .n small{font-size:12px;font-weight:500;color:var(--ink-3);margin-left:2px}
+.card .t{font-size:12.5px;color:var(--ink-2);margin-top:6px}
+.card.p0 .n{color:var(--p0)}
+.card.ok .n{color:var(--ok)}
+
+.callout{
+  background:var(--card);border:1px solid var(--line);border-left:3px solid var(--brand);
+  border-radius:10px;padding:16px 20px;margin:18px 0 0;color:var(--ink-2);font-size:13.5px;
+}
+.callout b{color:var(--ink)}
+
+/* ---------- 差距条 ---------- */
+.gapbar{
+  background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-top:16px;
+}
+.gapbar .row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.gapbar .row:last-child{margin-bottom:0}
+.gapbar .lbl{width:72px;font-size:12px;color:var(--ink-2);flex:none}
+.gapbar .track{flex:1;height:8px;background:var(--line-2);border-radius:99px;display:flex;overflow:hidden}
+.gapbar .seg{height:100%}
+.gapbar .seg.match{background:var(--ok)}
+.gapbar .seg.partial{background:#F2B23E}
+.gapbar .seg.miss{background:var(--p0)}
+.gapbar .num{width:92px;text-align:right;font-size:12px;color:var(--ink-2);font-family:var(--mono)}
+
+/* ---------- 表格 ---------- */
+.tbl-wrap{
+  background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;
+}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th{
+  text-align:left;font-size:11.5px;font-weight:700;letter-spacing:.03em;color:var(--ink-3);
+  text-transform:uppercase;background:#FBFCFD;border-bottom:1px solid var(--line);
+  padding:11px 14px;
+}
+td{
+  padding:13px 14px;border-bottom:1px solid var(--line-2);vertical-align:top;
+  font-size:12.8px;color:var(--ink-2);
+}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:#FBFCFD}
+td.cap{color:var(--ink);font-weight:600;font-size:13px}
+td.cap .dot{
+  display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--brand);
+  margin-right:8px;vertical-align:2px;opacity:.55;
+}
+td.pp{font-size:12.2px;line-height:1.6}
+td.pp code,td.cur code{
+  font-family:var(--mono);font-size:11.4px;background:#F4F6FA;border-radius:4px;
+  padding:1px 5px;color:#39415A;white-space:nowrap;
+}
+td.pp a{font-family:var(--mono);font-size:11px;border-bottom:1px dotted rgba(54,112,247,.4)}
+.badge{
+  display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.02em;
+  border-radius:5px;padding:2px 7px;line-height:1.5;white-space:nowrap;
+}
+.badge.p0{color:var(--p0);background:var(--p0-bg)}
+.badge.p1{color:var(--p1);background:var(--p1-bg)}
+.badge.p2{color:var(--p2);background:var(--p2-bg)}
+.gtag{
+  display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
+  white-space:nowrap;
+}
+.gtag::before{content:"";width:7px;height:7px;border-radius:2px;display:block}
+.gtag.match{color:var(--ok)}.gtag.match::before{background:var(--ok)}
+.gtag.partial{color:#B07800}.gtag.partial::before{background:#F2B23E}
+.gtag.miss{color:var(--p0)}.gtag.miss::before{background:var(--p0)}
+
+/* 列宽 */
+.col-cap{width:17%}.col-pen{width:40%}.col-cur{width:25%}.col-gap{width:10%}.col-pri{width:8%}
+
+/* ---------- 路线图 ---------- */
+.road{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+.batch{
+  background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;
+  display:flex;flex-direction:column;
+}
+.batch .tag{
+  font-family:var(--mono);font-size:11px;font-weight:700;color:var(--brand);
+  letter-spacing:.04em;margin-bottom:6px;
+}
+.batch h3{font-size:15px;font-weight:700;margin-bottom:4px}
+.batch .goal{font-size:12px;color:var(--ink-3);margin-bottom:12px;min-height:34px}
+.batch ul{list-style:none;display:flex;flex-direction:column;gap:7px;flex:1}
+.batch li{font-size:12.3px;color:var(--ink-2);padding-left:14px;position:relative;line-height:1.5}
+.batch li::before{content:"";position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;background:var(--line);border:1px solid var(--ink-3)}
+.batch .acc{
+  margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2);
+  font-size:11.5px;color:var(--ink-3);line-height:1.55;
+}
+.batch .acc b{color:var(--ink-2);display:block;margin-bottom:3px;font-size:11px;letter-spacing:.03em}
+
+/* ---------- 保留差异 ---------- */
+.keep{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.keep .item{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:15px 17px}
+.keep h4{font-size:13.5px;font-weight:700;margin-bottom:4px}
+.keep p{font-size:12.5px;color:var(--ink-2)}
+
+/* ---------- 附录 ---------- */
+details.appx{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
+details.appx summary{
+  cursor:pointer;padding:13px 16px;font-size:13px;font-weight:600;color:var(--ink);
+  list-style:none;display:flex;align-items:center;gap:10px;
+}
+details.appx summary::-webkit-details-marker{display:none}
+details.appx summary::before{
+  content:"›";display:inline-block;color:var(--ink-3);font-size:16px;transform:rotate(90deg);
+  transition:transform .15s;width:12px;
+}
+details.appx[open] summary::before{transform:rotate(-90deg)}
+details.appx .body{padding:2px 16px 16px 38px;border-top:1px solid var(--line-2);padding-top:12px}
+details.appx ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+details.appx li{font-family:var(--mono);font-size:11.6px;color:var(--ink-2);line-height:1.7;word-break:break-all}
+details.appx li b{font-family:inherit;color:var(--ink);font-weight:600}
+
+footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-3);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+
+@media(max-width:1000px){
+  .cards,.road{grid-template-columns:repeat(2,1fr)}
+  .col-cap{width:20%}.col-pen{width:36%}.col-cur{width:24%}.col-gap{width:12%}.col-pri{width:8%}
+}
+@media(max-width:720px){
+  .wrap{padding:0 18px 64px}
+  .hero h1{font-size:28px}
+  .cards,.road,.keep{grid-template-columns:1fr}
+  .tbl-wrap{overflow-x:auto}
+  table{min-width:820px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div>
+    <div class="kicker">Interaction Gap Analysis</div>
+    <h1>自研编辑器 vs <em>Penpot 2.18</em><br>整体交互体验靠拢方案</h1>
+    <p class="sub">以 Penpot 2.18.0 前端源码为唯一基准，逐项比对画布视口、选择变换、图层面板、属性面板、工具快捷键、标尺吸附、右键菜单、评论与演示模式，并新增顶部菜单、演示预览、导出工具、右键菜单四项专项对照，输出 126 项差距矩阵（含 32 项属性栏逐控件对照）与已执行的 P13–P19 七批路线、P20 外围层首批（剪贴板/翻转/WebP/SVG/演示顶栏）、P21 收口（A 查找替换/视图显隐/属性复制/页面复制，B 多描边虚线/Mixed/文本排版/原型动画，C 统一导出对话框/PDF/演示分享与登录）。所有 Penpot 行为均标注可点击的源码行号。</p>
+    <div class="meta">
+      <div><b>对比对象</b>editor-prototype/index.html（单文件 Canvas 编辑器）</div>
+      <div><b>基准版本</b>Penpot 2.18.0 · ClojureScript 前端</div>
+      <div><b>日期</b>2026-10-29</div>
+    </div>
+  </div>
+  <div class="stamp">
+    <div class="big" id="scorePct">—<span>% 对齐</span></div>
+    <div>按 126 项能力加权计算</div>
+    <div style="margin-top:6px">P0 <b style="color:var(--p0)" id="stampP0">—</b> · P1 <b style="color:var(--p1)" id="stampP1">—</b> · P2 <b style="color:var(--p2)" id="stampP2">—</b></div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <a href="#summary">摘要</a>
+  <a href="#matrix">差距矩阵</a>
+  <a href="#nav">视口导航</a>
+  <a href="#select">选择与变换</a>
+  <a href="#ruler">标尺与吸附</a>
+  <a href="#layers">图层面板</a>
+  <a href="#panel">属性面板</a>
+  <a href="#options">属性栏专项</a>
+  <a href="#tools">工具与快捷键</a>
+  <a href="#menu">右键菜单</a>
+  <a href="#comment">评论与演示</a>
+  <a href="#export">导出工具</a>
+  <a href="#roadmap">路线图</a>
+  <a href="#source">源码索引</a>
+</nav>
+
+<!-- ============ 摘要 ============ -->
+<section id="summary">
+  <div class="sec-head"><span class="no">00</span><h2>摘要：差距不在视觉，而在交互模型</h2></div>
+  <p class="sec-desc">当前原型已完成 MasterGo 风格的 UI 复刻，并在 P12 基础上完成 P13–P19 七批对齐：组与深层选择、变换修饰键、多选 Mixed、字母快捷键并轨、右键分区、评论回复线程、对齐/分布、四角圆角、导出预设、多填充、渐变与图片填充、描边内中外、效果列表（投影/内阴影/图层模糊/背景模糊）。P21 收口后，多描边与虚线、Mixed 覆盖、文本行高/字距/纵对齐/大小写、原型时长与缓动、统一导出对话框（PDF / per-object / 预览进度）、演示 flow 起点 / 缩略图计数 / 分享与登录入口均已落地。剩余差距集中在「布局与填充进阶」「矢量导出精度」与「协作权限」：自动布局与约束、填充混合与层排序、SVG 轮廓化、文件级 <code>.penpot</code>、账号与只读权限模型。</p>
+
+  <div class="cards">
+    <div class="card ok"><div class="n" id="cardMatch">—</div><div class="t">完全对齐（行为一致或更优）</div></div>
+    <div class="card"><div class="n" style="color:#B07800" id="cardPartial">—</div><div class="t">部分对齐（有入口，缺关键规则）</div></div>
+    <div class="card p0"><div class="n" id="cardMiss">—</div><div class="t">缺失（Penpot 有、当前没有）</div></div>
+    <div class="card"><div class="n" id="cardP0">—</div><div class="t">P0 阻塞项（先做，否则手感永远不对）</div></div>
+  </div>
+  <div class="gapbar" aria-hidden="true">
+    <div class="row"><span class="lbl">对齐度</span><div class="track"><div class="seg match" id="barMatch"></div><div class="seg partial" id="barPartial"></div><div class="seg miss" id="barMiss"></div></div><span class="num" id="barNum">—</span></div>
+  </div>
+
+  <div class="callout">
+    <b>靠拢原则：</b>复制 Penpot 的「交互模型」而不是复制它的视觉皮肤。凡是与现有 MasterGo 视觉 Token 冲突的，以 Penpot 的<b>行为规则与参数</b>为准（快捷键字母、修饰键语义、吸附阈值、缩放范围）；分支性功能（组件、自动布局、插件）不在本轮范围，明确列为「保留差异」。Penpot 为 MPL-2.0 文件级 copyleft：本方案只读取规格、重写实现，不复制源码。
+  </div>
+</section>
+
+<!-- ============ 全局矩阵概览 ============ -->
+<section id="matrix">
+  <div class="sec-head"><span class="no">01</span><h2>126 项差距分布</h2></div>
+  <p class="sec-desc">共 126 项（原 63 项 + 属性栏专项 32 项 + 四项专项 31 项）。完全对齐 35 项、部分对齐 69 项、缺失 22 项；P0 0 项、P1 39 项、P2 87 项，加权对齐度 55%。P13–P19 已消除 9 项 P0 结构性差距；P20 首批补齐层级快捷键、数值表达式、剪贴板/复制为、翻转/重命名、WebP/SVG 导出与演示顶栏；P21-A 补齐查找/替换、视图显隐、属性复制与页面复制，P21-B 补齐多描边+虚线、Mixed 覆盖、文本排版与原型动画参数，P21-C 将导出统一为对话框并加入 PDF/per-object/预览进度，同时补上演示 flow 起点、缩略图计数与分享/登录入口。</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th class="col-cap">维度</th><th class="col-pen">Penpot 基准（源码）</th><th class="col-cur">当前实现</th><th class="col-gap">差距</th><th class="col-pri">优先级</th></tr></thead>
+      <tbody>
+        <tr><td class="cap"><span class="dot"></span>视口导航</td><td class="pp">缩放 0.01–200×、按钮 ×1.3、fit 带 160/40px padding</td><td class="cur">0.01–200×、按钮 ×1.3、fit 留边 160</td><td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr><td class="cap"><span class="dot"></span>选择模型</td><td class="pp">组内深层选择、Ctrl+A、Alt 拖拽复制、worker 索引框选</td><td class="cur">组深层选择、Ctrl+A、Alt 拖拽复制、组内外粒度切换</td><td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr><td class="cap"><span class="dot"></span>变换</td><td class="pp">Shift 等比 / Alt 中心缩放、旋转 Shift 15° / Alt 45°</td><td class="cur">Shift 等比 / Alt 中心缩放、旋转 Shift 15° / Alt 45°</td><td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr><td class="cap"><span class="dot"></span>标尺吸附</td><td class="pp">标尺 22px、zoom 分档刻度、吸附 10px、显式开关</td><td class="cur">标尺 20px、1/2/5 阶梯、吸附 4px、网格 zoom≥5 自动</td><td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr><td class="cap"><span class="dot"></span>图层面板</td><td class="pp">递归树、Ctrl 加选 / Shift 范围、类型过滤</td><td class="cur">递归树、Ctrl 加选 / Shift 范围、组折叠与图标</td><td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr><td class="cap"><span class="dot"></span>属性面板</td><td class="pp">scrub Shift×10/Ctrl×0.1、表达式求值、Mixed、四角圆角</td><td class="cur">scrub Shift×10、表达式求值、Mixed 占位与统一写入、渐变/图片填充、多描边+虚线、文本行高/字距/纵对齐/大小写、效果列表</td><td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr><td class="cap"><span class="dot"></span>工具快捷键</td><td class="pp">V/B/R/E/T/P/L/C、Alt+L 面板、? 速查</td><td class="cur">V/B/R/E/T/P/L/C 并轨（P=段落），F/O/A/H/Z 别名</td><td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr><td class="cap"><span class="dot"></span>右键菜单</td><td class="pp">6 类上下文、形状菜单 14 段、快捷键提示</td><td class="cur">7 分区（编辑/层级/变换/组织/显示/视图导出/危险）+ 分区标题；形状 19 项 / 空白 5</td><td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr><td class="cap"><span class="dot"></span>评论</td><td class="pp">线程回复/解决/删除、侧栏按页分组、pin 跟随画板</td><td class="cur">单气泡 + 回复线程，无「解决」与侧栏</td><td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr><td class="cap"><span class="dot"></span>演示与原型</td><td class="pp">缩略图条、缩放/全屏、交互/评论/检查三模式</td><td class="cur">画板翻页 + 点击/悬停/按下交互（含时长/缓动）、flow 起点、顶栏 sitemap / 分享 / 登录入口、缩略图条与计数、缩放/全屏</td><td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 视口导航 ============ -->
+<section id="nav">
+  <div class="sec-head"><span class="no">02</span><h2>画布视口：缩放与平移</h2></div>
+  <p class="sec-desc">缩放上下限（0.01–200×）与按钮步进（×1.3）已按 Penpot 参数并轨，滚轮与空格平移保持原有手感。视口部分只剩 fit 留边与菜单档位的细节差异。</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th class="col-cap">能力</th><th class="col-pen">Penpot 2.18</th><th class="col-cur">当前实现</th><th class="col-gap">差距</th><th class="col-pri">优先级</th></tr></thead>
+      <tbody>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>缩放范围</td>
+          <td class="pp">下限 <code>0.01</code>、上限 <code>200</code>；按钮步进 <code>×1.3 / ÷1.3</code>。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/zoom.cljs#L38-L74">zoom.cljs L38-74</a></td>
+          <td class="cur">0.01–200×（clampZ）、按钮步进 ×1.3、fit 留边 160</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>缩放菜单档位</td>
+          <td class="pp">重置 100%、fit、zoom selected 各有独立命令与快捷键（<code>shift+0/1/2</code>）。</td>
+          <td class="cur">菜单仅 25/50/100/200% + 适应；无「缩放到选中」档位。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>滚轮语义</td>
+          <td class="pp">Mod+滚轮缩放、普通滚轮平移，<code>schedule-zoom!</code> 用 RAF 合并事件。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/viewport/actions.cljs#L383-L470">actions.cljs L383-470</a></td>
+          <td class="cur">Ctrl/⌘+滚轮指数缩放（<code>1.0015^-deltaY</code>）、Shift 横移、普通滚轮平移；无 RAF 合并。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>适应视图</td>
+          <td class="pp">fit-all 用页面一级对象包围盒，padding <code>160</code>；zoom-selected padding <code>40</code>，min-zoom <code>0.01</code>。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/zoom.cljs#L113-L189">zoom.cljs L113-189</a></td>
+          <td class="cur"><code>fitView</code> 固定留白 32px，无 min-zoom 保护。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L2846-L2866">index.html L2846</a></td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>平移</td>
+          <td class="pp">空格拖拽、中键拖拽，滚轮平移；无惯性。</td>
+          <td class="cur">空格、中键、手型工具 H 三种入口，行为一致（多一个手型工具）。</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>缩放锚点</td>
+          <td class="pp">以鼠标位置为中心计算 scale matrix，缩放时保持指针下的世界点不动。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/zoom.cljs#L25-L36">zoom.cljs L25-36</a></td>
+          <td class="cur">已实现指针锚点 + 160ms 平滑动画，且兼容视图旋转反算。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 选择与变换 ============ -->
+<section id="select">
+  <div class="sec-head"><span class="no">03</span><h2>选择模型与变换手柄</h2></div>
+  <p class="sec-desc">组结构与深层选择已落地：双击进组、Esc 逐级上退、组空白区拖动、Ctrl+G / Ctrl+Shift+G、Shift 等比、Alt 中心缩放、Alt 45° 旋转、Alt 拖拽复制。剩余差异是框选命中精度（Penpot 用 worker 索引）与手柄热区常量。</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th class="col-cap">能力</th><th class="col-pen">Penpot 2.18</th><th class="col-cur">当前实现</th><th class="col-gap">差距</th><th class="col-pri">优先级</th></tr></thead>
+      <tbody>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>组 / 深层选择</td>
+          <td class="pp">双击进入组、<code>select-inside-group</code> 取最上层命中子元素、Esc 逐级上退、Ctrl+G / Ctrl+Shift+G。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/selection.cljs#L383-L400">selection.cljs L383-400</a></td>
+          <td class="cur">组模型：双击进组、Esc 逐级上退、组内外点击切换粒度、组空白区拖动</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>全选</td>
+          <td class="pp"><code>c-mod a</code> 全选当前页面所有非锁定对象。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/shortcuts.cljs#L441-L500">shortcuts.cljs L441-500</a></td>
+          <td class="cur">Ctrl+A 按层级：进组选组内直接子层，否则各画板顶层（不含画板）</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>Alt 拖拽复制</td>
+          <td class="pp">移动开始时检测 Alt，自动 duplicate 后拖拽副本，并在拖拽中持续复制。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/transforms.cljs#L592-L700">transforms.cljs L592-700</a></td>
+          <td class="cur">Alt 拖拽即复制，组按后代递归平移保持相对位置</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>框选语义</td>
+          <td class="pp">框选交给 worker 索引查询 <code>full-frame? true</code>，并过滤 blocked 与 hidden 父级。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/selection.cljs#L347-L381">selection.cljs L347-381</a></td>
+          <td class="cur">AABB 相交即选中，已过滤 hidden/locked 图层，但未过滤父级隐藏。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L2446-L2460">index.html L2446</a></td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>点选 / Shift 加选</td>
+          <td class="pp">点击选中，Shift 切换选中状态（<code>toggle-selection</code>）。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/selection.cljs#L595-L625">selection.cljs L595-625</a></td>
+          <td class="cur">画布与图层面板均为 Shift 切换，行为一致。</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>缩放修饰键</td>
+          <td class="pp">Shift 等比缩放、Alt 以中心为基准；<code>resize</code> 按 handler + rotation + lock/shift 计算 scalev。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/transforms.cljs#L150-L203">transforms.cljs L150-203</a></td>
+          <td class="cur">Shift 等比缩放、Alt 以中心缩放</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>旋转吸附</td>
+          <td class="pp">Shift 吸附 <code>15°</code>、Alt 吸附 <code>45°</code>（两者可组合）。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/transforms.cljs#L501-L520">transforms.cljs L501-520</a></td>
+          <td class="cur">Shift 15° 吸附、Alt 45° 吸附</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>手柄尺寸 / 热区</td>
+          <td class="pp">旋转手柄 <code>20px</code>、缩放手柄方块 <code>8px</code>、圆形半径 <code>10px</code>、边手柄高 <code>8px</code>。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/viewport/selection.cljs#L35-L46">selection.cljs L35-46</a></td>
+          <td class="cur">方块 8px 一致；命中半径仅 <code>±6px</code>，比 Penpot 的 10px 紧。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L2168-L2177">index.html L2168</a></td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>多选变换</td>
+          <td class="pp">多选整体缩放/旋转，按 union selrect 计算，组语义参与。</td>
+          <td class="cur">多选 union bbox + 8 手柄统一缩放；几何快照避免比例复合</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>方向键微调</td>
+          <td class="pp">方向键 <code>1px</code>，Shift / Alt+方向 <code>10px</code>。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/transforms.cljs#L1060-L1100">transforms.cljs L1060-1100</a></td>
+          <td class="cur">1px 与 Shift 10px 已对齐，缺 Alt+方向 10px。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L2740-L2752">index.html L2740</a></td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>间距 / 尺寸提示</td>
+          <td class="pp">拖动时显示与相邻对象的间距线段与数字，<code>snap-distance-accuracy 20</code>。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/viewport/snap_distances.cljs#L53-L112">snap_distances.cljs L53-112</a></td>
+          <td class="cur">P12-A 已实现拖拽间距、尺寸徽标、旋转角徽标，形态接近。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>文本编辑</td>
+          <td class="pp">双击进入画布内编辑，编辑态与选中态分离，Esc 退出。</td>
+          <td class="cur">覆盖层 textarea 跟随缩放/旋转，双击进入；黑底编辑框样式与 Penpot 有差。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 标尺与吸附 ============ -->
+<section id="ruler">
+  <div class="sec-head"><span class="no">04</span><h2>标尺、参考线、网格与吸附</h2></div>
+  <p class="sec-desc">P12-C/D 已把这一块做到可用，剩余差距主要是「显式开关」与「参数对齐」：Penpot 的像素网格是独立开关（Shift+,）而不是缩放阈值自动出现；吸附阈值 10 屏幕像素，当前是 4。</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th class="col-cap">能力</th><th class="col-pen">Penpot 2.18</th><th class="col-cur">当前实现</th><th class="col-gap">差距</th><th class="col-pri">优先级</th></tr></thead>
+      <tbody>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>标尺尺寸</td>
+          <td class="pp">标尺区宽 <code>22px</code>、刻度字号 <code>12px</code>、选区范围带不透明度 <code>0.3</code>。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/viewport/rulers.cljs#L17-L33">rulers.cljs L17-33</a></td>
+          <td class="cur">标尺 <code>20px</code>、字号 10px、选区带 <code>0.18</code>。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L1632-L1654">index.html L1632</a></td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>刻度步长</td>
+          <td class="pp">按 zoom 分档：<code>&lt;0.008→10000</code>…<code>&gt;25→1</code>，每档固定世界单位。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/viewport/rulers.cljs#L51-L67">rulers.cljs L51-67</a></td>
+          <td class="cur">1/2/5×10ⁿ 中取「标签间距 ≥64px」的最小值。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L1635-L1638">index.html L1635</a></td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>参考线拖拽</td>
+          <td class="pp">从标尺拖出、移动、拖回删除；参考线存于页面数据。</td>
+          <td class="cur">三类操作均已实现，并支持拖动吸附；存于 <code>page.guides</code>。</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="miss" data-pri="P2">
+          <td class="cap"><span class="dot"></span>参考线颜色 / 菜单</td>
+          <td class="pp">右键参考线可选 8 种预设色（<code>#ff3277</code>、<code>#4dabf7</code>…）或删除。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/context_menu.cljs#L996-L1038">context_menu.cljs L996-1038</a></td>
+          <td class="cur">固定青色 <code>#00B6EB</code>，无颜色菜单。</td>
+          <td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>像素网格</td>
+          <td class="pp">独立开关 <code>shift+,</code>，另有吸附开关 <code>,</code>，不依赖缩放。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/shortcuts.cljs#L485-L548">shortcuts.cljs L485-548</a></td>
+          <td class="cur">Shift+G 切换，但 <code>z≥5</code> 时自动出现；无网格吸附开关。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>吸附阈值</td>
+          <td class="pp"><code>snap-accuracy 10</code>、<code>snap-distance-accuracy 20</code>（屏幕像素）。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/snap.cljs#L25-L27">snap.cljs L25-27</a></td>
+          <td class="cur">缩放吸附 <code>TOL=4px</code>，拖动吸附阈值亦偏紧。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L2564-L2566">index.html L2564</a></td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>对齐 / 分布</td>
+          <td class="pp">单对象也可对齐画板；快捷键 Alt+A/D/W/H/V/S，分布 Ctrl+Alt+Shift+H/V。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/shortcuts.cljs#L441-L480">shortcuts.cljs L441-480</a></td>
+          <td class="cur">需 ≥2 个对象，分布需 ≥3；无快捷键。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L1770-L1802">index.html L1770</a></td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P1">
+          <td class="cap"><span class="dot"></span>层级排列快捷键</td>
+          <td class="pp"><code>c-mod ↑/↓</code> 上移/下移，<code>c-mod shift ↑/↓</code> 置顶/置底。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/shortcuts.cljs#L120-L200">shortcuts.cljs L120-200</a></td>
+          <td class="cur"><code>Ctrl+]</code> / <code>Ctrl+[</code> 上移 / 下移，加 <code>Shift</code> 置顶 / 置底；右键「层级」四项同步。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L3900-L3906">index.html L3900-3906</a></td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 图层面板 ============ -->
+<section id="layers">
+  <div class="sec-head"><span class="no">05</span><h2>图层面板与页面树</h2></div>
+  <p class="sec-desc">图层面板已升级为递归树：组折叠 caret、组图标、搜索自动展开、Ctrl 加选 / Shift 范围选择均已对齐。剩余差异是类型过滤与跨组拖拽的边缘规则。</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th class="col-cap">能力</th><th class="col-pen">Penpot 2.18</th><th class="col-cur">当前实现</th><th class="col-gap">差距</th><th class="col-pri">优先级</th></tr></thead>
+      <tbody>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>树层级</td>
+          <td class="pp">递归渲染组/画板/布尔/蒙版，缩进随深度，折叠状态独立。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/sidebar/layer_item.cljs#L63-L202">layer_item.cljs L63-202</a></td>
+          <td class="cur">图层面板递归树、组折叠 caret、搜索自动展开、组图标</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>多选规则</td>
+          <td class="pp">普通点击单选、Ctrl/⌘ 加选、Shift 范围选择。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/sidebar/layer_item.cljs#L314-L333">layer_item.cljs L314-333</a></td>
+          <td class="cur">Ctrl 加选 / Shift 范围选择；组内外按层级粒度选择</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>拖拽排序</td>
+          <td class="pp">落点 top/bot/center 三段，center 拖入组/画板，跨层级 relocate。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/sidebar/layer_item.cljs#L374-L410">layer_item.cljs L374-410</a></td>
+          <td class="cur">P12-B 已实现三段落点、跨画板、自动展开与抑制误点选。</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>搜索 / 过滤</td>
+          <td class="pp">按名称、variant 名、id、文本内容匹配；支持按组件/图片/画板/文本/组/蒙版筛选并保留层级。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/sidebar/layers.cljs#L217-L245">layers.cljs L217-245</a> · <a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/sidebar/layers.cljs#L402-L507">L402-507</a></td>
+          <td class="cur">仅名称子串匹配；未命中的图层直接隐藏，层级被压平。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>显示 / 锁定</td>
+          <td class="pp">行内 eye / lock 按钮，隐藏层不可选。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/sidebar/layer_item.cljs#L278-L312">layer_item.cljs L278-312</a></td>
+          <td class="cur">行内 eye / lock 已实现，隐藏后自动移出选区。</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="miss" data-pri="P2">
+          <td class="cap"><span class="dot"></span>折叠快捷键</td>
+          <td class="pp">Shift+click 全折叠、Alt+click 展开整个子树。</td>
+          <td class="cur">仅单击折叠/展开单个画板。</td>
+          <td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>页面列表</td>
+          <td class="pp">Shift 范围、Ctrl 多选、拖拽排序；<code>relocate-page</code>。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/sidebar/sitemap.cljs#L77-L172">sitemap.cljs L77-172</a></td>
+          <td class="cur">单选、双击重命名、右键删除；无多选与拖拽排序。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="miss" data-pri="P2">
+          <td class="cap"><span class="dot"></span>批量重命名</td>
+          <td class="pp">多选后统一改名，按类型自动编号。</td>
+          <td class="cur">仅逐行双击重命名。</td>
+          <td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 属性面板 ============ -->
+<section id="panel">
+  <div class="sec-head"><span class="no">06</span><h2>右侧属性面板</h2></div>
+  <p class="sec-desc">属性面板已完成 scrub（Shift×10）、多选 Mixed、表达式求值、对齐/分布、四角圆角、多填充栈（纯色/线性/径向/图片）、描边内中外、效果列表（投影/内阴影/图层模糊/背景模糊）、导出预设（PNG/JPG/WebP/SVG × 0.5–4）。剩余差距：填充混合与层排序、多描边与虚线、文本全排版、自动布局与约束、PDF 导出。详见第 11 节「属性栏逐控件对照」。</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th class="col-cap">能力</th><th class="col-pen">Penpot 2.18</th><th class="col-cur">当前实现</th><th class="col-gap">差距</th><th class="col-pri">优先级</th></tr></thead>
+      <tbody>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>数值 scrub</td>
+          <td class="pp">拖拽按像素增量；Shift 步长 <code>×10</code>、Ctrl <code>×0.1</code>；↑↓ 步进，Enter 提交、Esc 还原。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/components/numeric_input.cljs#L227-L267">numeric_input.cljs L227-267</a> · <a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/components/numeric_input.cljs#L152-L169">L152-169</a></td>
+          <td class="cur">数值框横向 scrub（Shift×10）；Mixed 字段从 0 起算后统一写入</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P1">
+          <td class="cap"><span class="dot"></span>表达式求值</td>
+          <td class="pp"><code>smt/expr-eval</code>：支持 <code>10+5</code>、<code>50%</code> 等，再按 min/max 与整数规则夹取。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/components/numeric_input.cljs#L61-L83">numeric_input.cljs L61-83</a></td>
+          <td class="cur"><code>applyField</code> 支持 <code>+ - * /</code> 与括号（如 <code>10+20*2</code>、<code>(8+4)/2</code>），仅白名单字符参与求值。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L2199-L2207">index.html L2199-2207</a></td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>多选 Mixed</td>
+          <td class="pp">冲突值统一为 <code>:multiple</code>，占位显示 “Mixed” 或 <code>--</code>；批量改值覆盖全部。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/sidebar/options/shapes/multiple.cljs#L265-L353">multiple.cljs L265-353</a></td>
+          <td class="cur">X/Y/W/H 显示并集；圆角 R 与不透明度支持 Mixed 占位与统一写入</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>面板分组顺序</td>
+          <td class="pp">layer → measures → component → layout → constraints → text → fill → stroke → shadow → blur → exports。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/sidebar/options/shapes/multiple.cljs#L511-L595">multiple.cljs L511-595</a></td>
+          <td class="cur">名称 → 对齐 → 位置尺寸 → 圆角 → 类型字段 → 文本 → 填充 → 描边 → 效果 → 导出；无 Layout。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>填充</td>
+          <td class="pp">多填充叠加、纯色/线性/径向/图片、透明度、吸管与最近色。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/sidebar/options/rows/color_row.cljs#L250-L317">color_row.cljs L250-317</a></td>
+          <td class="cur">多填充栈：添加/删除/显隐、每层色值与透明度；纯色 / 线性渐变 / 径向渐变 / 图片（含色标、角度、fit）；无吸管。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>描边</td>
+          <td class="pp">内/中/外对齐、虚线样式与间隔、多描边叠加、四边独立宽度（flag）。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/sidebar/options/rows/stroke_row.cljs#L333-L418">stroke_row.cljs L333-418</a></td>
+          <td class="cur">单描边：颜色 + 线宽 + 启用开关 + 居中/内侧/外侧对齐；无多描边与虚线。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>效果（投影 / 模糊）</td>
+          <td class="pp">Effects 分区：投影、内阴影、层模糊、背景模糊，可多效果叠加与排序。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/sidebar/options/menus/shadow.cljs#L1-L200">shadow.cljs</a></td>
+          <td class="cur">效果列表：投影、内阴影、图层模糊、背景模糊，可添加/删除/显隐/切换类型；无拖拽排序。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>圆角四角</td>
+          <td class="pp">默认单值，展开后分别编辑 r1/r2/r4/r3；全等时回折叠。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/sidebar/options/menus/border_radius.cljs#L286-L348">border_radius.cljs L286-348</a></td>
+          <td class="cur">R 单值 + 展开四角（tl/tr/br/bl），全等时 R 显示统一值；无四角 Mixed 与锁定联动。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>导出预设</td>
+          <td class="pp">倍率 <code>0.5/0.75/1/1.5/2/4/6</code>，格式 PNG/JPG/WEBP/SVG/PDF，可多行批量。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/sidebar/options/menus/exports.cljs#L191-L203">exports.cljs L191-203</a></td>
+          <td class="cur">预设列表：0.5/1/2/3/4 倍率 + PNG/JPG，添加/删除与按行导出；缺 SVG/PDF/WEBP 与 0.75/1.5/6。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="miss" data-pri="P2">
+          <td class="cap"><span class="dot"></span>混合模式</td>
+          <td class="pp">16 种 blend mode（normal/darken/multiply…luminosity）。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/sidebar/options/menus/layer.cljs#L184-L204">layer.cljs L184-204</a></td>
+          <td class="cur">仅有不透明度。</td>
+          <td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="miss" data-pri="P2">
+          <td class="cap"><span class="dot"></span>约束 / 自动布局</td>
+          <td class="pp">九宫格约束（left/right/leftright/center/scale）、Flex/Grid 容器与子项 sizing。</td>
+          <td class="cur">无（本轮范围外，建议保留差异）。</td>
+          <td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 工具与快捷键 ============ -->
+<section id="tools">
+  <div class="sec-head"><span class="no">07</span><h2>工具、快捷键与顶部工具条</h2></div>
+  <p class="sec-desc">工具字母已并轨 Penpot：V/B/R/E/T/P/L/C（P 因暂无钢笔工具映射到段落文本），F/O/A/H/Z 保留为别名。P21-A 已补编辑菜单的查找 / 查找替换（Ctrl+F / Ctrl+H，浮层支持上一处 / 下一处 / 全部替换）与视图菜单的像素网格 / 参考线 / 隐藏 UI 勾选项（Tab 切换）；主菜单五组结构与 Penpot 一致，仍缺版本历史、共享库与 <code>.penpot</code> 导出，偏好/插件/MCP/帮助整类缺失。剩余是 Alt+L 面板显隐与 <code>?</code> 快捷键速查表。</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th class="col-cap">能力</th><th class="col-pen">Penpot 2.18</th><th class="col-cur">当前实现</th><th class="col-gap">差距</th><th class="col-pri">优先级</th></tr></thead>
+      <tbody>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>工具集合</td>
+          <td class="pp">move / frame / 形状组（rect、circle、line、arrow）/ text / image / path&amp;curve 组。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/top_toolbar.cljs#L346-L488">top_toolbar.cljs L346-488</a></td>
+          <td class="cur">select / frame / rect / text / hand / zoom / comment，形状与文本有子菜单；缺图片与钢笔。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>快捷键字母</td>
+          <td class="pp"><code>V</code> 移动、<code>B/A</code> 画板、<code>R</code> 矩形、<code>E</code> 椭圆、<code>T</code> 文本、<code>P</code> 路径、<code>L</code> 直线、<code>Shift+L</code> 箭头、<code>C</code> 评论。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/shortcuts.cljs#L323-L431">shortcuts.cljs L323-431</a></td>
+          <td class="cur">V/B/R/E/T/P/L/C 已并轨（P=段落，暂无钢笔）；F/O/A/H/Z 保留为别名</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>空格临时平移</td>
+          <td class="pp">按住空格左键拖拽 = 平移；松开恢复工具。</td>
+          <td class="cur">已实现，且额外支持 Space+Shift 旋转视图。</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>面板显隐 / 隐藏 UI</td>
+          <td class="pp"><code>alt+l</code> 图层、<code>alt+i</code> 资源、<code>alt+p</code> 色板、反引号隐藏 UI。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/shortcuts.cljs#L600-L671">shortcuts.cljs L600-671</a></td>
+          <td class="cur">Tab 隐藏 / 恢复整个 UI（顶栏 + 左右面板），视图菜单与空白右键均可触发；无分面板（图层 / 资源 / 色板）独立显隐。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="miss" data-pri="P2">
+          <td class="cap"><span class="dot"></span>快捷键速查</td>
+          <td class="pp"><code>?</code> 打开快捷键面板。</td>
+          <td class="cur">无。</td>
+          <td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>工具子菜单</td>
+          <td class="pp">长按/角标展开子工具，悬停 350ms 切换，Esc 关闭。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/top_toolbar.cljs#L126-L171">top_toolbar.cljs L126-171</a></td>
+          <td class="cur">形状/文本子菜单支持长按、角标、↑↓/Enter/Esc 键盘导航。</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>主菜单结构与分组</td>
+          <td class="pp">一级菜单 7 项：File / Edit / View / Preferences / Plugins / MCP / Help（插件与 MCP 受 feature flag 控制）；悬停展开二级，二级带箭头与快捷键提示。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/main_menu.cljs#L1015-L1125">main_menu.cljs L1015-1125</a></td>
+          <td class="cur">五组：文件 / 编辑 / 视图 / 文本 / 排列；悬停或点击展开二级，Esc 与外部点击关闭，子面板与激活行顶部对齐。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L4121-L4217">index.html L4121-4217</a></td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>文件菜单能力</td>
+          <td class="pp">发布 / 取消发布共享库、创建版本、版本历史、导出切图对话框、下载 <code>.penpot</code> 二进制、导出画板（选中画板或全部）。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/main_menu.cljs#L567-L745">main_menu.cljs L567-745</a></td>
+          <td class="cur">新建文件、导入文件、创建文件副本、导出所有切图、导出选中为 PNG。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L4121-L4129">index.html L4121-4129</a></td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>编辑菜单 / 查找替换</td>
+          <td class="pp">全选、查找、查找替换、撤销、重做；查找走图层面板搜索并支持替换。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/main_menu.cljs#L492-L565">main_menu.cljs L492-565</a></td>
+          <td class="cur">撤销、重做、全选、取消选择 + 查找 / 查找替换（Ctrl+F / Ctrl+H）；浮层支持图层名与文本双向匹配、上一处 / 下一处、全部替换。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L1363-L1426">index.html L1363-1426</a></td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>视图菜单显隐开关</td>
+          <td class="pp">标尺、参考线、锁定参考线、评论显隐、色板 / 文本色板、画板名称、像素网格、隐藏 UI；均带快捷键。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/main_menu.cljs#L344-L490">main_menu.cljs L344-490</a></td>
+          <td class="cur">放大 / 缩小 / 100% / 适应 / 缩放到选中 + 像素网格（Shift+G）、参考线（Shift+R）、隐藏 UI（Tab）三项带勾选与快捷键；仍缺标尺 / 画板名称 / 色板 / 评论显隐。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L4486-L4496">index.html L4486-4496</a></td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="miss" data-pri="P2">
+          <td class="cap"><span class="dot"></span>偏好 / 插件 / MCP / 帮助</td>
+          <td class="pp">偏好：主题切换、WebGL / WASM 渲染切换；插件管理；MCP 连接状态指示灯；帮助与快捷键入口。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/main_menu.cljs#L300-L342">main_menu.cljs L300-342</a></td>
+          <td class="cur">无。</td>
+          <td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>顶栏右侧与文件信息</td>
+          <td class="pp">文件名 + 保存状态、演示按钮、缩放控件（百分比下拉：±、重置、fit、fill、全屏）、成员头像与分享。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/top_toolbar.cljs#L396-L477">top_toolbar.cljs L396-477</a></td>
+          <td class="cur">文件名就地重命名、头像、演示按钮、缩放胶囊（25–800% + 适应）；无保存状态提示、无分享入口。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L481-L494">index.html L481-494</a></td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 右键菜单 ============ -->
+<section id="menu">
+  <div class="sec-head"><span class="no">08</span><h2>右键菜单</h2></div>
+  <p class="sec-desc">右键菜单已按 Penpot 分区（编辑 / 层级 / 变换 / 组织 / 显示 / 视图与导出 / 危险操作），带分区标题与危险色。P20 首批已补齐编辑段（剪切 / 复制 / 粘贴、复制为图片、复制 CSS/SVG/ID）、翻转（水平/垂直）与重命名；P21-A 继续补入复制文本、复制属性 / 粘贴属性、页面树「复制页面」与空白画布「粘贴 / 隐藏 UI」。仍缺蒙版、路径布尔、组件、Flex/Grid、流程起点与复制链接。</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th class="col-cap">能力</th><th class="col-pen">Penpot 2.18</th><th class="col-cur">当前实现</th><th class="col-gap">差距</th><th class="col-pri">优先级</th></tr></thead>
+      <tbody>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>菜单广度</td>
+          <td class="pp">形状菜单顺序：编辑 → 层级 → 翻转 → 缩略图 → 重命名 → 成组 → 聚焦 → 路径布尔 → 显隐锁定 → 原型 → 布局 → 组件 → 参考线 → 删除。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/context_menu.cljs#L759-L790">context_menu.cljs L759-790</a></td>
+          <td class="cur">七分区（编辑/层级/变换/组织/显示/视图与导出/危险操作）+ 分区标题 + 危险项；形状 19 项 / 空白 5 项</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>快捷键提示</td>
+          <td class="pp">菜单项 <code>shortcut-key</code> 渲染，并支持自定义快捷键覆盖。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/context_menu.cljs#L57-L150">context_menu.cljs L57-150</a></td>
+          <td class="cur">编辑 / 层级项已带 <code>Ctrl+C/X/V</code>、<code>Ctrl+] / Ctrl+[</code>，空白右键带 <code>Tab</code>；查找替换带 <code>Ctrl+F / Ctrl+H</code>；菜单尚无自定义快捷键覆盖</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>右键先选中</td>
+          <td class="pp">右键命中未选中对象时先将其设为选中，再弹菜单。</td>
+          <td class="cur">画布与图层列表均已实现。</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>编辑 / 剪贴板 / 复制为</td>
+          <td class="pp">剪切、复制、粘贴、复制一份；复制为图片、复制文本、粘贴属性、复制属性、复制 CSS / SVG / ID / 链接；动作随选中类型裁剪。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/context_menu.cljs#L157-L278">context_menu.cljs L157-278</a></td>
+          <td class="cur">右键「编辑」段：剪切 / 复制 / 粘贴（Ctrl+X/C/V，内部剪贴板 + 16px 阶梯偏移）、复制为图片、复制文本（仅文本图层）、复制 CSS/SVG/ID、复制属性 / 粘贴属性（填充、描边、圆角、透明度、效果，文本额外含字号/字重/颜色/对齐）；仍缺复制链接。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="match" data-pri="P2">
+          <td class="cap"><span class="dot"></span>翻转（水平 / 垂直）</td>
+          <td class="pp">水平翻转、垂直翻转，作用于单选或多选；菜单带图标。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/context_menu.cljs#L280-L360">context_menu.cljs L280-360</a></td>
+          <td class="cur">右键「变换」段：水平 / 垂直翻转，多选批量；绘制阶段绕包围盒镜像，命中与导出同步。</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>重命名 / 缩略图</td>
+          <td class="pp">重命名（就地编辑）、显示 / 隐藏缩略图开关；页面树与图层行共用。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/context_menu.cljs#L360-L440">context_menu.cljs L360-440</a></td>
+          <td class="cur">右键「重命名」在菜单位置弹出输入框（Enter 提交 / Esc 取消）；缩略图常驻，无开关。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="miss" data-pri="P2">
+          <td class="cap"><span class="dot"></span>蒙版</td>
+          <td class="pp">设为蒙版 / 移除蒙版；蒙版是组内特殊角色，随组一起变换。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/context_menu.cljs#L440-L500">context_menu.cljs L440-500</a></td>
+          <td class="cur">无蒙版模型与入口。</td>
+          <td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="miss" data-pri="P2">
+          <td class="cap"><span class="dot"></span>路径布尔 / 扁平化</td>
+          <td class="pp">并集、差集、交集、排除；扁平化、描边转路径；仅路径与形状可用。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/context_menu.cljs#L500-L580">context_menu.cljs L500-580</a></td>
+          <td class="cur">无布尔运算，无扁平化与描边转路径。</td>
+          <td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="miss" data-pri="P2">
+          <td class="cap"><span class="dot"></span>组件与变体</td>
+          <td class="pp">创建组件、分离实例、切换变体；与资源面板联动。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/context_menu.cljs#L580-L650">context_menu.cljs L580-650</a></td>
+          <td class="cur">有组件库面板与实例联动，但画布右键无组件命令。</td>
+          <td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="miss" data-pri="P2">
+          <td class="cap"><span class="dot"></span>Flex / Grid 布局</td>
+          <td class="pp">添加 / 移除 Flex 布局、添加 / 移除 Grid 布局；入口在右键「布局」段。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/context_menu.cljs#L650-L700">context_menu.cljs L650-700</a></td>
+          <td class="cur">无自动布局，右键无布局入口。</td>
+          <td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="miss" data-pri="P2">
+          <td class="cap"><span class="dot"></span>流程起点（flow）</td>
+          <td class="pp">将画板设为流程起点，演示按 flow 顺序播放；右键显示 / 取消。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/context_menu.cljs#L700-L758">context_menu.cljs L700-758</a></td>
+          <td class="cur">无 flow 概念，演示从选中画板或首个画板起播。</td>
+          <td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>页面树右键</td>
+          <td class="pp">重命名页面、复制页面、删除页面；删除前弹确认，最后一页不可删。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/context_menu.cljs#L803-L830">context_menu.cljs L803-830</a></td>
+          <td class="cur">重命名（就地输入，Enter 提交 / Esc 取消）、复制页面（深拷贝画板树并插入源页之后、自动切换）、删除页面（至少保留 1 页）；删除暂无二次确认。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L1127-L1136">index.html L1127-1136</a></td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>空白画布右键</td>
+          <td class="pp">粘贴、隐藏 UI、聚焦画布；空白处不提供层级与对齐类命令。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/context_menu.cljs#L845-L855">context_menu.cljs L845-855</a></td>
+          <td class="cur">粘贴（无剪贴板内容时禁用）、全选、取消选择、隐藏 UI（Tab）、缩放到全部；未提供「聚焦画布」。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L3679-L3688">index.html L3679-3688</a></td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 评论与演示 ============ -->
+<section id="comment">
+  <div class="sec-head"><span class="no">09</span><h2>评论与演示模式</h2></div>
+  <p class="sec-desc">评论已有回复线程（列表 + 回复输入 + 关闭保留），仍是单点气泡模型；Penpot 的「解决」状态、按页分组侧栏、pin 跟随与 32px 合并尚未实现。演示模式已有翻页、顶栏 sitemap、缩略图条、缩放/全屏、过渡动画与原型交互；仍缺分享/登录与「交互 / 评论 / 检查」三模式，动画参数也尚不可配置。</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th class="col-cap">能力</th><th class="col-pen">Penpot 2.18</th><th class="col-cur">当前实现</th><th class="col-gap">差距</th><th class="col-pri">优先级</th></tr></thead>
+      <tbody>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>创建评论</td>
+          <td class="pp">评论工具 C 点击创建草稿，提交后成线程；点击 layer 层处理展开/折叠优先级。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/comments.cljs#L1-L80">comments.cljs</a></td>
+          <td class="cur">评论工具 C 点击创建 pin 并弹出输入框，Enter 保存。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>线程交互</td>
+          <td class="pp">回复框（Ctrl+Enter 提交）、解决 checkbox、owner 可编辑/删除、750 字上限、气泡宽 <code>284px</code>、最大高 <code>50%</code> 视口。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/comments.cljs#L667-L1020">comments.cljs L667-1020</a></td>
+          <td class="cur">评论回复线程（列表 + 回复输入 + 关闭保留）；无「解决」状态</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="miss" data-pri="P2">
+          <td class="cap"><span class="dot"></span>评论侧栏</td>
+          <td class="pp">按页面分组的线程列表，全部/我的/提及筛选 + 隐藏已解决。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/comments.cljs#L32-L164">workspace/comments.cljs L32-164</a></td>
+          <td class="cur">无。</td>
+          <td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="miss" data-pri="P2">
+          <td class="cap"><span class="dot"></span>pin 跟随与合并</td>
+          <td class="pp">pin 跟随画板平移/旋转；32px 内气泡合并，缩放 ≥1.75 档时展开。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/workspace/comments.cljs#L120-L220">comments.cljs L120-220</a></td>
+          <td class="cur">pin 固定世界坐标，不随画板移动，无合并。</td>
+          <td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>原型交互</td>
+          <td class="pp">动作 navigate / open-overlay / toggle-overlay / close-overlay / prev-screen / open-url；overlay 支持位置、背景、关闭外部点击、动画。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/viewer/shapes.cljs#L56-L147">viewer/shapes.cljs L56-147</a></td>
+          <td class="cur">触发器（单击/悬停/按下）+ 动作（打开画板/返回上一页）+ 6 种转场。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L1274-L1314">index.html L1274</a></td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>演示缩略图条</td>
+          <td class="pp">底部画板缩略图，单项宽 <code>152px</code>，滚轮/箭头翻页，可展开列表，点击 <code>go-to-frame-by-index</code>。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/viewer/thumbnails.cljs#L24-L151">thumbnails.cljs L24-151</a></td>
+          <td class="cur">底部缩略图条：按画板渲染缩略图、当前项高亮、点击跳转、左右滚动按钮；缺计数与折叠动画。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>演示缩放 / 全屏</td>
+          <td class="pp">顶部 zoom-widget（±、100%、fit、fill、fullscreen），全屏 <code>Shift+F</code> / <code>Alt+Enter</code>。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/viewer/header.cljs#L36-L208">viewer/header.cljs L36-208</a></td>
+          <td class="cur">顶栏 − / 百分比 / + / fit / 全屏（F），<code>+ - 0</code> 快捷键；缺 fill 模式与 Shift+F / Alt+Enter 组合键。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>演示键盘</td>
+          <td class="pp">←↑/Shift+Enter/PageUp 上一屏，→↓/Enter/Space/PageDown 下一屏，<code>F</code> 缩放模式、<code>G I/C/V</code> 切模式。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/data/viewer/shortcuts.cljs#L16-L94">viewer/shortcuts.cljs L16-94</a></td>
+          <td class="cur">←→ / PageUp/PageDown / Space 已实现，缺 Enter、全屏与模式切换。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="miss" data-pri="P2">
+          <td class="cap"><span class="dot"></span>演示三模式</td>
+          <td class="pp">顶部 <code>mode-zone</code>：交互（flows/interactions）、评论、检查，按权限显示。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/viewer/header.cljs#L268-L360">header.cljs L268-360</a></td>
+          <td class="cur">仅演示画板，无模式切换。</td>
+          <td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P1">
+          <td class="cap"><span class="dot"></span>演示顶栏 / sitemap</td>
+          <td class="pp">顶部 header：返回工作区、文件与页面信息、sitemap 下拉（页面 + 画板列表）、缩略图开关、缩放、全屏、分享、登录。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/viewer/header.cljs#L210-L360">viewer/header.cljs L210-360</a></td>
+          <td class="cur">顶栏含返回、文件名 / 页面面包屑、sitemap 下拉（按页分组、点击跳转）、缩略图 / 缩放 / 全屏、翻页与退出；新增「分享」（复制直达画板的 <code>#demo?a=</code> 链接）与访客头像登录入口（原型态提示未接入）。</td>
+          <td><span class="gtag match">对齐</span></td><td><span class="badge p1">P1</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>演示起始画板 / 流程</td>
+          <td class="pp">flows-menu 选择流程，按 flow 顺序播放；无显式 flow 时按页面顺序。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/viewer/header.cljs#L172-L178">viewer/header.cljs L172-178</a></td>
+          <td class="cur">画板面板可勾选「流程起点」（同页唯一），演示无选中时从 flow 画板起播，否则从选中/首个画板；分享链接可指定画板；无多流程选择菜单。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L4243-L4275">index.html L4243-4275</a></td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>演示过渡动画</td>
+          <td class="pp">动画类型 / 时长 / 缓动 / 保持滚动由交互定义，逐条可配。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/viewer/shapes.cljs#L56-L147">viewer/shapes.cljs L56-147</a></td>
+          <td class="cur">6 种方向（左/右/上/下滑、淡入）+ 每条交互可配时长与缓动（线性/缓入/缓出/缓入缓出），演示按该参数执行；仍缺「保持滚动」与更多动画类型。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L4308-L4360">index.html L4308-4360</a></td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+        <tr data-gap="partial" data-pri="P2">
+          <td class="cap"><span class="dot"></span>演示分享 / 登录 / 只读</td>
+          <td class="pp">分享链接弹窗、登录入口；只读权限隐藏编辑按钮，团队内可回到工作区。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/viewer/header.cljs#L122-L208">viewer/header.cljs L122-208</a></td>
+          <td class="cur">演示为只读层；新增分享按钮（复制含目标画板的链接，打开即进入演示）与访客登录入口（弹层提示原型未接入账号体系）。</td>
+          <td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 导出工具 ============ -->
+<section id="export">
+  <div class="sec-head"><span class="no">10</span><h2>导出工具：入口、格式与批量</h2></div>
+  <p class="sec-desc">导出已收口为<b>统一对话框</b>：属性栏预设、文件菜单、右键三处入口都打开同一面板，支持选中项（per-object 逐项）/ 当前画板 / 全部画板、<b>PNG/JPG/WebP/SVG/PDF</b>、0.5–4 倍率、文件名与每项后缀，并提供<b>缩略图预览、像素尺寸、进度条与导出中禁用态</b>。PDF 由内联 JPEG XObject 生成多页文件（每项一页），多图自动内联 ZIP。仍保留差异：自定义倍率输入、SVG 轮廓化选项与文件级 <code>.penpot</code> 二进制。</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th class="col-cap">能力</th><th class="col-pen">Penpot 2.18</th><th class="col-cur">当前实现</th><th class="col-gap">差距</th><th class="col-pri">优先级</th></tr></thead>
+      <tbody>
+        <tr data-gap="match" data-pri="P1"><td class="cap"><span class="dot"></span>导出入口与对象范围</td><td class="pp">文件菜单「导出切图」打开统一对话框；支持选中对象、画板、整页与整文件；导出项挂在对象上。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/main_menu.cljs#L643-L745">main_menu.cljs L643-745</a></td><td class="cur">属性栏预设、文件菜单、右键三处入口统一打开导出对话框；范围可选选中项 / 当前画板 / 全部画板，画板整板、图层按包围盒裁剪、跨画板多选。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L4599-L4614">index.html L4599-4614</a></td><td><span class="gtag match">对齐</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr data-gap="partial" data-pri="P1"><td class="cap"><span class="dot"></span>导出格式覆盖</td><td class="pp">PNG、JPEG、WebP、SVG、PDF；SVG 另有嵌入图片 / 轮廓化等选项。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/sidebar/options/menus/exports.cljs#L47-L274">exports.cljs L47-274</a></td><td class="cur">PNG / JPG / WebP / SVG（位图内嵌 + title/desc）/ <b>PDF</b>（多页 JPEG XObject，每项一页，96dpi→72pt）；仍缺 SVG 轮廓化与嵌入策略选项。</td><td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr data-gap="partial" data-pri="P2"><td class="cap"><span class="dot"></span>倍率与自定义尺寸</td><td class="pp">倍率可输入任意值，另有 1x/2x 快捷；导出尺寸随倍率实时换算。</td><td class="cur">固定五档 0.5 / 1 / 2 / 3 / 4，不能输入自定义倍率。</td><td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="match" data-pri="P1"><td class="cap"><span class="dot"></span>多导出项并行 / 后缀</td><td class="pp">同一对象可挂多个导出项（格式 + 倍率 + 文件名后缀），一次导出全部；导出项带缩略图与尺寸。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/sidebar/options/menus/exports.cljs#L191-L203">exports.cljs L191-203</a></td><td class="cur">多选时每个对象独立成项（per-object），统一对话框可设文件名与每项后缀，逐项预览尺寸并一次成包；全局预设列表仍可复用。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L4600-L4670">index.html L4600-4670</a></td><td><span class="gtag match">对齐</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr data-gap="match" data-pri="P2"><td class="cap"><span class="dot"></span>批量 ZIP</td><td class="pp">多文件导出打包 zip，单文件直接下载。</td><td class="cur">多文件走内联 <code>zipStore</code>（store 格式 + UTF-8 文件名），单文件直接下载。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L4423-L4453">index.html L4423-4453</a></td><td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="match" data-pri="P2"><td class="cap"><span class="dot"></span>文件名与重名去重</td><td class="pp">清洗非法字符，重名自动追加序号，扩展名随格式。</td><td class="cur"><code>cleanName</code> 清洗 <code>\/:*?&quot;&lt;&gt;|</code> 并去掉扩展名；重复名追加 <code>_2</code>。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L4404-L4406">index.html L4404-4406</a></td><td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="partial" data-pri="P2"><td class="cap"><span class="dot"></span>导出预览</td><td class="pp">每个导出项显示对象缩略图、像素尺寸与预估文件大小。</td><td class="cur">统一对话框为每项生成缩略图并显示像素尺寸，预览阶段有进度；暂不预估文件大小。</td><td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="partial" data-pri="P2"><td class="cap"><span class="dot"></span>导出进行中状态</td><td class="pp">导出期间按钮禁用并显示进度 / 状态，可取消。</td><td class="cur">导出期间按钮禁用并显示「正在导出 N / M」与进度条，完成后自动关闭；导出中不可取消。</td><td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="partial" data-pri="P2"><td class="cap"><span class="dot"></span>SVG 元数据</td><td class="pp">SVG 输出含 title / desc、对象 ID 与图片嵌入策略。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/shapes/export.cljs#L53-L133">shapes/export.cljs L53-133</a></td><td class="cur">SVG 输出含 <code>title</code> / <code>desc</code>，内容为位图内嵌；无对象 ID 与轮廓化选项。</td><td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="match" data-pri="P2"><td class="cap"><span class="dot"></span>背景与透明</td><td class="pp">PNG 保留透明，JPEG 自动铺白底。</td><td class="cur">PNG 保留透明；JPG 先铺白底再按 0.92 质量编码。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/editor-prototype/index.html#L4459-L4468">index.html L4459-4468</a></td><td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="partial" data-pri="P2"><td class="cap"><span class="dot"></span>文件级 / 二进制导出</td><td class="pp">下载 <code>.penpot</code> 二进制（含页面、组件库与资源）。<a href="file:///d:/1.WorkSpace/1.WorkShop/Project_16%20prototype-html/penpot-2.18.0/penpot-2.18.0/frontend/src/app/main/ui/workspace/main_menu.cljs#L731-L737">main_menu.cljs L731-737</a></td><td class="cur">导出 <code>.prototype.html</code>（Ctrl+S / 创建副本），可离线再打开。</td><td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 右侧属性栏专项 ============ -->
+<section id="options">
+  <div class="sec-head"><span class="no">11</span><h2>右侧属性栏：逐控件对照</h2></div>
+  <p class="sec-desc">这一节只针对右侧属性栏，按「容器 / 通用交互 / 位置尺寸 / 形状属性 / 文本 / 原型 / 导出」逐项拆分，共 32 项。判断标准是 Penpot 属性栏的<b>可见控件 + 交互规则</b>：同一个字段在 Penpot 里能否多值、能否算式、能否折叠、能不能 scrub，都单列。P17–P19 已补齐<b>对齐/分布、四角圆角、导出预设、多填充、渐变与图片填充、描边内中外、效果列表（投影/内阴影/图层模糊/背景模糊）</b>；当前主要缺口收敛到<b>布局类</b>（自动布局、约束、组属性）与<b>填充/效果进阶</b>（填充混合、层排序、多描边与虚线），以及文本全排版与矢量导出。</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th class="col-cap">控件 / 功能</th><th class="col-pen">Penpot 2.18 属性栏</th><th class="col-cur">当前实现</th><th class="col-gap">差距</th><th class="col-pri">优先级</th></tr></thead>
+      <tbody>
+        <tr data-gap="partial" data-pri="P2"><td class="cap"><span class="dot"></span>面板容器 / 页签</td><td class="pp">Design · Prototype 双页签；选中组件时追加组件页签；右侧固定 272px</td><td class="cur">设计 · 原型 · 标注 三页签；固定 252px，内容宽 234</td><td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="miss" data-pri="P2"><td class="cap"><span class="dot"></span>分区可折叠</td><td class="pp">每个分区标题可折叠，状态记忆；折叠后仅留标题行</td><td class="cur">全部分区常驻展开，无折叠控件</td><td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="partial" data-pri="P2"><td class="cap"><span class="dot"></span>分区顺序</td><td class="pp">Page → Layout → Align → Size/Position → Radius → Fill → Stroke → Shadow → Text → Export</td><td class="cur">名称 → 对齐 → 位置尺寸 → 圆角 → 形状 → 文本 → 填充 → 描边 → 效果 → 导出（无 Layout / Constraints）</td><td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="partial" data-pri="P2"><td class="cap"><span class="dot"></span>数值输入 scrub</td><td class="pp">横向拖动调值，Shift ×10、Ctrl/Alt 高精度，双击进入文本编辑</td><td class="cur">横向拖动调值（4px/单位），Shift ×10；Mixed 字段从 0 起算</td><td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="match" data-pri="P1"><td class="cap"><span class="dot"></span>数值表达式</td><td class="pp">输入框支持算式求值：<code>12/2</code>、<code>40+8</code>、<code>360/3</code></td><td class="cur">支持 <code>+ - * /</code> 与括号，白名单字符求值后再写入</td><td><span class="gtag match">对齐</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr data-gap="miss" data-pri="P2"><td class="cap"><span class="dot"></span>单位切换</td><td class="pp">部分字段可切 px / %（宽度、圆角等）</td><td class="cur">全部固定 px</td><td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="partial" data-pri="P1"><td class="cap"><span class="dot"></span>Mixed 状态</td><td class="pp">多选时所有可编辑字段都可 Mixed，占位显示 Mixed，写入后统一</td><td class="cur">X/Y/W/H 显示并集；圆角 R 与不透明度支持 Mixed 占位与统一写入；填充/描边/字号无 Mixed</td><td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr data-gap="partial" data-pri="P2"><td class="cap"><span class="dot"></span>字段键盘操作</td><td class="pp">Enter 提交、Esc 还原、Tab 顺序切下一字段、↑↓ 步进</td><td class="cur">Enter 失焦提交；Esc 关闭菜单；无 Tab 循环与 ↑↓ 步进</td><td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="partial" data-pri="P1"><td class="cap"><span class="dot"></span>位置 / 尺寸</td><td class="pp">X/Y/W/H + 旋转 + 水平/垂直翻转 + 绝对/相对定位</td><td class="cur">X/Y/W/H + 旋转 ∠ + 右键水平/垂直翻转；无绝对/相对定位切换</td><td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr data-gap="miss" data-pri="P2"><td class="cap"><span class="dot"></span>约束 Constraints</td><td class="pp">相对父容器设置 左/右/居中/缩放、固定宽高</td><td class="cur">无约束模型，节点为画板内绝对定位</td><td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="miss" data-pri="P2"><td class="cap"><span class="dot"></span>自动布局</td><td class="pp">Layout 分区：Flex/Grid、方向、间距、padding、对齐、换行、裁剪</td><td class="cur">无自动布局，移动/缩放均为手动</td><td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="match" data-pri="P2"><td class="cap"><span class="dot"></span>对齐 / 分布</td><td class="pp">Align 分区：六向对齐、水平/垂直分布、等间距、相对画板/选区</td><td class="cur">面板与画布浮动条双入口：六向对齐 + 水平/垂直分布；单选相对父画板、多选相对并集、分布需 3+ 图层</td><td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="partial" data-pri="P1"><td class="cap"><span class="dot"></span>组属性</td><td class="pp">组是容器，位置尺寸与子层属性均可直接编辑</td><td class="cur">组包围盒 X/Y/W/H 只读，仅提示「双击进组 / Ctrl+Shift+G」</td><td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr data-gap="partial" data-pri="P1"><td class="cap"><span class="dot"></span>圆角</td><td class="pp">单值 + 四角独立展开、每角可 Mixed、可锁定联动</td><td class="cur">R 单值 + 展开四角（↖↗↙↘），全等时回统一值；无四角 Mixed 与锁定联动</td><td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr data-gap="partial" data-pri="P1"><td class="cap"><span class="dot"></span>填充</td><td class="pp">多填充栈（+ 添加）、纯色/线性渐变/径向渐变/图片、每层独立不透明度与可见性</td><td class="cur">多填充栈：添加/删除/显隐、每层透明度；纯色 / 线性渐变（角度+色标）/ 径向渐变 / 图片（拉伸/覆盖/适应）；无吸管与最近色</td><td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr data-gap="partial" data-pri="P1"><td class="cap"><span class="dot"></span>渐变 / 图片填充</td><td class="pp">线性/径向渐变编辑器（角度、色标、位置）、图片填充（裁切/平铺）</td><td class="cur">数值化渐变编辑器：角度、色标增删与位置%；图片填充支持本地选图、缩略图与 fit（拉伸/覆盖/适应，按形状裁剪）；无画布上渐变手柄拖拽与图片平铺/裁切框</td><td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr data-gap="miss" data-pri="P2"><td class="cap"><span class="dot"></span>填充/描边层排序</td><td class="pp">填充与描边均为可拖拽排序的层栈，支持拖入拖出</td><td class="cur">填充层固定顺序，仅增删与显隐；无拖拽排序</td><td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="miss" data-pri="P2"><td class="cap"><span class="dot"></span>填充混合模式</td><td class="pp">每层填充可选 正常/正片叠底/滤色/叠加等</td><td class="cur">无混合模式</td><td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="partial" data-pri="P1"><td class="cap"><span class="dot"></span>描边</td><td class="pp">多描边栈、内/中/外位置、虚线、端点与拐角、独立线宽/颜色</td><td class="cur">多描边栈：逐条颜色 / 线宽 / 内中外位置 / 实线-虚线-点线 / 端点 / 拐角 / 显隐 / 删除，旧 stroke 字段同步兼容</td><td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr data-gap="match" data-pri="P2"><td class="cap"><span class="dot"></span>虚线 / 端点 / 拐角</td><td class="pp">虚线间隔与相位、端点（butt/round/square）、拐角（miter/round/bevel）</td><td class="cur">solid / dashed / dotted 三种线型，端点 butt/round/square、拐角 miter/round/bevel，内外侧按像素裁剪</td><td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="partial" data-pri="P1"><td class="cap"><span class="dot"></span>阴影 / 模糊</td><td class="pp">Effects 分区：投影、内阴影、层模糊、背景模糊，可叠加多效果</td><td class="cur">效果列表：投影、内阴影、图层模糊、背景模糊，可添加/删除/显隐/切换类型；画布与导出共用绘制路径，CSS 输出 box-shadow / filter / backdrop-filter</td><td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr data-gap="partial" data-pri="P2"><td class="cap"><span class="dot"></span>内阴影 / 背景模糊 / 多效果</td><td class="pp">同一图层可叠加多个效果，逐条显隐/排序；支持内阴影与背景模糊</td><td class="cur">效果列表可叠加多个同类效果并逐条显隐；内阴影用 clip + evenodd 外环投影，背景模糊按设备像素自绘；无拖拽排序</td><td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="partial" data-pri="P1"><td class="cap"><span class="dot"></span>文本排版</td><td class="pp">字族、字重、字号、行高、字间距、横/纵对齐、大小写、下划线/删除线、自动宽高</td><td class="cur">字号、字重（4 档）、行高、字间距、横对齐与纵向对齐、大小写、颜色；画布测量与 CSS 输出同步（line-height / letter-spacing / text-transform）；仍缺字族选择、下划线/删除线与自动宽高</td><td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr data-gap="miss" data-pri="P2"><td class="cap"><span class="dot"></span>图层混合 / 遮罩</td><td class="pp">图层混合模式、遮罩、隔离模式</td><td class="cur">无混合模式与遮罩</td><td><span class="gtag miss">缺失</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="partial" data-pri="P2"><td class="cap"><span class="dot"></span>组件 / 实例</td><td class="pp">组件创建、实例覆盖、库资源、资产面板</td><td class="cur">已有组件库面板与实例联动；缺组件创建 / 变体 / 覆盖管理</td><td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="match" data-pri="P2"><td class="cap"><span class="dot"></span>导出</td><td class="pp">多预设并行、PNG/JPG/SVG/PDF、1x/2x/自定义倍率、SVG 选项</td><td class="cur">预设列表：0.5/1/2/3/4 倍率 + PNG/JPG/WebP/SVG；统一导出对话框叠加 PDF、范围（选中/画板/全部）、文件名与每项后缀，多选逐项成包</td><td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="partial" data-pri="P2"><td class="cap"><span class="dot"></span>矢量 / 文档格式导出</td><td class="pp">SVG（含嵌入/轮廓选项）、PDF、WEBP 导出</td><td class="cur">支持 WebP、SVG（位图内嵌 + title/desc）与 PDF（多页 JPEG XObject，每项一页）；仍缺矢量轮廓化与 SVG 选项</td><td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="partial" data-pri="P1"><td class="cap"><span class="dot"></span>原型交互</td><td class="pp">触发（点击/悬停/按下/延迟/拖拽/按键）、动作（导航/覆盖/返回/URL/滚动）、动画类型/缓动/时长/保持滚动</td><td class="cur">点击/悬停/按下 + 目标画板 + 动作；每条交互可设时长与缓动（缓入/缓出/缓入缓出/线性）并驱动演示动画；仍缺延迟/拖拽触发与保持滚动</td><td><span class="gtag partial">部分</span></td><td><span class="badge p1">P1</span></td></tr>
+        <tr data-gap="partial" data-pri="P2"><td class="cap"><span class="dot"></span>标注 / 检查</td><td class="pp">完整 inspect：尺寸、间距测量、样式复制、设计 token</td><td class="cur">位置尺寸 + CSS 代码片段</td><td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="partial" data-pri="P2"><td class="cap"><span class="dot"></span>页面属性</td><td class="pp">页面名、网格/指南设置、页面级导出</td><td class="cur">仅封面缩略图（无页面设置项）</td><td><span class="gtag partial">部分</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="match" data-pri="P2"><td class="cap"><span class="dot"></span>面板视觉规范</td><td class="pp">26/28px 行高、12px 字号、浅灰底、hover 高亮、分区细分隔线</td><td class="cur">30px 行高、12px 字号、#FAFAFA 底、hover 高亮、1px 细分隔线（MasterGo 实测值）</td><td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td></tr>
+        <tr data-gap="match" data-pri="P2"><td class="cap"><span class="dot"></span>行内快捷图标</td><td class="pp">分区标题右侧 +、行内眼睛/链接/更多等快捷操作</td><td class="cur">填充层行内眼睛/删除、导出预设行内导出/删除、分区级添加按钮</td><td><span class="gtag match">对齐</span></td><td><span class="badge p2">P2</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout" style="margin-top:14px">
+    <b>属性栏差距归并（按收益排序）：</b>① <b>Layout + Constraints 两个分区仍缺失</b>（自动布局、相对父容器约束），这决定「排版效率」而不是「像素还原」；② <b>填充/效果进阶</b>（填充混合、层排序、多描边与虚线、效果拖拽排序、画布上渐变手柄与图片裁切框），渐变/图片填充与内阴影/背景模糊/多效果列表已在 P19 落地；③ <b>文本全排版与矢量导出</b>（字族/行高/字距、SVG/PDF/WEBP）属于 P1–P2 字段级补全；④ 面板交互细节（折叠记忆、表达式求值、Tab 步进、单位切换）属于 P2 手感打磨。组属性只读是 P14「组=容器」模型的直接副作用，若要像 Penpot 一样可编辑组框，需要把组升级为真实父容器坐标系，成本高于收益，建议列入「保留差异」。
+  </div>
+</section>
+
+<!-- ============ 路线图 ============ -->
+<section id="roadmap">
+  <div class="sec-head"><span class="no">12</span><h2>落地路线：P13 – P19（已执行）+ P20 – P21（进行中）</h2></div>
+  <p class="sec-desc">P13–P19 七批均已落地；每批的「已落地 / 未落地」在卡片内写明。P20 完成剪贴板 / 翻转 / WebP·SVG 导出 / 演示顶栏，P21-A 继续补齐编辑菜单查找替换、视图菜单显隐、复制文本与属性、页面树复制页与空白画布右键。四个专项的 P1 命令类缺口已基本收口，剩余按<b>属性栏（多描边 / 虚线 / Mixed 覆盖 / 文本排版 / 原型动画参数）→ 导出（PDF / per-object / 预览进度 / 统一对话框）→ 演示（过渡参数 / flow / 分享登录）</b>推进。</p>
+
+  <div class="road">
+    <div class="batch">
+      <div class="tag">P13 · 手感层 · 已完成</div>
+      <h3>变换与缩放并轨</h3>
+      <div class="goal">不改数据结构，先把最常用的手势调到 Penpot 参数。</div>
+      <ul>
+        <li>缩放范围 0.01–200×，按钮步进 1.3，fit padding 160/40</li>
+        <li>缩放工具/菜单补「缩放到选中」档位与 400%/800%</li>
+        <li>缩放修饰键：Shift 等比、Alt 中心，边手柄单轴</li>
+        <li>旋转吸附：Shift 15° + Alt 45° 可组合</li>
+        <li>Alt 拖拽复制（拖拽开始时复制副本）</li>
+        <li>手柄命中热区 ±6 → ±10，旋转热区对齐 20px</li>
+        <li>Alt+方向键 10px 微调；框选过滤父级隐藏</li>
+      </ul>
+      <div class="acc"><b>验收</b>Playwright 断言：缩放边界 0.01/200、Shift 缩放宽高比误差 &lt;0.5%、Alt 旋转吸附到 45°、Alt 拖拽后对象数 +1、手柄 9px 偏移仍命中。</div>
+    </div>
+    <div class="batch">
+      <div class="tag">P14 · 结构层 · 已完成</div>
+      <h3>引入组与深层选择</h3>
+      <div class="goal">补齐 Penpot 选择模型的底座，图层面板随之递归。</div>
+      <ul>
+        <li>新增 <code>group</code> 类型：children 递归、包围盒、旋转继承</li>
+        <li>双击进组、Esc 逐级上退、Ctrl+G / Ctrl+Shift+G</li>
+        <li>组选中框与组内子元素高亮两种视觉态</li>
+        <li>图层面板递归渲染，组行折叠、组图标</li>
+        <li>Ctrl+A 全选；Ctrl 加选 / Shift 范围选择</li>
+        <li>多选整体缩放/旋转（union selrect）</li>
+        <li>拖拽可跨层级进出组</li>
+      </ul>
+      <div class="acc"><b>验收</b>双击命中组内最上层子元素、Esc 回到父组、Ctrl+G 后图层面板出现嵌套行、多选缩放后各子元素相对间距成比例。</div>
+    </div>
+    <div class="batch">
+      <div class="tag">P15 · 面板层 · 部分完成</div>
+      <h3>数值输入与快捷键</h3>
+      <div class="goal">把右栏从「能用」做到「顺手」，并对齐快捷键字母。<b>已落地：</b>V/B/R/E/T/P/L/C 快捷键并轨（P=段落，保留 F/O/A/H/Z 别名）、Shift 锁轴拖拽、Shift 等比创建、Alt 中心创建、Esc 取消交互、多选 Mixed（圆角/不透明度）、Mixed 字段 scrub、右键菜单分区、表达式求值、层级快捷键（Ctrl+] / Ctrl+[ / Shift）。<b>未落地：</b>↑↓/Ctrl×0.1/Esc 还原、Alt 对齐快捷键。</div>
+      <ul>
+        <li>数值框：↑↓ 步进、Ctrl×0.1、表达式求值、Esc 还原（表达式已落地，其余未落地）</li>
+        <li>多选 Mixed 占位与批量改值（已落地）</li>
+        <li>圆角四角、描边位置、多填充、渐变/图片填充、效果列表、导出预设、对齐分布（已移至 P17–P19）</li>
+        <li>单对象对齐快捷键 Alt+A/D/W/H/V/S（未落地）</li>
+        <li>层级快捷键 Ctrl+] / Ctrl+[ / Shift（已落地）</li>
+        <li>工具字母并轨 V/B/R/E/T/L/C（已落地）</li>
+        <li>右键菜单补编辑类：剪切/复制/粘贴/复制属性/重命名/成组（已落地）</li>
+      </ul>
+      <div class="acc"><b>验收</b>输入 <code>120+8</code> 得 128、<code>50%</code> 按父宽换算；多选改描边色全部生效；Alt+A 左对齐画板；B 切画板、E 切椭圆。</div>
+    </div>
+    <div class="batch">
+      <div class="tag">P16 · 外围层 · 部分完成</div>
+      <h3>标尺细节、评论、演示</h3>
+      <div class="goal">补齐外围体验与可发现性，不影响主编辑流程。<b>已落地：</b>评论回复线程（列表 + 回复输入 + 关闭保留）、右键菜单分区与危险项、演示顶栏 sitemap、底部缩略图条、缩放/全屏。<b>未落地：</b>标尺与网格可见化、演示评论/检查三模式、隐藏 UI。</div>
+      <ul>
+        <li>标尺 22px、zoom 分档刻度、参考线颜色预设</li>
+        <li>像素网格显式开关 Shift+, 与网格吸附 ,</li>
+        <li>吸附阈值 4 → 10 屏幕像素</li>
+        <li>评论线程：回复/解决/删除 + 按页分组侧栏</li>
+        <li>演示：底部缩略图条、缩放控件、全屏、三模式（除三模式外已落地）</li>
+        <li>Alt+L 面板显隐、反引号隐藏 UI、<code>?</code> 快捷键速查</li>
+      </ul>
+      <div class="acc"><b>验收</b>演示中按 F 全屏、T 打开缩略图条、点击缩略图跳转正确；评论可回复并关闭保留。</div>
+    </div>
+    <div class="batch">
+      <div class="tag">P17 · 面板层 · 已完成</div>
+      <h3>对齐 / 四角圆角 / 导出预设</h3>
+      <div class="goal">把属性栏从「字段级补全」推进到「结构级对齐」，先解决选中对象的排布与导出效率。</div>
+      <ul>
+        <li>对齐分区：六向对齐 + 水平/垂直分布；单选相对父画板、多选相对并集、分布需 3+ 图层</li>
+        <li>四角圆角：R 展开 tl/tr/br/bl，绘制、缩放、历史快照与标注 CSS 全链路同步</li>
+        <li>导出预设：0.5/1/2/3/4 倍率 × PNG/JPG，逐行导出、添加与删除</li>
+        <li>导出链路支持 JPEG 白底与 <code>.jpg</code> 扩展名、MIME</li>
+      </ul>
+      <div class="acc"><b>验收</b>左对齐后 <code>worldX == 画板 X</code>、三元素分布间距相等、仅左上圆角变圆、1x PNG 与 2x JPG 文件名/MIME 正确。</div>
+    </div>
+    <div class="batch">
+      <div class="tag">P18 · 面板层 · 已完成</div>
+      <h3>多填充 / 描边位置 / 效果</h3>
+      <div class="goal">让属性栏能表达真实 UI 的层级与材质，而不只是单色矩形。</div>
+      <ul>
+        <li>多填充栈：逐层色值/透明度/显隐/删除/添加，主色自动同步</li>
+        <li>描边位置：居中/内侧/外侧，使用 clip + evenodd 保证几何正确</li>
+        <li>投影：X/Y/模糊/颜色/透明度 + 开关；图层模糊走 <code>ctx.filter</code></li>
+        <li>画布与导出共用绘制路径，标注 CSS 输出 <code>box-shadow</code> / <code>filter</code></li>
+      </ul>
+      <div class="acc"><b>验收</b>像素抽样确认内/外描边边界；两层填充叠加正确；导出含投影与模糊且无报错。</div>
+    </div>
+    <div class="batch">
+      <div class="tag">P19 · 面板层 · 已完成</div>
+      <h3>渐变 / 图片填充 + 效果列表</h3>
+      <div class="goal">把填充与效果从「单色 + 单投影」推进到可叠加的材质系统。</div>
+      <ul>
+        <li>填充类型：纯色 / 线性渐变（角度 + 色标增删 + 位置%）/ 径向渐变 / 图片（本地选图、缩略图、拉伸/覆盖/适应）</li>
+        <li>渐变与图片走同一 <code>shapePath</code>：渐变按包围盒生成坐标，图片先裁剪形状再绘制，圆角同样生效</li>
+        <li>效果列表：投影 / 内阴影 / 图层模糊 / 背景模糊，可添加、切换类型、逐条显隐与删除</li>
+        <li>内阴影用 clip + evenodd 外环投影；背景模糊按设备像素把画布自绘模糊后绘回</li>
+        <li>旧 <code>effect.shadow</code> / <code>blur</code> 字段双向同步，历史节点与标注 CSS 不受影响</li>
+        <li>标注 CSS 输出 linear-gradient / radial-gradient、多条 box-shadow（inset）、filter、backdrop-filter</li>
+      </ul>
+      <div class="acc"><b>验收</b>渐变左中右三点色值、径向中心与角落、图片填充洋红、内阴影顶部 217 / 中心 255、背景模糊由纯黄变混色、效果增删与 2x PNG 导出全部通过；P14–P18 回归 <code>errs: []</code>。</div>
+    </div>
+    <div class="batch">
+      <div class="tag">P20 · 外围层 · 已完成</div>
+      <h3>菜单 / 右键 / 导出 / 演示补全</h3>
+      <div class="goal">四项专项对照后的收口批次，按「命令可达 → 导出可用 → 演示完整」排序。<b>已落地：</b>剪贴板与复制为（CSS/SVG/ID）、翻转、重命名、WebP/SVG 导出、演示顶栏 sitemap、缩略图条、缩放/全屏。<b>后续：</b>PDF 与分享登录由 P21-C 补齐。</div>
+      <ul>
+        <li>主菜单：剪贴板与层级快捷键（查找替换与视图显隐由 P21-A 承接）</li>
+        <li>右键：剪切/复制/粘贴、复制为图片/文本、复制属性/CSS/SVG、翻转、重命名（复制文本与属性由 P21-A 承接）</li>
+        <li>导出：WebP/SVG 已落地（PDF、per-object、预览进度与统一对话框由 P21-C 承接）</li>
+        <li>演示：顶部 sitemap、底部缩略图条、缩放/全屏（分享登录由 P21-C 承接）</li>
+      </ul>
+      <div class="acc"><b>验收</b>Ctrl+C/V 复制粘贴 16px 阶梯；右键复制 CSS 可粘贴到浏览器；WebP/SVG 可打开；演示按 T 打开缩略图、F 全屏、点击缩略图跳转。</div>
+    </div>
+    <div class="batch">
+      <div class="tag">P21 · 外围层 · 已收口</div>
+      <h3>A 命令可达 / B 属性栏 / C 导出与演示</h3>
+      <div class="goal">补齐上一轮列出的 P1「部分项」：命令可达、属性栏深水区、导出与演示外围。<b>A 批：</b>查找替换、视图显隐、属性复制、页面复制。<b>B 批：</b>多描边 + 虚线/端点/拐角、Mixed 覆盖写入、文本行高/字距/纵对齐/大小写、原型时长与缓动。<b>C 批：</b>统一导出对话框（预览/进度/per-object/PDF）、演示 flow 起点 / 缩略图计数 / 分享链接与登录入口。</div>
+      <ul>
+        <li>描边栈：逐条颜色 / 线宽 / 内中外位置 / solid-dashed-dotted / cap / join / 显隐 / 删除，绘制与 CSS 输出共用</li>
+        <li>文本：行高、字距、纵对齐、大小写进入测量、画布绘制与标注 CSS；多选可覆盖</li>
+        <li>原型：交互项带时长与缓动，演示帧按其执行；画板面板可设唯一 flow 起点</li>
+        <li>导出：三处入口统一对话框，缩略图 + 尺寸 + 进度条，per-object 逐项与后缀，PDF 多页 JPEG XObject</li>
+        <li>演示：分享复制 <code>#demo?a=</code> 直达链接，访客头像登录入口，缩略图计数 <code>N / M</code></li>
+      </ul>
+      <div class="acc"><b>验收</b>查找 16 / 替换 16、属性复制一致、复制页 3→4；描边 dashed+dotted 双层、文本 lh1.2/ls2/upper/middle、Mixed 占位正常；对话框预览 2 项、PNG 多选导出 ZIP、PDF 单板导出成功；演示计数 2/8→3/8、分享链接含画板 id。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 保留差异 ============ -->
+<section id="keep">
+  <div class="sec-head"><span class="no">13</span><h2>明确保留的差异</h2></div>
+  <p class="sec-desc">以下不是缺口，而是当前产品定位决定的合理差异，不建议为了「像 Penpot」而改。</p>
+  <div class="keep">
+    <div class="item"><h4>本地文件保存 vs 服务端自动保存</h4><p>当前 Ctrl+S / Ctrl+O 基于 File System Access API，单文件可离线打开；Penpot 依赖后端与团队权限。保留现有实现。</p></div>
+    <div class="item"><h4>Canvas 2D 渲染 vs WASM 渲染器</h4><p>Penpot 用 Rust/WASM 绘制 + SVG overlay；当前为 Canvas 2D。只对齐交互参数与视觉常量，不迁移渲染架构。</p></div>
+    <div class="item"><h4>组件 / 变体 / 自动布局</h4><p>Penpot 的组件体系与 Flex/Grid 布局是独立产品能力，本轮不实现，面板中也暂不放置无功能的占位入口。</p></div>
+    <div class="item"><h4>视图旋转</h4><p>Penpot 无画布旋转；当前 P12-D 已实现 Space+Shift 拖拽与 15° 步进，作为增强能力保留。</p></div>
+  </div>
+</section>
+
+<!-- ============ 源码索引 ============ -->
+<section id="source">
+  <div class="sec-head"><span class="no">14</span><h2>Penpot 源码索引</h2></div>
+  <p class="sec-desc">报告中所有结论的原始依据，按主题折叠。路径相对 <code>penpot-2.18.0/penpot-2.18.0/</code>，链接可直接在浏览器中打开。</p>
+
+  <details class="appx" open>
+    <summary>视口 / 选择 / 变换</summary>
+    <div class="body"><ul>
+      <li><b>缩放范围与步进</b> · frontend/src/app/main/data/workspace/zoom.cljs#L38-L111</li>
+      <li><b>fit / zoom-selected</b> · frontend/src/app/main/data/workspace/zoom.cljs#L113-L189</li>
+      <li><b>滚轮与 RAF 合并</b> · frontend/src/app/main/ui/workspace/viewport/actions.cljs#L383-L470</li>
+      <li><b>选区手柄常量</b> · frontend/src/app/main/ui/workspace/viewport/selection.cljs#L35-L46</li>
+      <li><b>框选查询</b> · frontend/src/app/main/data/workspace/selection.cljs#L347-L381</li>
+      <li><b>进组选择</b> · frontend/src/app/main/data/workspace/selection.cljs#L383-L400</li>
+      <li><b>缩放 / 旋转计算</b> · frontend/src/app/main/data/workspace/transforms.cljs#L150-L203、#L473-L520</li>
+      <li><b>Alt 拖拽复制</b> · frontend/src/app/main/data/workspace/transforms.cljs#L774-L820</li>
+      <li><b>方向键微调</b> · frontend/src/app/main/data/workspace/transforms.cljs#L1010-L1077</li>
+    </ul></div>
+  </details>
+
+  <details class="appx">
+    <summary>标尺 / 参考线 / 吸附 / 对齐</summary>
+    <div class="body"><ul>
+      <li><b>标尺常量与刻度</b> · frontend/src/app/main/ui/workspace/viewport/rulers.cljs#L17-L67</li>
+      <li><b>吸附阈值</b> · frontend/src/app/main/snap.cljs#L25-L27</li>
+      <li><b>间距测量</b> · frontend/src/app/main/ui/workspace/viewport/snap_distances.cljs#L53-L208</li>
+      <li><b>对齐 / 分布 UI</b> · frontend/src/app/main/ui/workspace/sidebar/options/menus/align.cljs#L18-L108</li>
+      <li><b>参考线颜色菜单</b> · frontend/src/app/main/ui/workspace/context_menu.cljs#L996-L1038</li>
+    </ul></div>
+  </details>
+
+  <details class="appx">
+    <summary>图层 / 页面 / 属性面板</summary>
+    <div class="body"><ul>
+      <li><b>图层行与拖拽</b> · frontend/src/app/main/ui/workspace/sidebar/layer_item.cljs#L63-L202、#L374-L410</li>
+      <li><b>图层搜索与过滤</b> · frontend/src/app/main/ui/workspace/sidebar/layers.cljs#L217-L245、#L402-L507</li>
+      <li><b>页面列表</b> · frontend/src/app/main/ui/workspace/sidebar/sitemap.cljs#L77-L172</li>
+      <li><b>面板分组顺序</b> · frontend/src/app/main/ui/workspace/sidebar/options/shapes/multiple.cljs#L511-L595</li>
+      <li><b>数值输入</b> · frontend/src/app/main/ui/components/numeric_input.cljs#L61-L83、#L152-L169、#L227-L267</li>
+      <li><b>圆角四角</b> · frontend/src/app/main/ui/workspace/sidebar/options/menus/border_radius.cljs#L286-L348</li>
+      <li><b>描边行</b> · frontend/src/app/main/ui/workspace/sidebar/options/rows/stroke_row.cljs#L333-L418</li>
+      <li><b>导出预设</b> · frontend/src/app/main/ui/workspace/sidebar/options/menus/exports.cljs#L191-L203</li>
+      <li><b>混合模式</b> · frontend/src/app/main/ui/workspace/sidebar/options/menus/layer.cljs#L184-L204</li>
+    </ul></div>
+  </details>
+
+  <details class="appx">
+    <summary>工具 / 快捷键 / 右键 / 评论 / 演示</summary>
+    <div class="body"><ul>
+      <li><b>顶部工具条</b> · frontend/src/app/main/ui/workspace/top_toolbar.cljs#L346-L488</li>
+      <li><b>主菜单 / 文件 / 编辑 / 视图</b> · frontend/src/app/main/ui/workspace/main_menu.cljs#L344-L490、#L492-L565、#L567-L745、#L1015-L1125</li>
+      <li><b>导出配置菜单</b> · frontend/src/app/main/ui/workspace/sidebar/options/menus/exports.cljs#L47-L274</li>
+      <li><b>SVG 导出元数据</b> · frontend/src/app/main/ui/shapes/export.cljs#L53-L133</li>
+      <li><b>基础快捷键</b> · frontend/src/app/main/data/workspace/shortcuts.cljs#L68-L671</li>
+      <li><b>右键菜单分派</b> · frontend/src/app/main/ui/workspace/context_menu.cljs#L759-L790、#L1042-L1078</li>
+      <li><b>评论线程 UI</b> · frontend/src/app/main/ui/comments.cljs#L667-L1020</li>
+      <li><b>评论侧栏</b> · frontend/src/app/main/ui/workspace/comments.cljs#L32-L164</li>
+      <li><b>演示 header / 缩略图</b> · frontend/src/app/main/ui/viewer/header.cljs#L36-L360、thumbnails.cljs#L24-L151</li>
+      <li><b>演示快捷键</b> · frontend/src/app/main/data/viewer/shortcuts.cljs#L16-L94</li>
+    </ul></div>
+  </details>
+</section>
+
+<footer>
+  <div>基准：Penpot 2.18.0（MPL-2.0，仅读取规格、重写实现）· 对比对象：editor-prototype/index.html</div>
+  <div>报告生成于 2026-10-29 · 126 项能力对照</div>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var rows = Array.prototype.slice.call(document.querySelectorAll('tbody tr[data-gap]'));
+  var counts = {match:0, partial:0, miss:0, P0:0, P1:0, P2:0};
+  rows.forEach(function(r){
+    var g = r.getAttribute('data-gap');
+    var p = r.getAttribute('data-pri');
+    if (counts[g] !== undefined) counts[g]++;
+    if (counts[p] !== undefined) counts[p]++;
+  });
+  var total = rows.length || 1;
+  function set(id, v){ var el = document.getElementById(id); if (el) el.textContent = v; }
+  set('cardMatch', counts.match);
+  set('cardPartial', counts.partial);
+  set('cardMiss', counts.miss);
+  set('cardP0', counts.P0);
+  set('stampP0', counts.P0);
+  set('stampP1', counts.P1);
+  set('stampP2', counts.P2);
+  var weighted = (counts.match * 1 + counts.partial * 0.5) / total;
+  set('scorePct', Math.round(weighted * 100) + '%');
+  var pct = function(n){ return (n / total * 100).toFixed(2) + '%'; };
+  var bm = document.getElementById('barMatch');
+  var bp = document.getElementById('barPartial');
+  var bx = document.getElementById('barMiss');
+  if (bm) bm.style.width = pct(counts.match);
+  if (bp) bp.style.width = pct(counts.partial);
+  if (bx) bx.style.width = pct(counts.miss);
+  set('barNum', counts.match + ' 对齐 / ' + counts.partial + ' 部分 / ' + counts.miss + ' 缺失');
+})();
+</script>
+</body>
+</html>
