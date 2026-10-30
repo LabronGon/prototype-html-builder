@@ -350,6 +350,18 @@ footer{border-top:1px solid var(--line);background:var(--bg-2);padding:44px 0 40
   display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
   color:var(--muted);font-size:11.5px;
 }
+/* GitHub 入口 */
+.gh-btn{gap:7px}
+.gh-btn svg{color:var(--ink-2);transition:color .16s}
+.gh-btn:hover svg{color:var(--ink)}
+.foot-gh{
+  display:inline-flex;align-items:center;gap:8px;margin-top:16px;
+  font-family:var(--mono);font-size:12px;color:var(--ink-2);text-decoration:none;
+  border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 11px;
+  transition:border-color .16s,color .16s,background .16s;
+}
+.foot-gh:hover{border-color:#C9CDD4;color:var(--brand);background:#FCFCFD}
+.foot-gh .star{color:#F5A623;display:flex}
 
 /* ============ Reveal ============ */
 .js .reveal{opacity:0;transform:translateY(14px);transition:opacity .55s cubic-bezier(.2,.7,.3,1),transform .55s cubic-bezier(.2,.7,.3,1)}
@@ -410,6 +422,10 @@ footer{border-top:1px solid var(--line);background:var(--bg-2);padding:44px 0 40
       <a href="#faq">问答</a>
     </nav>
     <div class="nav-cta">
+      <a class="btn btn-ghost gh-btn" href="https://github.com/LabronGon/prototype-html-builder" target="_blank" rel="noopener" title="GitHub 仓库 · 欢迎 Star">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        <span>Star</span>
+      </a>
       <a class="btn btn-ghost" href="#download">资源清单</a>
       <a class="btn btn-primary" href="#download">立即下载</a>
     </div>
@@ -432,6 +448,10 @@ footer{border-top:1px solid var(--line);background:var(--bg-2);padding:44px 0 40
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2.5v8m0 0l-3-3m3 3l3-3M3 13h10" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
         <a class="btn btn-ghost btn-lg" href="#download">下载初始文件</a>
+        <a class="btn btn-ghost btn-lg gh-btn" href="https://github.com/LabronGon/prototype-html-builder" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          在 GitHub 上 Star
+        </a>
       </div>
       <div class="hero-meta">
         <span><i></i>单文件交付</span>
@@ -855,6 +875,10 @@ ProtoAPI.exportPNG(<span class="s">'首页'</span>, 2);   <span class="c">// →
           <span class="logo-name">prototype-html-builder</span>
         </a>
         <p>把声明式规格编译为可编辑、可演示、可离线的单文件高保真原型。<br>本页为单文件交付物：不含任何外部资源，可直接转发。</p>
+        <a class="foot-gh" href="https://github.com/LabronGon/prototype-html-builder" target="_blank" rel="noopener" title="GitHub 仓库 · 欢迎 Star">
+          <span class="star"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.2l2.06 4.18 4.62.67-3.34 3.26.79 4.6L8 11.74 3.87 13.9l.79-4.6L1.32 6.05l4.62-.67L8 1.2z"/></svg></span>
+          github.com/LabronGon/prototype-html-builder
+        </a>
       </div>
       <div class="foot-r">
         <div>
