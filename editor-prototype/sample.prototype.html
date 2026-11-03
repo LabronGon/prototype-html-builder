@@ -86,6 +86,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)}
 .tool-btn:hover{background:var(--hover)}
 .tool-btn.active{background:var(--brand);color:#fff}
 .tool-btn.active:hover{background:var(--brand)}
+.tool-btn.vec-tool{display:none} /* P34：默认隐藏，updateVecTools 按选中内容显隐 */
 .tool-btn.sm{width:30px;height:30px}
 .tool-btn:disabled{color:var(--text-dis)}
 .tool-btn:disabled:hover{background:transparent}
@@ -1350,6 +1351,12 @@ const IC={
   slice:'<circle cx="4.2" cy="11.6" r="1.8"/><circle cx="11.8" cy="11.6" r="1.8"/><path d="M5.4 10.3 12.6 2.7M10.6 10.3 3.4 2.7"/>',
   play:'<path d="M4.4 4.4 11.6 8 4.4 11.6z" fill="currentColor" stroke="none"/>',
   comment:'<path d="M5.2 3h5.6a2.7 2.7 0 0 1 2.7 2.7v3.2a2.7 2.7 0 0 1-2.7 2.7H8.2l-2.4 2.4v-2.5a2.7 2.7 0 0 1-2.6-2.6V5.7A2.7 2.7 0 0 1 5.2 3z"/>',
+  /* P33：钢笔——笔尖朝左下、笔帽朝右上 */
+  pen:'<path d="M3 13.2 4.4 9.8 10.6 3.6a1.5 1.5 0 0 1 2.1 0l.9.9a1.5 1.5 0 0 1 0 2.1L7.2 12.6 3.8 13z"/><path d="M11.3 4 12 4.7"/>',
+  /* P34：矢量上下文按钮图标 */
+  node:'<rect x="6.2" y="6.2" width="3.6" height="3.6" rx=".8"/><circle cx="2.8" cy="13.2" r="1.5"/><circle cx="13.2" cy="2.8" r="1.5"/><path d="M4 11.9 6.2 9.8M9.8 6.2 12 4"/>',
+  closePath:'<path d="M3.4 11.6c.8-4.6 8.4-4.6 9.2 0"/><circle cx="3" cy="12.2" r="1.3"/><circle cx="13" cy="12.2" r="1.3"/><path d="M4.4 12.2h7.2" stroke-dasharray="2 1.8"/>',
+  toPath:'<path d="M13.5 9.2v4.3h-11v-11H8.8"/><circle cx="12.8" cy="3.2" r="1.6"/>',
   zoom:'<circle cx="7" cy="7" r="4.7"/><path d="M10.3 10.3 13.5 13.5M7 5.1v3.8M5.1 7h3.8"/>',
   img:'<rect x="2.5" y="3.5" width="11" height="9" rx="1.5"/><circle cx="5.8" cy="6.6" r="1.2"/><path d="M2.5 10.6 6.2 7.7l2.6 2.1 2-1.7 2.7 2.2"/>',
   drop:'<path d="M8 2.2s4 4.7 4 7.5a4 4 0 1 1-8 0c0-2.8 4-7.5 4-7.5z"/>',
@@ -1401,6 +1408,12 @@ const state={
   showGuides:true,  // P12-C：参考线显隐
   hideUI:false,     // P21：隐藏 UI（Tab 切换）
   enterGroup:[],    // P14：已进入的组 id 路径（根→深），双击进组 / Esc 逐级上退
+  penPath:null,     // P33：钢笔工具进行中正在绘制的路径节点
+  penAb:null,       // P33：钢笔路径所属画板（null=自由图层）
+  vecEdit:null,     // P33：当前处于矢量锚点编辑模式的路径节点 id
+  vecSel:-1,        // P33：矢量编辑中选中的锚点索引（-1=未选中）
+  segHover:null,    // P34：矢量编辑下悬停的路径段（"+"加锚点）{i,t,s}
+  penSnap:null,     // P34：钢笔悬停吸附 {s:{x,y},close}
 };
 let editing=null; // 正在文字编辑的节点：画布跳过它的绘制，改由 #textEditor 覆盖层渲染（避免重影）
 const R=o=>Object.assign({type:'rect',fill:'#D8D8D8',stroke:null,strokeW:1,radius:0,opacity:1},o);
@@ -1411,6 +1424,9 @@ const PG=o=>Object.assign({type:'polygon',sides:3,fill:'#D8D8D8',stroke:null,str
 const ST=o=>Object.assign({type:'star',points:5,fill:'#D8D8D8',stroke:null,strokeW:1,opacity:1},o);
 const IM=o=>Object.assign({type:'image',src:'',opacity:1},o);
 const AB=o=>Object.assign({type:'artboard',bg:'#FFFFFF',children:[]},o);
+/* P33：矢量路径——pts 为锚点数组（画板局部坐标），每个锚点 {x,y,c1,c2}；
+   c1/c2 为相对锚点的贝塞尔控制柄（null=拐角）；closed 表示闭合。x/y/w/h 由 syncPathRect 维护。 */
+const P=(o)=>Object.assign({type:'path',pts:[],x:0,y:0,w:0,h:0,fill:null,stroke:'#000000',strokeW:1,opacity:1,closed:false},o);
 
 /* ---------------- P31 主题（浅色 / 深色） ----------------
    深色只换 UI 与画布底色，画板内容（白底/业务色）保持原样；
@@ -1568,7 +1584,12 @@ function flattenLeaves(list,out){
 }
 /* 平移节点：组递归平移全部后代（坐标均为画板局部，增量一致） */
 function translateNode(n,dx,dy){
-  n.x+=dx;n.y+=dy;
+  if(n.type==='path'){ // P34-fix：路径渲染位置只由 pts 决定（shapePath 中 n.x 会被抵消），平移必须改 pts 并同步包围盒
+    for(const a of n.pts||[]){a.x+=dx;a.y+=dy}
+    syncPathRect(n);
+  }else{
+    n.x+=dx;n.y+=dy;
+  }
   if(n.type==='group'||n.type==='bool')for(const c of n.children||[])translateNode(c,dx,dy);
 }
 /* 选中集合去掉"祖先也被选中"的节点，避免重复变换 */
@@ -1598,7 +1619,7 @@ function hitNode(n,wx,wy){
 }
 
 /* ---------------- 画板名称计数器 ---------------- */
-const CN={rect:'矩形',ellipse:'椭圆',text:'文本',artboard:'画板',group:'编组',line:'直线',arrow:'箭头',polygon:'多边形',star:'星形',image:'图片',svg:'图标'};
+const CN={rect:'矩形',ellipse:'椭圆',text:'文本',artboard:'画板',group:'编组',line:'直线',arrow:'箭头',polygon:'多边形',star:'星形',image:'图片',svg:'图标',path:'路径'};
 function nextName(type){
   let i=1;const set=new Set(allNodes().map(n=>n.name));
   while(set.has(CN[type]+' '+i))i++;
@@ -1618,7 +1639,7 @@ $('#pageHeadIcons').innerHTML=
    <button class="icon-btn" id="phAdd" title="新建页面">${icon('plus',16)}</button>
    <button class="icon-btn" id="phFold" title="折叠页面树">${icon('collapse',16)}</button>`;
 
-/* 工具栏：7 个已实现工具（形状/文本带子菜单，含缩放工具）。组件/复制/连线/蒙版/链接/切片 6 个范围外工具已移除，不留置灰占位 */
+/* 工具栏：选择/画板/形状/文本/手型/缩放/评论/钢笔。组件/复制/连线/蒙版/链接/切片 6 个范围外工具已移除，不留置灰占位 */
 const TOOLS=[
   {k:'select',ic:'cursor',tip:'选择 V',active:true},
   {k:'frame',ic:'frame',tip:'画板 B'},
@@ -1627,6 +1648,7 @@ const TOOLS=[
   {k:'hand',ic:'hand',tip:'手型 H'},
   {k:'zoom',ic:'zoom',tip:'缩放 Z：单击放大 / Alt 单击缩小 / 拖拽框选'},
   {k:'comment',ic:'comment',tip:'评论 C'},
+  {k:'pen',ic:'pen',tip:'钢笔 P'},
 ];
 function buildTools(){
   const el=$('#tools');
@@ -1664,7 +1686,38 @@ function buildTools(){
     b.addEventListener('click',()=>applyBool(t.k));
     el.appendChild(b);
   }
+  /* P34：矢量上下文按钮——选中路径/可转形状时出现在工具栏右侧（样式同工具栏按钮） */
+  el.insertAdjacentHTML('beforeend','<i class="tool-divider"></i>'+
+    `<button class="tool-btn vec-tool" id="pathEdit" data-tip="编辑锚点">${icon('node',16)}</button>`+
+    `<button class="tool-btn vec-tool" id="pathClose" data-tip="闭合路径">${icon('closePath',16)}</button>`+
+    `<button class="tool-btn vec-tool" id="pathConv" data-tip="转为路径并编辑锚点">${icon('toPath',16)}</button>`);
+  $('#pathEdit').addEventListener('click',()=>{const n=single();if(n&&n.type==='path'){state.vecEdit=state.vecEdit===n.id?null:n.id;state.vecSel=-1;renderPanel();drawSoon()}});
+  $('#pathClose').addEventListener('click',()=>{const n=single();if(n&&n.type==='path'&&!n.closed){n.closed=true;syncPathRect(n);syncAllGroups();snapshot();renderPanel();drawSoon()}});
+  $('#pathConv').addEventListener('click',()=>{const n=single();if(n&&CONVERTIBLE.includes(n.type)){
+    if(n.inst){toast('组件实例请先分离后再转路径');return}
+    const node=toPathNode(n);
+    if(!node){toast('该类型暂不支持转为路径');return}
+    state.vecEdit=node.id;state.vecSel=-1;state.segHover=null;snapshot();syncSelection();renderPanel();drawSoon();
+  }});
   updateBoolTools();
+}
+/* P34：矢量上下文按钮显隐/状态（选中唯一路径→编辑锚点+闭合路径；可转形状→转为路径） */
+function updateVecTools(){
+  const n=single();
+  const edit=$('#pathEdit'),close=$('#pathClose'),conv=$('#pathConv');
+  if(!edit)return;
+  const isPath=n&&n.type==='path',isConv=n&&CONVERTIBLE.includes(n.type);
+  const show=(b,v)=>{b.style.display=v?'flex':'none'};
+  show(edit,!!(isPath||isConv));show(close,!!isPath);show(conv,!!isConv);
+  if(isPath){
+    const on=state.vecEdit===n.id;
+    edit.classList.toggle('active',on);
+    edit.dataset.tip=on?'退出矢量编辑':'编辑锚点';
+    close.disabled=!!n.closed;
+    close.dataset.tip=n.closed?'路径已闭合':'闭合路径';
+  }else{
+    edit.classList.remove('active');
+  }
 }
 /* 布尔工具仅在选中 2 个及以上同画板图层时可用 */
 function updateBoolTools(){
@@ -2021,6 +2074,7 @@ ctxShow=(x,y,items)=>{window.__ctxItems=items;window.__ctxPos={x:x+8,y:y+8};__ct
   };
 };
 function deleteSel(){
+  state.vecEdit=null;state.vecSel=-1; // P33：删除后退出矢量编辑
   for(const id of [...state.sel]){
     const n=nodeById(id);if(!n)continue;
     if(n.type==='artboard'){const arr=curPage().artboards;arr.splice(arr.indexOf(n),1)}
@@ -2632,6 +2686,12 @@ function expandSelAncestors(){
   }
 }
 function syncSelection(){
+  /* P33：矢量编辑只应作用于当前唯一选中的路径，切换选择后退出 */
+  if(state.vecEdit){
+    const s=selNodes();
+    if(s.length!==1||s[0].id!==state.vecEdit||s[0].type!=='path'){state.vecEdit=null;state.vecSel=-1;state.segHover=null;}
+  }
+  updateVecTools(); // P34：同步顶部工具栏矢量按钮显隐
   expandSelAncestors(); // 下钻 / 选中嵌套元素时展开祖先编组，保证选中行在左侧可见
   renderLayers();
   const selRow=$('#layerList .lrow.sel'); // 提示用户当前选中的元素：滚动到可见
@@ -2893,6 +2953,7 @@ function effectBody(n){
     </div>`;
 }
 function renderPanel(){
+  updateVecTools(); // P34：矢量编辑状态可能经此刷新（dblclick/Esc/按钮切换）
   const p=$('#panel');const nodes=selNodes();
   if(rtab==='assets'){
     p.innerHTML=
@@ -3130,6 +3191,8 @@ function renderPanel(){
   /* P18：填充层（文本保持单色）+ 效果（投影/图层模糊） */
   const fillHtml=isText?sec('填充',colorRow('fill',fillVal,1)+opRow):(noFill?'':fillSectionHtml(n,opRow));
   const effectHtml=sec('效果',effectBody(n));
+  /* P34：路径编辑按钮已上移至顶部工具栏（updateVecTools 控制显隐），右侧面板不再重复 */
+  const pathHtml='';
   p.innerHTML=
     nameRow(n)+
     compSectionHtml(n)+
@@ -3140,6 +3203,7 @@ function renderPanel(){
     fillHtml+
     strokeHtml+
     effectHtml+
+    pathHtml+
     (noFill?sec('不透明度',opRow):'')+
     sec('导出',exportRow());
   bindPanelInputs(n);bindFillInputs(n);bindStrokeInputs(n);bindEffectInputs(n);
@@ -3158,6 +3222,7 @@ document.addEventListener('click',e=>{
     ensureEffects(n).push(defaultEffect('drop'));syncLegacyEffects(n);snapshot();renderPanel();drawSoon();return;
   }
   if(e.target.closest('#radExp')){rOpen=!rOpen;renderPanel();return}
+  /* P34：路径编辑按钮已上移顶部工具栏（buildTools 内直连事件），面板委托移除 */
   /* P31：组件库 / 组件区块 */
   const ci=e.target.closest('#panel [data-comp-insert]');
   if(ci){placeComp(ci.dataset.compInsert);return}
@@ -3736,9 +3801,28 @@ function applyField(k,v,n,nodes){
     return;
   }
   if(!n)return;
+  /* P33：路径几何由锚点决定——面板 X/Y/W/H 直接作用于锚点（平移/等比缩放），不改动锚点则改尺寸无意义 */
+  if(n.type==='path'&&(k==='x'||k==='y'||k==='w'||k==='h')){
+    const ab=abOf(n);
+    if(k==='x'||k==='y'){
+      const tx=(k==='x')?(num-(ab?ab.x:0)):n.x;
+      const ty=(k==='y')?(num-(ab?ab.y:0)):n.y;
+      const dx=tx-n.x,dy=ty-n.y;
+      if(dx||dy){for(const a of n.pts){a.x+=dx;a.y+=dy;if(a.c1){a.c1.x+=dx;a.c1.y+=dy}if(a.c2){a.c2.x+=dx;a.c2.y+=dy}}syncPathRect(n);syncAllGroups();}
+    }else{
+      const f=(k==='w')?Math.max(0.01,num/n.w):Math.max(0.01,num/n.h);
+      const cx=n.x+n.w/2,cy=n.y+n.h/2;
+      for(const a of n.pts){a.x=cx+(a.x-cx)*f;a.y=cy+(a.y-cy)*f;if(a.c1){a.c1.x*=f;a.c1.y*=f}if(a.c2){a.c2.x*=f;a.c2.y*=f}}
+      syncPathRect(n);syncAllGroups();
+    }
+    refreshPanelXY();drawSoon();return;
+  }
   // 文本颜色映射到 color
   if(n.type==='text'&&(k==='fill'||k==='fillHex')){n.color=v;return}
   applyOne(n);
+  /* 修复#1：单选几何变更（宽/高/坐标等）后同步祖先组包围盒，
+     否则在属性面板改单个子元素宽度时父编组 bbox 不刷新、残留空白无效区域 */
+  syncAllGroups();refreshPanelXY();
 }
 function unionRect(ns){
   let x1=1e9,y1=1e9,x2=-1e9,y2=-1e9;
@@ -4214,7 +4298,7 @@ function draw(){
       ctx.closePath();ctx.stroke();
       /* P22：直线/箭头不显示包围盒手柄（端点圆即缩放控件，避免与角点重叠） */
       const lnSel=(n.type==='line'||n.type==='arrow')&&!n.rot;
-      if(!lnSel){drawHandles(n);drawGradHandles(n)} // P24：渐变色标手柄
+      if(!lnSel&&n.type!=='path'){drawHandles(n);drawGradHandles(n)} // P33：路径禁用普通缩放手柄（几何由锚点决定）
       if(lnSel){
         for(const p of lineEndsWorld(n)){
           const s=w2s(p.x,p.y);
@@ -4223,6 +4307,16 @@ function draw(){
           ctx.strokeStyle=BRAND;ctx.lineWidth=1.5;ctx.stroke();
         }
       }
+      /* P33：路径进入矢量编辑后，在选中框内绘制可拖拽锚点与控制柄 */
+      if(n.type==='path'&&state.vecEdit===n.id)drawPathAnchors(n);
+      /* P34：矢量编辑下悬停线段显示 "+"（点击插入锚点） */
+      if(n.type==='path'&&state.vecEdit===n.id&&!mode&&state.segHover){
+        const s=state.segHover.s;
+        ctx.beginPath();ctx.arc(s.x,s.y,6.5,0,Math.PI*2);
+        ctx.fillStyle='#fff';ctx.fill();ctx.strokeStyle=BRAND;ctx.lineWidth=1.5;ctx.stroke();
+        ctx.beginPath();ctx.moveTo(s.x-3.2,s.y);ctx.lineTo(s.x+3.2,s.y);
+        ctx.moveTo(s.x,s.y-3.2);ctx.lineTo(s.x,s.y+3.2);ctx.stroke();
+      }
     }
   }else if(nodes.length>1){
     const b=unionRect(nodes),p=w2s(b.x,b.y);
@@ -4230,6 +4324,8 @@ function draw(){
     ctx.strokeRect(p.x,p.y,b.w*cam.z,b.h*cam.z);
     drawHandlesRect(b,0); // P14：多选同样给出手柄（整体缩放）
   }
+  // P34：钢笔吸附高亮 + 进行中路径锚点
+  if(state.tool==='pen')drawPenOverlay();
   // hover 高亮（图层行/画布联动，仅未选中时）
   if(hoverId&&!state.sel.has(hoverId)){
     const hn=nodeById(hoverId);
@@ -4399,7 +4495,275 @@ function shapePath(n,p,sw,sh,noBegin){
     }
     ctx.closePath();return true;
   }
+  if(n.type==='path'){
+    const pts=n.pts||[];
+    if(!pts.length)return false;
+    if(!noBegin)ctx.beginPath();
+    const sc=cam.z, ox=p.x-n.x*sc, oy=p.y-n.y*sc; // 锚点存画板局部坐标，按 (坐标-n.x)*缩放 映射到屏幕
+    const X=v=>ox+v*sc, Y=v=>oy+v*sc;
+    const seg=(a,b)=>{
+      if(a.c2||b.c1){
+        const c1=a.c2?{x:a.x+a.c2.x,y:a.y+a.c2.y}:{x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+        const c2=b.c1?{x:b.x+b.c1.x,y:b.y+b.c1.y}:{x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+        ctx.bezierCurveTo(X(c1.x),Y(c1.y),X(c2.x),Y(c2.y),X(b.x),Y(b.y));
+      }else ctx.lineTo(X(b.x),Y(b.y));
+    };
+    ctx.moveTo(X(pts[0].x),Y(pts[0].y));
+    for(let i=1;i<pts.length;i++)seg(pts[i-1],pts[i]);
+    if(n.closed){seg(pts[pts.length-1],pts[0]);ctx.closePath();}
+    return true;
+  }
   return false;
+}
+/* P33：路径辅助函数 */
+function syncPathRect(n){
+  const pts=n.pts||[];
+  if(!pts.length){n.w=Math.max(1,n.w);n.h=Math.max(1,n.h);return;}
+  let x1=1e9,y1=1e9,x2=-1e9,y2=-1e9;
+  for(const a of pts){
+    x1=Math.min(x1,a.x);y1=Math.min(y1,a.y);x2=Math.max(x2,a.x);y2=Math.max(y2,a.y);
+    if(a.c1){x1=Math.min(x1,a.x+a.c1.x);y1=Math.min(y1,a.y+a.c1.y);x2=Math.max(x2,a.x+a.c1.x);y2=Math.max(y2,a.y+a.c1.y);}
+    if(a.c2){x1=Math.min(x1,a.x+a.c2.x);y1=Math.min(y1,a.y+a.c2.y);x2=Math.max(x2,a.x+a.c2.x);y2=Math.max(y2,a.y+a.c2.y);}
+  }
+  n.x=x1;n.y=y1;n.w=Math.max(1,x2-x1);n.h=Math.max(1,y2-y1);
+}
+function anchorScreen(n,i){const ab=abOf(n),a=n.pts[i];return w2s((ab?ab.x:0)+a.x,(ab?ab.y:0)+a.y);}
+function handleScreen(n,i,which){
+  const ab=abOf(n),a=n.pts[i],c=a[which];if(!c)return null;
+  return w2s((ab?ab.x:0)+(a.x+c.x),(ab?ab.y:0)+(a.y+c.y));
+}
+function detachNode(n){
+  if(!n)return;
+  if(n.parent){const c=n.parent.children;if(c)c.splice(c.indexOf(n),1)}
+  else{const l=curPage().loose||[];const i=l.indexOf(n);if(i>=0)l.splice(i,1)}
+}
+/* P33：矢量编辑——命中锚点（方块）/ 控制柄（圆） */
+function vecHit(sx,sy){
+  const id=state.vecEdit;if(!id)return null;
+  const n=nodeById(id);if(!n||n.type!=='path')return null;
+  const pts=n.pts||[];
+  for(let i=0;i<pts.length;i++){
+    const s=anchorScreen(n,i);
+    if(Math.hypot(sx-s.x,sy-s.y)<=7)return{kind:'anchor',idx:i};
+    if(pts[i].c2){const h=handleScreen(n,i,'c2');if(Math.hypot(sx-h.x,sy-h.y)<=6)return{kind:'handle',idx:i,which:'c2'};}
+    if(pts[i].c1){const h=handleScreen(n,i,'c1');if(Math.hypot(sx-h.x,sy-h.y)<=6)return{kind:'handle',idx:i,which:'c1'};}
+  }
+  return null;
+}
+function drawPathAnchors(n){
+  const pts=n.pts||[];
+  ctx.strokeStyle='rgba(54,112,247,0.55)';ctx.lineWidth=1;
+  for(let i=0;i<pts.length;i++){
+    if(i<pts.length-1||n.closed){
+      const a=anchorScreen(n,i),b=anchorScreen(n,(i+1)%pts.length);
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+    }
+  }
+  for(let i=0;i<pts.length;i++){
+    const a=pts[i];
+    ['c1','c2'].forEach(which=>{
+      const h=handleScreen(n,i,which);if(!h)return;
+      const c=anchorScreen(n,i);
+      ctx.strokeStyle='rgba(54,112,247,0.55)';ctx.beginPath();ctx.moveTo(c.x,c.y);ctx.lineTo(h.x,h.y);ctx.stroke();
+      ctx.fillStyle='#fff';ctx.strokeStyle=BRAND;ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.arc(h.x,h.y,4,0,Math.PI*2);ctx.fill();ctx.stroke();
+    });
+    const s=anchorScreen(n,i);
+    ctx.fillStyle=(state.vecSel===i)?'#fff':BRAND;
+    ctx.fillRect(s.x-4,s.y-4,8,8);
+    ctx.strokeStyle=BRAND;ctx.lineWidth=1.5;ctx.strokeRect(s.x-4,s.y-4,8,8);
+  }
+}
+/* P34：矢量增强——顶点收集 / 吸附 / 段加锚点 / 锚点类型 / 形状转路径 */
+const CONVERTIBLE=['rect','ellipse','line','polygon','star'];
+const CUBIC_K=0.5522847498307936;
+function shapeVertsWorld(o){
+  const r=worldRect(o),cx=r.x+r.w/2,cy=r.y+r.h/2,out=[];
+  if(o.type==='polygon'){
+    const s=Math.max(3,o.sides||3);
+    for(let i=0;i<s;i++){const a=-Math.PI/2+i*2*Math.PI/s;out.push({x:cx+r.w/2*Math.cos(a),y:cy+r.h/2*Math.sin(a)});}
+  }else{
+    const ps=Math.max(5,o.points||5);
+    for(let i=0;i<ps*2;i++){const a=-Math.PI/2+i*Math.PI/ps;const rx=(i%2?0.191:0.5)*r.w,ry=(i%2?0.191:0.5)*r.h;out.push({x:cx+rx*Math.cos(a),y:cy+ry*Math.sin(a)});}
+  }
+  return out;
+}
+function collectVertsWorld(excludeNode){
+  const out=[];
+  for(const o of allNodes()){
+    if(o===excludeNode||o.hidden||o.locked||o.type==='artboard')continue;
+    if(o.type==='path'){const ab=abOf(o);for(const a of o.pts||[])out.push({x:(ab?ab.x:0)+a.x,y:(ab?ab.y:0)+a.y});}
+    else if(o.type==='line'||o.type==='arrow'){for(const p of lineEndsWorld(o))out.push(p);}
+    else if(o.type==='ellipse'){const r=worldRect(o);out.push({x:r.x+r.w/2,y:r.y},{x:r.x+r.w,y:r.y+r.h/2},{x:r.x+r.w/2,y:r.y+r.h},{x:r.x,y:r.y+r.h/2});}
+    else if(o.type==='polygon'||o.type==='star'){for(const v of shapeVertsWorld(o))out.push(v);}
+    else if(o.type==='rect'||o.type==='image'||o.type==='text'||o.type==='bool'){const r=worldRect(o);out.push({x:r.x,y:r.y},{x:r.x+r.w,y:r.y},{x:r.x+r.w,y:r.y+r.h},{x:r.x,y:r.y+r.h});}
+  }
+  return out;
+}
+function snapVertex(sx,sy,excludeNode){
+  let best=null,bd=8; // 屏幕像素吸附半径
+  for(const v of collectVertsWorld(excludeNode)){
+    const s=w2s(v.x,v.y),d=Math.hypot(sx-s.x,sy-s.y);
+    if(d<=bd){bd=d;best=v;}
+  }
+  return best;
+}
+function cubicAt(p0,c1,c2,p3,t){
+  const u=1-t;
+  return{x:u*u*u*p0.x+3*u*u*t*c1.x+3*u*t*t*c2.x+t*t*t*p3.x,
+         y:u*u*u*p0.y+3*u*u*t*c1.y+3*u*t*t*c2.y+t*t*t*p3.y};
+}
+function segHitAt(sx,sy){
+  const id=state.vecEdit;if(!id)return null;
+  const n=nodeById(id);if(!n||n.type!=='path')return null;
+  const pts=n.pts||[];if(pts.length<2)return null;
+  const ab=abOf(n),ax=ab?ab.x:0,ay=ab?ab.y:0;
+  const segs=n.closed?pts.length:pts.length-1;
+  let best=null,bd=7;
+  for(let i=0;i<segs;i++){
+    const a=pts[i],b=pts[(i+1)%pts.length];
+    const c1=a.c2?{x:a.x+a.c2.x,y:a.y+a.c2.y}:{x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+    const c2=b.c1?{x:b.x+b.c1.x,y:b.y+b.c1.y}:{x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+    for(let k=0;k<=20;k++){
+      const t=k/20,pt=cubicAt(a,c1,c2,b,t);
+      const s=w2s(ax+pt.x,ay+pt.y),d=Math.hypot(sx-s.x,sy-s.y);
+      if(d<bd){bd=d;best={i,t,s};}
+    }
+  }
+  return best;
+}
+function insertSegAnchor(n,i,t){
+  if(!n||n.type!=='path')return;
+  const pts=n.pts,a=pts[i],b=pts[(i+1)%pts.length];
+  const C1=a.c2?{x:a.x+a.c2.x,y:a.y+a.c2.y}:{x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+  const C2=b.c1?{x:b.x+b.c1.x,y:b.y+b.c1.y}:{x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+  const L=(p,q)=>({x:p.x+(q.x-p.x)*t,y:p.y+(q.y-p.y)*t}); // De Casteljau 分割，曲线形状不变
+  const Q0=L({x:a.x,y:a.y},C1),Q1=L(C1,C2),Q2=L(C2,{x:b.x,y:b.y});
+  const R0=L(Q0,Q1),R1=L(Q1,Q2),S=L(R0,R1);
+  a.c2={x:Q0.x-a.x,y:Q0.y-a.y};
+  b.c1={x:Q2.x-b.x,y:Q2.y-b.y};
+  pts.splice(i+1,0,{x:S.x,y:S.y,c1:{x:R0.x-S.x,y:R0.y-S.y},c2:{x:R1.x-S.x,y:R1.y-S.y},t:'c'});
+  state.vecSel=i+1;
+  syncPathRect(n);syncAllGroups();snapshot();renderPanel();drawSoon();
+}
+function deleteAnchor(n,idx){
+  if(!n||n.type!=='path'||n.pts.length<=2)return;
+  n.pts.splice(idx,1);
+  if(state.vecSel===idx)state.vecSel=-1;
+  syncPathRect(n);syncAllGroups();snapshot();renderPanel();drawSoon();
+}
+function setAnchorType(idx,t){
+  const n=nodeById(state.vecEdit);if(!n||n.type!=='path')return;
+  const pts=n.pts,a=pts[idx];if(!a)return;
+  const isEnd0=idx===0&&!n.closed,isEnd1=idx===pts.length-1&&!n.closed;
+  const prev=isEnd0?null:pts[(idx-1+pts.length)%pts.length];
+  const next=isEnd1?null:pts[(idx+1)%pts.length];
+  if(t==='c'){a.c1=null;a.c2=null;a.t='c';} // 尖角：去柄，两侧变直
+  else if(prev&&next){
+    const dx=next.x-prev.x,dy=next.y-prev.y,L=Math.hypot(dx,dy)||1;
+    const len=Math.min(Math.hypot(a.x-prev.x,a.y-prev.y),Math.hypot(next.x-a.x,next.y-a.y))/3;
+    if(t==='s'){a.c1={x:-dx/L*len,y:-dy/L*len};a.c2={x:dx/L*len,y:dy/L*len};a.t='s';}
+    else if(t==='i'){ // 非对称平滑：两侧共线、长度随各自相邻边
+      const lp=Math.hypot(a.x-prev.x,a.y-prev.y)/3,ln=Math.hypot(next.x-a.x,next.y-a.y)/3;
+      a.c1={x:-dx/L*lp,y:-dy/L*lp};a.c2={x:dx/L*ln,y:dy/L*ln};a.t='i';
+    }
+    else{a.c1=null;a.c2={x:dx/L*len,y:dy/L*len};a.t='a';} // 半边圆角：入边直、出边圆
+  }else{
+    const o=prev||next;if(!o)return;
+    const dx=o.x-a.x,dy=o.y-a.y,L=Math.hypot(dx,dy)||1,len=L/3;
+    if(prev){a.c2=null;a.c1={x:dx/L*len,y:dy/L*len};} // 末端点：柄指向入边
+    else{a.c1=null;a.c2={x:dx/L*len,y:dy/L*len};}    // 起始点：柄指向出边
+    a.t='a';
+  }
+  syncPathRect(n);syncAllGroups();snapshot();renderPanel();drawSoon();
+}
+function toPathNode(n){
+  if(!n||n.type==='path')return n;
+  if(!CONVERTIBLE.includes(n.type))return null;
+  const ox=n.x,oy=n.y,w=Math.max(1,n.w),h=Math.max(1,n.h);
+  let pts=[],closed=true;
+  if(n.type==='rect')pts=[{x:ox,y:oy},{x:ox+w,y:oy},{x:ox+w,y:oy+h},{x:ox,y:oy+h}];
+  else if(n.type==='ellipse'){
+    const kx=CUBIC_K*w/2,ky=CUBIC_K*h/2;
+    pts=[
+      {x:ox+w/2,y:oy,c1:{x:-kx,y:0},c2:{x:kx,y:0},t:'s'},
+      {x:ox+w,y:oy+h/2,c1:{x:0,y:-ky},c2:{x:0,y:ky},t:'s'},
+      {x:ox+w/2,y:oy+h,c1:{x:kx,y:0},c2:{x:-kx,y:0},t:'s'},
+      {x:ox,y:oy+h/2,c1:{x:0,y:ky},c2:{x:0,y:-ky},t:'s'}];
+  }else if(n.type==='line'){
+    closed=false;
+    pts=n.dir==='/'?[{x:ox,y:oy+h},{x:ox+w,y:oy}]:[{x:ox,y:oy},{x:ox+w,y:oy+h}];
+  }else{
+    const cx=ox+w/2,cy=oy+h/2;
+    if(n.type==='polygon'){
+      const s=Math.max(3,n.sides||3);
+      for(let i=0;i<s;i++){const a=-Math.PI/2+i*2*Math.PI/s;pts.push({x:cx+w/2*Math.cos(a),y:cy+h/2*Math.sin(a)});}
+    }else{
+      const ps=Math.max(5,n.points||5);
+      for(let i=0;i<ps*2;i++){const a=-Math.PI/2+i*Math.PI/ps;const rx=(i%2?0.191:0.5)*w,ry=(i%2?0.191:0.5)*h;pts.push({x:cx+rx*Math.cos(a),y:cy+ry*Math.sin(a)});}
+    }
+  }
+  n.type='path';n.pts=pts;n.closed=closed;
+  delete n.sides;delete n.points;delete n.dir;delete n.radius;delete n.rc;delete n.radii;
+  syncPathRect(n);
+  return n;
+}
+function drawPenOverlay(){
+  const ps=state.penSnap;
+  if(ps){
+    if(ps.close&&state.penPath){ // 悬停首锚点：闭合提示环
+      const s=anchorScreen(state.penPath,0);
+      ctx.beginPath();ctx.arc(s.x,s.y,8,0,Math.PI*2);
+      ctx.fillStyle='rgba(54,112,247,.18)';ctx.fill();
+      ctx.strokeStyle=BRAND;ctx.lineWidth=2;ctx.stroke();
+    }else if(ps.s){ // 顶点吸附高亮环
+      ctx.beginPath();ctx.arc(ps.s.x,ps.s.y,6.5,0,Math.PI*2);
+      ctx.fillStyle='rgba(54,112,247,.18)';ctx.fill();
+      ctx.strokeStyle=BRAND;ctx.lineWidth=2;ctx.stroke();
+    }
+  }
+  const n=state.penPath;if(!n)return;
+  for(let i=0;i<n.pts.length;i++){ // 进行中路径的已落锚点
+    const s=anchorScreen(n,i);
+    ctx.fillStyle=i===0?'#fff':BRAND;
+    ctx.fillRect(s.x-3.5,s.y-3.5,7,7);
+    ctx.strokeStyle=BRAND;ctx.lineWidth=1.5;ctx.strokeRect(s.x-3.5,s.y-3.5,7,7);
+  }
+}
+/* P33：钢笔——点击落锚、拖拽出控制柄、点首锚点闭合、Enter/Esc 收笔 */
+function penDown(sx,sy,wpt,e){
+  const ab=containingAb(wpt.x,wpt.y);
+  let lx=ab?wpt.x-ab.x:wpt.x, ly=ab?wpt.y-ab.y:wpt.y;
+  if(state.penPath){
+    const n=state.penPath;
+    const p0=anchorScreen(n,0),cur=w2s(wpt.x,wpt.y);
+    if(n.pts.length>=3&&Math.hypot(cur.x-p0.x,cur.y-p0.y)<=8){ // 靠近首锚点闭合
+      n.closed=true;syncPathRect(n);finishPen();return;
+    }
+    const v=snapVertex(sx,sy,n); // P34：顶点吸附（排除进行中路径自身）
+    if(v){lx=ab?v.x-ab.x:v.x;ly=ab?v.y-ab.y:v.y}
+    n.pts.push({x:lx,y:ly,c1:null,c2:null});
+    const idx=n.pts.length-1;syncPathRect(n);syncAllGroups();
+    mode='penDraw';start={sx,sy,anchorIdx:idx,moved:false};state.penSnap=null;drawSoon();return;
+  }
+  const v0=snapVertex(sx,sy,null); // P34：首锚点同样吸附已有顶点
+  if(v0){lx=ab?v0.x-ab.x:v0.x;ly=ab?v0.y-ab.y:v0.y}
+  const n=P({id:uid(),name:nextName('path'),pts:[{x:lx,y:ly,c1:null,c2:null}]});
+  syncPathRect(n);
+  if(ab){n.parent=ab;ab.children.push(n);}
+  else{const pg=curPage();pg.loose=pg.loose||[];pg.loose.push(n);n.parent=null;}
+  state.penPath=n;state.penAb=ab;state.penSnap=null;
+  state.sel.clear();state.sel.add(n.id);syncSelection();
+  mode='penDraw';start={sx,sy,anchorIdx:0,moved:false};
+  drawSoon();
+}
+function finishPen(){
+  const n=state.penPath;state.penPath=null;state.penAb=null;mode=null;state.penSnap=null;state.segHover=null;
+  if(n){
+    if(!n.pts||n.pts.length<2){detachNode(n);state.sel.clear();syncSelection();toast('路径至少需要 2 个锚点');}
+    else{syncPathRect(n);snapshot();state.sel.clear();state.sel.add(n.id);syncSelection();}
+  }
+  setTool('select');drawSoon();renderPanel();
 }
 /* P19：渐变 / 图片填充绘制 */
 function fillGradient(f,p,sw,sh,type){
@@ -4843,6 +5207,7 @@ function hitHandle(sx,sy){
   const ns=selNodes();
   if(!ns.length)return null;
   if(ns.some(n=>n.type==='artboard'||n.hidden||n.locked))return null;
+  if(ns.some(n=>n.type==='path'))return null; // P33：路径几何由锚点控制，禁用普通缩放手柄（改尺寸请用面板 W/H 或矢量编辑）
   // P14：单选按自身 OBB；多选按联合包围盒（不旋转）
   const r=ns.length===1?worldRect(ns[0]):unionRect(ns);
   const rot=ns.length===1?(ns[0].rot||0):0;
@@ -4931,6 +5296,7 @@ function hitTest(wx,wy){
   return null;
 }
 function setTool(k){
+  if(state.penPath&&k!=='pen')finishPen(); // P33：切换工具时先收笔
   state.tool=k;
   $$('#tools .tool-btn').forEach(b=>b.classList.toggle('active',b.dataset.tool===k));
   updateCursor();
@@ -5013,6 +5379,7 @@ canvas.addEventListener('pointerdown',e=>{
 
   if(state.tool!=='select'){
     const wpt=s2w(sx,sy);
+    if(state.tool==='pen'){penDown(sx,sy,wpt,e);return;} // P33：钢笔落锚/追加/闭合
     if(state.tool==='text'){
       // 点击即建文本并进入编辑；画板外同样可用（P26：自由图层）
       const ab=containingAb(wpt.x,wpt.y);
@@ -5027,6 +5394,22 @@ canvas.addEventListener('pointerdown',e=>{
     if(state.tool==='frame'){mode='createAb';start={sx,sy,wx:wpt.x,wy:wpt.y,ab:containingAb(wpt.x,wpt.y)||null,alt:e.altKey};return}
     mode='create';start={sx,sy,wx:wpt.x,wy:wpt.y,ab:containingAb(wpt.x,wpt.y),alt:e.altKey};
     return;
+  }
+
+  /* P33/P34：矢量编辑模式——优先命中锚点/控制柄，其次路径段"+"加锚点 */
+  if(state.vecEdit&&!state.space){
+    const ve=vecHit(sx,sy);
+    if(ve){
+      const n=nodeById(state.vecEdit),a=n.pts[ve.idx];
+      const wpt=s2w(sx,sy),ab=abOf(n);
+      mode='vecEdit';
+      start={kind:ve.kind,idx:ve.idx,which:ve.which,moved:false,
+        ox:a.x,oy:a.y,wx0:wpt.x-(ab?ab.x:0),wy0:wpt.y-(ab?ab.y:0)};
+      state.vecSel=ve.idx;updateCursor('crosshair');drawSoon();return;
+    }
+    const sg=segHitAt(sx,sy); // P34：悬停段上点击 → 该处插入锚点
+    if(sg){insertSegAnchor(nodeById(state.vecEdit),sg.i,sg.t);return;}
+    state.vecEdit=null;state.vecSel=-1;state.segHover=null;drawSoon(); // 点空白退出矢量编辑
   }
 
   // 选择工具
@@ -5110,6 +5493,23 @@ canvas.addEventListener('pointermove',e=>{
   const rect=canvas.getBoundingClientRect();
   const sx=e.clientX-rect.left,sy=e.clientY-rect.top;
   if(!mode){ // 悬停光标 + hover 高亮
+    /* P34：钢笔顶点吸附 / 矢量编辑线段 "+" 悬停 */
+    if(state.tool==='pen'){
+      let ps=null;
+      if(state.penPath){
+        const p0=anchorScreen(state.penPath,0);
+        if(state.penPath.pts.length>=3&&Math.hypot(sx-p0.x,sy-p0.y)<=8)ps={close:true}; // 首锚点闭合提示
+      }
+      if(!ps){const v=snapVertex(sx,sy,state.penPath);if(v)ps={s:w2s(v.x,v.y)}}
+      state.penSnap=ps;drawSoon();return;
+    }
+    if(state.vecEdit){
+      const vh=vecHit(sx,sy);
+      const sg=vh?null:segHitAt(sx,sy);
+      state.segHover=sg;
+      updateCursor(vh||sg?'crosshair':null);
+      drawSoon();return;
+    }
     if(state.tool==='select'&&!state.space){
       if(!viewRot&&(sx<RULER||sy<RULER)){ // P12-C：标尺/参考线光标
         const g=hitGuide(sx,sy);
@@ -5297,6 +5697,50 @@ canvas.addEventListener('pointermove',e=>{
     start.x1=x1;start.y1=y1;start.alt=e.altKey;start.shift=e.shiftKey;
     previewCreate();drawSoon();return;
   }
+  if(mode==='penDraw'){ // P33：按住拖拽出贝塞尔控制柄（镜像平滑点）
+    const n=state.penPath;if(!n){mode=null;return;}
+    if(Math.hypot(sx-start.sx,sy-start.sy)>3){
+      start.moved=true;
+      const a=n.pts[start.anchorIdx];
+      const cx=(sx-start.sx)/cam.z, cy=(sy-start.sy)/cam.z;
+      a.c2={x:cx,y:cy};a.c1={x:-cx,y:-cy};
+      syncPathRect(n);syncAllGroups();drawSoon();
+    }
+    return;
+  }
+  if(mode==='vecEdit'){ // P33：拖拽锚点移动 / 拖拽控制柄调曲率
+    const n=nodeById(state.vecEdit);if(!n){mode=null;return;}
+    const wpt=s2w(sx,sy),ab=abOf(n);
+    const ax=wpt.x-(ab?ab.x:0), ay=wpt.y-(ab?ab.y:0);
+    const a=n.pts[start.idx];
+    if(start.kind==='anchor'){
+      const ddx=ax-start.wx0, ddy=ay-start.wy0;
+      let nx=start.ox+ddx, ny=start.oy+ddy;
+      guides=[]; // P34：对齐参考线（与其他顶点 x/y 对齐吸附，Alt 暂停吸附）
+      if(!e.altKey){
+        const abx=ab?ab.x:0,aby=ab?ab.y:0;
+        const wx0=abx+start.ox,wy0=aby+start.oy,wx=abx+nx,wy=aby+ny,TOL=4/cam.z;
+        let bx=null,by=null,bdx=TOL,bdy=TOL;
+        for(const v of collectVertsWorld(null)){
+          if(Math.abs(v.x-wx0)<.01&&Math.abs(v.y-wy0)<.01)continue; // 排除被拖锚点自身
+          const dx=Math.abs(v.x-wx);if(dx<bdx){bdx=dx;bx=v.x}
+          const dy=Math.abs(v.y-wy);if(dy<bdy){bdy=dy;by=v.y}
+        }
+        if(bx!=null){nx=bx-abx;guides.push({v:true,x:bx*cam.z+cam.x})}
+        if(by!=null){ny=by-aby;guides.push({v:false,y:by*cam.z+cam.y})}
+      }
+      a.x=nx; a.y=ny;
+    }else{
+      const c2x=ax-a.x, c2y=ay-a.y;
+      a[start.which]={x:c2x,y:c2y};
+      if(!e.altKey){ // P34：按锚点类型联动（Alt 临时独立）——'s'对称镜像 / 'a''i'共线保长 / 'c'独立
+        const ow=start.which==='c2'?'c1':'c2',ty=a.t||'s';
+        if(ty==='s')a[ow]={x:-c2x,y:-c2y};
+        else if((ty==='a'||ty==='i')&&a[ow]){const ol=Math.hypot(a[ow].x,a[ow].y),L=Math.hypot(c2x,c2y)||1;a[ow]={x:-c2x/L*ol,y:-c2y/L*ol};}
+      }
+    }
+    start.moved=true;syncPathRect(n);syncAllGroups();refreshPanelXY();drawSoon();return;
+  }
 });
 canvas.addEventListener('pointerup',e=>{
   if(demo.on){demoUp(e);return} // P2
@@ -5371,6 +5815,8 @@ canvas.addEventListener('pointerup',e=>{
     marquee=null;mode=null;syncSelection();return;
   }
   if(mode==='create'||mode==='createAb'){finishCreate();mode=null;return}
+  if(mode==='penDraw'){mode=null;drawSoon();return} // P33：保留进行中路径，等待下一次落锚
+  if(mode==='vecEdit'){mode=null;guides=[];if(start&&start.moved){snapshot();renderPanel()}drawSoon();return} // P33/P34
   mode=null;
 });
 canvas.addEventListener('dblclick',e=>{
@@ -5407,6 +5853,18 @@ canvas.addEventListener('dblclick',e=>{
     }
     return;
   }
+  if(hit&&(hit.type==='path'||CONVERTIBLE.includes(hit.type))){ // P33/P34：双击路径进矢量编辑；形状先转路径
+    let node=hit;
+    if(hit.type!=='path'){
+      if(hit.inst){toast('组件实例请先分离后再转路径');return}
+      node=toPathNode(hit);
+      if(!node){toast('该类型暂不支持转为路径');return}
+      snapshot();
+    }
+    state.vecEdit=node.id;state.vecSel=-1;state.segHover=null;
+    state.sel.clear();state.sel.add(node.id);syncSelection();drawSoon();renderPanel();
+    return;
+  }
   if(hit&&hit.type==='text'){
     state.sel.clear();state.sel.add(hit.id);syncSelection();
     startTextEdit(hit,false);
@@ -5418,6 +5876,23 @@ canvas.addEventListener('contextmenu',e=>{
   const rect=canvas.getBoundingClientRect();
   const sx=e.clientX-rect.left,sy=e.clientY-rect.top;
   const wpt=s2w(sx,sy);
+  /* P34：矢量编辑下右键锚点 → 删除 / 尖角 / 圆角 / 半边圆角 */
+  if(state.vecEdit){
+    const ve=vecHit(sx,sy);
+    if(ve&&ve.kind==='anchor'){
+      state.vecSel=ve.idx;
+      const n=nodeById(state.vecEdit);
+      ctxShow(e.clientX,e.clientY,[
+        {label:'删除锚点',kbds:['Del'],dis:n.pts.length<=2,act:()=>deleteAnchor(n,ve.idx)},
+        {sep:1},
+        {label:'尖角（直角）',act:()=>setAnchorType(ve.idx,'c')},
+        {label:'圆角（对称平滑）',act:()=>setAnchorType(ve.idx,'s')},
+        {label:'非对称平滑',act:()=>setAnchorType(ve.idx,'i')},
+        {label:'半边圆角（单侧平滑）',act:()=>setAnchorType(ve.idx,'a')}
+      ]);
+      drawSoon();return;
+    }
+  }
   let hit=hitTest(wpt.x,wpt.y);
   if(!hit){const lbl=hitAbLabel(sx,sy);if(lbl)hit=lbl} // 画板名称标签视同画板
   if(hit&&!state.sel.has(hit.id)){state.sel.clear();state.sel.add(hit.id);syncSelection()} // 右键先选中命中对象
@@ -5436,6 +5911,7 @@ canvas.addEventListener('contextmenu',e=>{
 canvas.addEventListener('mouseleave',()=>{
   if(demo.on){demo.hover=null;drawSoon();return} // P2
   if(hoverId){hoverId=null;drawSoon()}
+  if(state.segHover||state.penSnap){state.segHover=null;state.penSnap=null;drawSoon()} // P34
 });
 
 function containingAb(wx,wy){
@@ -5948,6 +6424,9 @@ window.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&!findBar.hidden){closeFind();return}
   if(e.key==='Escape'&&!$('#exportDlg').hidden){closeExportDlg();return}
   if(e.key==='Escape'){
+    /* P33：收笔 / 退出矢量编辑优先于其它 Esc 行为 */
+    if(state.penPath){finishPen();return;}
+    if(state.vecEdit){state.vecEdit=null;state.vecSel=-1;drawSoon();renderPanel();return;}
     /* P15：Esc 取消进行中的拖拽/创建，恢复起始几何（对齐 Penpot） */
     if(mode){
       if(mode==='create'||mode==='createAb'){preview=null;setTool('select')}
@@ -5981,6 +6460,16 @@ window.addEventListener('keydown',e=>{
     else if(state.sel.size){state.sel.clear();syncSelection()}
     return;
   }
+  /* P33：回车收笔（钢笔进行中）；矢量编辑下 Delete/Backspace 删除选中锚点 */
+  if(e.key==='Enter'&&state.penPath){e.preventDefault();finishPen();return;}
+  if((e.key==='Delete'||e.key==='Backspace')&&state.vecEdit){
+    const n=nodeById(state.vecEdit);
+    if(n&&n.type==='path'&&state.vecSel>=0&&n.pts.length>2){
+      n.pts.splice(state.vecSel,1);state.vecSel=-1;syncPathRect(n);syncAllGroups();
+      snapshot();renderPanel();drawSoon();
+    }
+    e.preventDefault();return;
+  }
   /* P12-A：方向键微调（1px，Shift/Alt 10px）——对齐 Penpot nudge */
   if(e.key.startsWith('Arrow')){
     const ns=effectiveSel();
@@ -6009,7 +6498,7 @@ window.addEventListener('keydown',e=>{
   if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&e.shiftKey&&key==='h'){e.preventDefault();setHotspots(!protoShow);return}
   if((e.ctrlKey||e.metaKey)&&e.altKey&&key==='k'){e.preventDefault();createComponent(single());return}
   /* P15：字母快捷键并轨 Penpot（V/B/R/E/T/P/L/C），并保留 F/O/A/H/Z 旧别名 */
-  const map={v:'select',b:'frame',f:'frame',r:'rect',e:'ellipse',o:'ellipse',t:'text',p:'para',a:'para',l:'line',h:'hand',z:'zoom',c:'comment'};
+  const map={v:'select',b:'frame',f:'frame',r:'rect',e:'ellipse',o:'ellipse',t:'text',a:'para',l:'line',h:'hand',z:'zoom',c:'comment',p:'pen'};
   if(map[key]&&!e.ctrlKey&&!e.metaKey){
     const k=map[key];
     // 形状/文本走子菜单入口，保证主按钮图标、提示与高亮同步
@@ -6328,10 +6817,20 @@ function selectAllAll(){
   }
   syncSelection();
 }
-/* P13/P14：深拷贝节点树（组递归），parent 引用重建，避免 JSON 循环 */
+/* P13/P14：深拷贝节点树（组递归），parent 引用重建，避免 JSON 循环。
+   修复#2：所有属性深拷贝（数组/对象不再与原节点共享引用），复制组件实例时
+   生成独立 iid，避免"复制/被复制元素被关联改动" */
+function deepVal(v){
+  if(v==null||typeof v!=='object')return v;
+  if(Array.isArray(v))return v.map(deepVal);
+  if(typeof Path2D!=='undefined'&&v instanceof Path2D)return v;
+  const o={};for(const k in v)o[k]=deepVal(v[k]);return o;
+}
 function cloneNodeTree(src,parent){
-  const c={};for(const k in src)if(k!=='parent'&&k!=='children')c[k]=src[k];
+  const c={};
+  for(const k in src){if(k==='parent'||k==='children')continue;c[k]=deepVal(src[k]);}
   c.id=uid();c.parent=parent;
+  if(src.inst&&src.iid)c.iid='i'+uid(); // 复制组件实例 → 独立实例，断开 iid 关联
   if(src.children)c.children=src.children.map(ch=>cloneNodeTree(ch,c));
   return c;
 }
