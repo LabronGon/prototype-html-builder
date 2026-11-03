@@ -1289,7 +1289,34 @@ body[data-theme=dark] ::-webkit-scrollbar-thumb:active{background:rgba(255,255,2
 </div>
 <div id="demoPageIdx"></div>
 <input type="file" id="fileInput" accept=".html" hidden>
+<!-- ==================================================================
+PROTOTYPE-AI-GUIDE v1（静态说明块，保存时随文件保留；勿改动本注释结构）
+本文件 = 单文件高保真原型：编辑器脚本 + 内嵌设计文档（script#__doc，JSON）+ AI 视图（script#__ai_view，逐行清单）。
+【给 AI 的读法】
+ 1) 像素级复刻设计 → 只读 #__ai_view 区块：每行一个节点，含全部精确几何与样式；坐标均为「画板局部坐标」，可直接映射 CSS，无需换算。
+ 2) 修改设计稿 → 读 #__doc JSON，按下文「AI 修改约定」输出新文档 JSON（不要重写整个 HTML，编辑器壳必须原样保留）。
+ 3) 编写需求文档 → 以 #__ai_view 的画板/图层分组与命名为结构依据。
+【坐标约定】叶子与组的 x/y 一律相对所在画板左上角；画板自身 x/y 为页面坐标。rotation 单位度、顺时针、绕节点中心。
+【节点类型】artboard 画板 | rect 矩形 | text 文本 | image 图片 | line 线 | group 组(容器/组件实例) | path 矢量路径 | ellipse 椭圆 | polygon 多边形(sides) | star 星形(points) | svg 图标 | arrow 箭头 | bool 布尔
+【文本字段】text 文本内容 fontSize 字号 fontWeight 字重(400/500/600/700) color 颜色 align 对齐(left/center/right) lineHeight 行高 letterSpacing 字距
+【填充 fills】数组自底向上叠加；项为 {type:'solid',color,opacity,on} 或 {type:'linear',angle,stops:[{color,pos,opacity}]} / {type:'radial',stops:[...]}；text 用 color 字段；旧数据回落单值 fill/stroke。
+【描边 strokes】{color,width,align:center/inside/outside,style:solid/dashed/dotted,cap,join,on}；旧数据回落 stroke/strokeW/strokeAlign。
+【效果 effects】{type:drop/inner/blur/bgblur, on, x,y,blur,color,opacity} 模糊类用 value；旧数据回落 effect.shadow / blur。
+【圆角】radius 单值；4 角不同时用 radii:[左上,右上,右下,左下]（旧数据 rc 同序）。
+【交互 proto】节点上数组 [{trigger:单击|悬停|按下|拖拽|滚动, dir:方向, action:打开画板|打开弹层|关闭弹层|返回上一页|切换变体, target:目标画板id, variant, anim:过渡动画, duration:ms, easing}]
+【组件实例】group + inst:母版画板id + iid；ov:{母版节点id:{字段:值}} 为实例级覆盖；导出/复刻时须先用 ov 覆盖母版对应字段再渲染。
+【AI 修改设计稿约定】输出一个与 #__doc 完全同构的 JSON：{version:1,name,theme,pages,tree}（全量最稳）。文档过大(>100KB)时可只输出变更页：[{page:<索引或页名>, artboards:[...]}]，用 apply-doc.mjs 合入或编辑器「打开 JSON」整份载入。禁止改动本注释、编辑器脚本以及两个内嵌 script 标签之外的任何 HTML 内容。
+【像素级复刻建议】以 #__ai_view 为布局唯一真源逐行转译 CSS；图片用节点 src/fit；渐变、描边、阴影、圆角按字段直译；完成后以视口宽度=画板宽度自校验对齐。
+================================================================== -->
 <script type="application/json" id="__doc">{"version":1,"name":"空白原型","theme":"light","pages":[{"name":"页面 1","artboards":[{"type":"artboard","id":"n1","name":"画板 1","x":0,"y":0,"w":1440,"h":900,"bg":"#FFFFFF","children":[]}]}],"tree":[{"label":"页面 1","page":0}]}</script>
+<script type="text/plain" id="__ai_view">
+# AI-VIEW 设计清单（自动生成，勿手改；再生：编辑器保存 / embed-ai-view.mjs / apply-doc.mjs）
+doc: 空白原型
+
+## page 0: 页面 1
+## artboard n1 "画板 1" page=0,0 size=1440x900 bg=#FFFFFF
+</script>
+
 
 <script>
 'use strict';

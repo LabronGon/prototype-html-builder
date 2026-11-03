@@ -5,6 +5,47 @@
 
 ---
 
+## v1.2.1（2026-11-03）
+
+AI 协作三件套：让 AI 只凭一个 HTML 完成像素级复刻 / 修改设计稿 / 需求文档编写（P35）。
+
+### 产物新增（编辑器壳 P35）
+
+| # | 项 | 说明 |
+| --- | --- | --- |
+| 1 | `PROTOTYPE-AI-GUIDE` 头注释 | `__doc` 前静态注释（~2.7KB）：给 AI 的读法、坐标约定（全部叶子/组 x/y 为画板局部坐标）、节点类型与字段字典、交互 schema、组件实例覆盖、AI 修改约定、复刻建议 |
+| 2 | `#__ai_view` 逐行清单 | `<script type="text/plain" id="__ai_view">`：每节点一行（id/名/几何/填充/描边/效果/交互/实例覆盖），编辑器保存时经 `embedAIView()` 自动再生（区域锚定，不触碰壳代码） |
+| 3 | 打开 .json | 编辑器「打开」接受 `.json`：AI 输出的纯文档 JSON 直接 `applyDoc` 载入 |
+| 4 | `ProtoAPI.exportAI()` | 一次返回 `{ok, ai_view, doc}`，脚本化取用 |
+
+### skill 脚本
+
+- 新增 `ai-view.mjs` 共享模块（`AI_GUIDE` / `genAIView(doc)` / `embedAIBlocks(html, doc)`）。
+- 新增 `embed-ai-view.mjs`：旧原型批量补嵌 GUIDE + ai_view（原地更新）。
+- 新增 `apply-doc.mjs`：AI 输出文档 JSON 合入原型，支持全量 `{version,pages,...}` 与变更页补丁 `[{page, artboards}]` 两种格式；合入前跑全套结构校验，落盘后自动再生 ai_view。
+- `build-prototype.mjs` / `gen-template.mjs` 产物自动嵌入 AI 协作块；`validate-doc.mjs` 缺块时降级为提示。
+
+### 验证
+
+- 5 个原型（master / editor-prototype×2 / 空白 / 选矿）补嵌后：主脚本语法 OK、`__doc` 字节数不变、ProtoAPI/buildFile 完整、ai_view 位置正确（__doc 与主脚本之间）。
+- apply-doc 双格式合入 + 非法输入拦截（页面不存在 / 画板缺 id 尺寸非法）通过。
+- 无头 Chrome 冒烟：启动零报错、`exportAI()` 返回 588 行清单 + 3 页文档、`buildFile()` 产物含 ai_view 且 `__doc` 完整。
+
+### 踩坑记录
+
+- **AI-GUIDE 注释内禁止出现裸 `<script>` 字样**：会被解析器/正则当成块边界，把主脚本切成两段（首段报语法错误）。
+- **ai_view 替换禁止全文宽松正则**：编辑器 JS 源码内含 `<script type="text/plain" id="__ai_view">` 字符串字面量（`embedAIView` 函数），`reAI` 全文匹配会从字面量处吞掉其后 ~47KB 编辑器代码（buildFile/ProtoAPI 丢失，文件变小）。修复为「区域锚定」：只在 `__doc` 结束 → 下一个裸 `<script>` 之间的 HTML 区操作。曾导致 master 与 editor-prototype 两副本损坏，已从 git 恢复重做。
+
+### 升级方式
+
+```bash
+node scripts/embed-ai-view.mjs 旧原型.prototype.html          # 旧文件补嵌
+node scripts/apply-doc.mjs 原型.prototype.html AI输出.json     # AI 改稿合入
+node scripts/validate-doc.mjs 原型.prototype.html              # 校验
+```
+
+---
+
 ## v1.2.0（2026-11-03）
 
 编辑器壳从 2026-11-03 矢量增强版重建（P33/P34/P34b 三批升级）；`gen-template.mjs` 新增 `--empty` / `-o`。
