@@ -5,6 +5,18 @@
 
 ---
 
+## 样本壳升级（2026-11-05 · 不升版本）
+
+**发现**：`空白原型.prototype.html`、`选矿设备管理.prototype.html`、live skill `examples/选矿设备管理.prototype.html` 共 3 份仍是旧编辑器壳——静态 AI 块（GUIDE v1.2 / AI-NOTICE / meta / aiHint / `__ai_view`）已事后补嵌，但运行时 `ProtoAPI.exportAI()` 不存在，保存时也会把 AI 块退回旧常量。与红外测温平台此前遇到的壳遗留同源。`validate-doc.mjs` 只校验文档、不校验编辑器壳，因此该问题只能靠浏览器冒烟发现。
+
+**处理**：`tools/regen-aiview.mjs --shell sample.prototype.html <目标>` 只换壳、`__doc` 设计数据原样保留；重建前备份至 `.workbuddy/backup-samples/`。
+
+**验证**：设计数据逐字段一致（忽略刷新的 aiHint）；三份新文件编辑器壳与 master 完全同源；`exportAI()` 由 0→1；浏览器零报错且 `exportAI().doc.aiHint` 可用；`__ai_view` 空白 6 行 / 选矿 927 行（103 条交互）保持；`validate-doc` PASS；门禁 0 命中；连续三次再生字节一致；live skill 选矿示例与仓库版本字节一致。版本号保持 v1.2.2（未改功能）。
+
+**规范补充**：`CONTRIBUTING.md` 提交前检查新增「全部样本的运行时壳」一项，明确静态 AI 块齐全不等于运行时壳最新。
+
+---
+
 ## 仓库级文案规范化（2026-11-05 · 不升版本）
 
 定位统一为**自研**：仓库内第三方对标、逆向类措辞全部改为自研体系术语（自研编辑器 / 自研交互基线 / 自研设计系统 / 自研验收基线）。

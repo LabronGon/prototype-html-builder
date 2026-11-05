@@ -11,7 +11,7 @@
   注意：本文件很大，直接从文件中部读起会漏规范；务必先定位 PROTOTYPE-AI-GUIDE 再动手。 -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>自研原型编辑器</title>
+<title>Prototype 编辑器 · 布局与 UI 设计参考</title>
 <style>
 /* ============ 设计 Token（全部来自实测规格） ============ */
 :root{
@@ -1296,7 +1296,7 @@ body[data-theme=dark] ::-webkit-scrollbar-thumb:active{background:rgba(255,255,2
   <button class="dth-nav" id="demoThumbR" title="向右滚动"></button>
 </div>
 <div id="demoPageIdx"></div>
-<input type="file" id="fileInput" accept=".html" hidden>
+<input type="file" id="fileInput" accept=".html,.json" hidden>
 <!-- ==================================================================
 PROTOTYPE-AI-GUIDE v1.2（静态说明块，保存时随文件保留；勿改动本注释结构）
 本文件 = 单文件高保真原型：编辑器脚本 + 内嵌设计文档（script#__doc，JSON）+ AI 视图（script#__ai_view，逐行清单）。
@@ -1334,7 +1334,7 @@ doc: 空白原型
 <script>
 'use strict';
 /* ================================================================
- * 自研原型编辑器
+ * 自研原型编辑器（布局与 UI 设计参考）
  * 规格来源：自研设计系统规格（内部实测基线）
  * ================================================================ */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -1567,6 +1567,8 @@ function makePage2(){
 }
 /* ---------------- 文档容器（P1：文档 JSON 内嵌于 <script id="__doc">） ---------------- */
 const DOC_VER=1;
+/* P35b：随 __doc 输出的 AI 提示键（Agent 只抽 __doc JSON 时也能看到规范入口） */
+const AI_HINT='AI 必读：本 JSON 为单文件原型的设计文档。原型仅提供空间布局与 UI 元素整体效果参考；实现须遵循项目既定开发规范（Vue3/React 标准组件、组件库与设计系统 Token、响应式与可访问性），禁止逐节点硬编码绝对定位，重复 UI 应抽象为可复用组件。界面结构→读 script#__ai_view 布局清单；修改设计稿→输出与本 JSON 同构的 {version:1,name,theme,pages,tree}（用 apply-doc.mjs 合入，勿改 HTML）；字段字典/坐标约定/交互 schema→全文搜索 PROTOTYPE-AI-GUIDE 注释。所有叶子/组 x/y 均为画板局部坐标。';
 let pages=[], tree=[];
 function defaultDoc(){
   return {version:DOC_VER,
@@ -6671,7 +6673,7 @@ function detectFileName(){
 function persistDoc(){
   if(!docEl)return;
   const meta=docTitle?{name:docTitle}:{}; // V6：保存时保留文档内嵌名，避免重开丢名
-  docEl.textContent=JSON.stringify({version:DOC_VER,...meta,theme:uiTheme,pages,tree},(k,v)=>k==='parent'?undefined:v);
+  docEl.textContent=JSON.stringify({version:DOC_VER,aiHint:AI_HINT,...meta,theme:uiTheme,pages,tree},(k,v)=>k==='parent'?undefined:v);
 }
 function bumpUidFromDoc(){
   let mx=__uid;
@@ -6748,9 +6750,16 @@ function setFileName(n){
 async function openDoc(){
   if(window.showOpenFilePicker){
     try{
-      const [h]=await showOpenFilePicker({types:[{description:'Prototype 文档',accept:{'text/html':['.prototype.html','.html']}}]});
+      const [h]=await showOpenFilePicker({types:[
+        {description:'Prototype 文档',accept:{'text/html':['.prototype.html','.html']}},
+        {description:'文档 JSON（AI 输出）',accept:{'application/json':['.json']}}
+      ]});
       const text=await (await h.getFile()).text();
-      const doc=extractDoc(text);
+      let doc=extractDoc(text);
+      if(!doc&&/\.json$/i.test(h.name)){ // P35：AI 输出的纯 JSON 文档直接载入
+        try{doc=JSON.parse(text)}catch(e){}
+        if(doc&&!doc.pages)doc=null;
+      }
       if(!doc){toast('无效的 .prototype.html（缺少内嵌文档）');return}
       applyDoc(doc);fileHandle=h;setFileName(h.name);clearAutosave();toast('已打开 '+h.name);
     }catch(e){if(e&&e.name!=='AbortError')toast('打开失败：'+(e.message||e))}
@@ -6758,16 +6767,145 @@ async function openDoc(){
 }
 function openFromInput(file){
   file.text().then(text=>{
-    const doc=extractDoc(text);
+    let doc=extractDoc(text);
+    if(!doc&&/\.json$/i.test(file.name)){ // P35：纯 JSON 文档兜底
+      try{doc=JSON.parse(text)}catch(e){}
+      if(doc&&!doc.pages)doc=null;
+    }
     if(!doc){toast('无效的 .prototype.html（缺少内嵌文档）');return}
     applyDoc(doc);fileHandle=null;setFileName(file.name);clearAutosave();toast('已打开 '+file.name);
   }).catch(()=>toast('读取文件失败'));
 }
+/* ---- P35：AI 友好化——#__ai_view 逐行设计清单（保存/生成时自动再生） ---- */
+function aiFillStr(n){
+  const fs=fillsOf(n).filter(f=>f.on!==false);
+  if(!fs.length)return null;
+  return fs.map(f=>{
+    if(f.type==='linear'||f.type==='radial'){
+      const st=gradientStopsOf(f).map(s=>s.color+'@'+Math.round((s.pos??0)*100)+'%').join(' -> ');
+      return (f.type==='linear'?'linear('+Math.round(f.angle||0)+'deg)':'radial')+'('+st+')';
+    }
+    return f.color+((f.opacity!=null&&f.opacity<1)?'@'+Math.round(f.opacity*100)+'%':'');
+  }).join(' + ');
+}
+function aiStrokeStr(n){
+  const ss=strokesOf(n).filter(s=>s.on!==false&&s.color);
+  if(!ss.length)return null;
+  return ss.map(s=>'stroke='+s.color+' w='+(s.width??1)+(s.align&&s.align!=='center'?' '+s.align:'')+(s.style&&s.style!=='solid'?' '+s.style:'')).join(' | ');
+}
+function aiEffectStr(n){
+  const es=effectsOf(n).filter(e=>e.on!==false);
+  if(!es.length)return null;
+  return es.map(e=>{
+    if(e.type==='blur')return 'blur='+e.value;
+    if(e.type==='bgblur')return 'bgblur='+e.value;
+    return (e.type==='inner'?'inner-shadow':'shadow')+'('+[e.x,e.y,e.blur].map(v=>v??0).join(',')+' '+e.color+((e.opacity!=null&&e.opacity<1)?'@'+Math.round(e.opacity*100)+'%':'')+')';
+  }).join(' | ');
+}
+function aiCommonAttr(n){
+  let s='';
+  if(n.opacity!=null&&n.opacity<1)s+=' opacity='+n.opacity;
+  if(n.rotation)s+=' rotate='+n.rotation;
+  if(n.hidden||n.visible===false)s+=' hidden'; // P35b：编辑器模型用 hidden（visible 为兼容兜底）
+  if(n.locked)s+=' locked';
+  if(n.clip)s+=' clip';
+  const st=aiStrokeStr(n);if(st)s+=' '+st;
+  const ef=aiEffectStr(n);if(ef)s+=' '+ef;
+  if(Array.isArray(n.proto)&&n.proto.length)s+=' proto['+n.proto.map(p=>{
+    let t=(p.trigger||'单击')+' -> '+(p.action||'')+':'+(p.target||'');
+    if(p.anim&&p.anim!=='无')t+=' anim='+p.anim;if(p.duration)t+=' dur='+p.duration;
+    if(p.easing&&p.easing!=='ease-out')t+=' ease='+p.easing;if(p.variant)t+=' variant='+p.variant;
+    if(p.dir&&p.dir!=='任意')t+=' dir='+p.dir;
+    return t;
+  }).join('; ')+']';
+  return s;
+}
+/* P35b：字符串值一律输出 JSON 字符串字面量（\n、引号、script 闭合序列全部无损转义，AI 可 JSON.parse 还原） */
+function aiStr(v){
+  const out=JSON.stringify(String(v??''));
+  return out.replace(/<\//g,'<\\/'); // JSON 里 \/ 合法且等价 /，同时杜绝 script 闭合序列提前出现
+}
+function aiNodeLine(n,ind){
+  const t=n.type||'rect';
+  let s=ind+'- '+t+' '+(n.id||'')+(n.name?' '+aiStr(n.name):'')+' @'+(n.x??0)+','+(n.y??0)+' '+(n.w??0)+'x'+(n.h??0);
+  if(t==='text'){
+    s+=' text='+aiStr(n.text);
+    s+=' font='+n.fontSize+(n.fontWeight&&n.fontWeight!==400?'/'+n.fontWeight:'')+' color='+(n.color||'#000000');
+    if(n.align)s+=' align='+n.align;
+    if(n.lineHeight)s+=' lh='+n.lineHeight;
+    if(n.letterSpacing)s+=' ls='+n.letterSpacing;
+    if(n.bg)s+=' bg='+n.bg;
+  }else if(t==='svg'){ // P35b：图标名 + 着色（此前落入矩形分支丢失 icon/color）
+    s+=' icon='+(n.icon||('(paths:'+(n.paths||[]).length+')'))+' color='+(n.color||'#000000');
+  }else if(t==='arrow'){ // P35b：箭头方向
+    s+=' color='+(n.stroke||'#000000')+' w='+(n.strokeW??1)+' dir='+(n.dir||'\\');
+  }else if(t==='path'){
+    const f=aiFillStr(n);if(f)s+=' fill='+f;
+    s+=' closed='+(n.closed?'1':'0')+' pts=['+(n.pts||[]).map(p=>p.x+','+p.y).join(' ')+' ]';
+  }else if(t==='ellipse'||t==='polygon'||t==='star'){
+    const f=aiFillStr(n);if(f)s+=' fill='+f;
+    if(t==='polygon'&&n.sides)s+=' sides='+n.sides;
+    if(t==='star'&&n.points)s+=' points='+n.points;
+  }else if(t==='line'){
+    s+=' color='+(n.color||n.stroke||'#000000')+' w='+(n.strokeW??n.width??1);
+  }else if(t==='image'){
+    s+=' src='+aiStr(n.src)+(n.fit?' fit='+n.fit:'');
+  }else{ // rect / artboard / bool / 其他默认矩形语义
+    const f=aiFillStr(n);if(f)s+=' fill='+f;
+    if(n.op)s+=' op='+n.op;
+    if(n.bg&&t==='artboard')s+=' bg='+n.bg;
+    if(n.radius)s+=' r='+n.radius;else if(Array.isArray(n.radii))s+=' r=['+n.radii.join(',')+']';
+  }
+  if(t==='group'&&n.inst)s+=' [INSTANCE of '+n.inst+(n.iid?' iid='+n.iid:'')+']';
+  s+=aiCommonAttr(n);
+  return s;
+}
+function aiWalk(n,ind,out){
+  out.push(aiNodeLine(n,ind));
+  if(Array.isArray(n.children))n.children.forEach(c=>aiWalk(c,ind+'  ',out));
+  if(n.ov&&typeof n.ov==='object'){ // 实例覆盖单独列出，便于 AI 精确还原
+    Object.keys(n.ov).forEach(k=>{
+      const o=n.ov[k]||{};
+      if(!Object.keys(o).length)return;
+      out.push(ind+'    override '+k+': '+Object.keys(o).map(f=>f+'='+JSON.stringify(o[f])).join(', '));
+    });
+  }
+}
+function genAIView(){
+  const out=[];
+  out.push('# AI-VIEW 设计清单（自动生成，勿手改；再生：编辑器保存或 regen-aiview.mjs）');
+  out.push('# 用途：空间布局与 UI 元素整体效果参考；实现须遵循项目开发规范（Vue3 标准组件/设计系统 Token），勿逐节点硬编码绝对定位，母版/实例→可复用组件。');
+  if(docTitle)out.push('doc: '+docTitle);
+  pages.forEach((p,pi)=>{
+    out.push('');
+    out.push('## page '+pi+': '+(p.name||('页'+(pi+1))));
+    (p.artboards||[]).forEach(ab=>{
+      out.push('## artboard '+ab.id+' '+aiStr(ab.name||'')+' page='+(ab.x??0)+','+(ab.y??0)+' size='+(ab.w??0)+'x'+(ab.h??0)+(ab.bg?' bg='+ab.bg:''));
+      if(Array.isArray(ab.children))ab.children.forEach(n=>aiWalk(n,'  ',out));
+    });
+  });
+  return out.join('\n');
+}
+/* 把 #__ai_view 区块同步进 HTML 文本。
+   区域锚定：只在 __doc 结束 → 下一个裸 script 开标签之间的 HTML 区操作，
+   绝不碰编辑器 JS 源码（其内含本函数的字符串字面量，宽松正则会误吞代码）。 */
+function embedAIView(html){
+  const view=genAIView().replace(/<\/(script)/gi,'<\\/$1');
+  const text='<script type="text/plain" id="__ai_view">\n'+view+'\n<\/script>';
+  const dm=/(<script type="application\/json" id="__doc">[\s\S]*?<\/script>)/.exec(html);
+  if(!dm)return html;
+  const zs=dm.index+dm[0].length;
+  const ns=html.indexOf('<script>',zs);
+  const ze=ns===-1?html.length:ns;
+  const zone=html.slice(zs,ze).replace(/[ \t]*<script type="text\/plain" id="__ai_view">[\s\S]*?<\/script>[ \t]*\n?/g,'')
+    .replace(/^\s*\n/,'').replace(/\s+$/,''); // 归一化区间空白，保证反复保存幂等
+  return html.slice(0,zs)+'\n'+text+(zone?'\n'+zone:'')+'\n'+html.slice(ze);
+}
 /* ---- 保存：句柄直写覆盖 → 系统另存 → 下载兜底 ---- */
 function buildFile(){
-  const json=JSON.stringify({version:DOC_VER,theme:uiTheme,pages,tree},(k,v)=>k==='parent'?undefined:v).replace(/</g,'\\u003c');
+  const json=JSON.stringify({version:DOC_VER,aiHint:AI_HINT,theme:uiTheme,pages,tree},(k,v)=>k==='parent'?undefined:v).replace(/</g,'\\u003c');
   const re=/(<script type="application\/json" id="__doc">)[\s\S]*?(<\/script>)/;
-  if(re.test(PRISTINE_HTML))return PRISTINE_HTML.replace(re,(m,p1,p2)=>p1+json+p2);
+  if(re.test(PRISTINE_HTML))return embedAIView(PRISTINE_HTML.replace(re,(m,p1,p2)=>p1+json+p2));
   return PRISTINE_HTML;
 }
 async function writeFile(h){
@@ -8671,6 +8809,11 @@ const ProtoAPI=(()=>{
       return {ok:true,nodes:nodes.map(snapOf)};
     }catch(e){return err(e.message)}},
     getSelection(){return {ok:true,ids:[...state.sel]}},
+    exportAI(){try{ // P35：一次给齐 AI 所需三件套（清单 + 完整文档 JSON）
+      return {ok:true,
+        ai_view:genAIView(),
+        doc:JSON.parse(JSON.stringify({version:DOC_VER,aiHint:AI_HINT,theme:uiTheme,pages,tree},(k,v)=>k==='parent'?undefined:v))};
+    }catch(e){return err(e.message)}},
     undo(){try{undo();return {ok:true}}catch(e){return err(e.message)}},
     redo(){try{redo();return {ok:true}}catch(e){return err(e.message)}}
   };

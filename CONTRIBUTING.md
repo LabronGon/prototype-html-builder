@@ -45,6 +45,7 @@ git status --short
 
 - 壳一致性：master 与 `editor-prototype/` 两份副本的 `PROTOTYPE-AI-GUIDE` / `aiHint` / `#__ai_view` 头部一致。
 - 浏览器冒烟：打开 master，控制台零报错，`ProtoAPI.exportAI()` 可用。
+- **全部样本的运行时壳**：`空白原型.prototype.html`、`选矿设备管理.prototype.html`、live skill 的 `assets/` 与 `examples/` 产物，浏览器里 `ProtoAPI.exportAI()` 都必须可用。**静态 AI 块（GUIDE / aiHint / `__ai_view`）齐全 ≠ 运行时壳最新**——旧壳文件也可以被补嵌上新版静态块，两者必须分别验证；发现不一致用 `tools/regen-aiview.mjs --shell sample.prototype.html <目标>` 只换壳、保留设计数据。
 - 幂等：`tools/regen-aiview.mjs` 连续运行两次，文件字节数不变。
 
 **改了编辑器壳或 AI 指引时必须同步**：
