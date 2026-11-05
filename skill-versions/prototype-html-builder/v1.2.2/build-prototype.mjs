@@ -1,0 +1,574 @@
+#!/usr/bin/env node
+/**
+ * build-prototype.mjs — 把声明式 JSON 规格编译成 .prototype.html
+ *
+ * 用法：
+ *   node scripts/build-prototype.mjs examples/demo-spec.json
+ *   node scripts/build-prototype.mjs spec.json -o out.prototype.html
+ *   node scripts/build-prototype.mjs --check spec.json      # 只编译校验，不落盘
+ *
+ * 产物 = assets/template.prototype.html（编辑器壳，含 218 个 Element Plus / Ant Design
+ * SVG 图标） + 内嵌文档 JSON。所有图标都是矢量 Path2D，节点可重新着色。
+ *
+ * 规格顶层：
+ *   { name, theme, kit, pages:[{name,bg,guides,comments,artboards:[{name,x,y,w,h,bg,nodes}]}],
+ *     components:[{id,name,w,h,nodes}], tree:[...] }
+ * 节点：
+ *   { type:'rect|ellipse|text|icon|line|arrow|polygon|star|image|group|bool|instance', ... }
+ * 详见 references/spec.md。
+ */
+import { readFile, writeFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { AI_GUIDE, AI_NOTICE, META_AI, AI_HINT, genAIView, embedAIBlocks } from './ai-view.mjs';
+
+// v1.2.2：AI 协作块（GUIDE/NOTICE/meta + __ai_view 清单）随产物自动嵌入
+export { AI_GUIDE, AI_NOTICE, META_AI, AI_HINT, genAIView, embedAIBlocks };
+
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const SKILL = path.resolve(HERE, '..');
+const TEMPLATE = path.join(SKILL, 'assets', 'template.prototype.html');
+const KIT_FILE = path.join(SKILL, 'assets', 'design-kit.json');
+const ICONS_FILE = path.join(SKILL, 'assets', 'icons.json');
+
+const NODE_TYPES = new Set(['rect', 'ellipse', 'text', 'svg', 'icon', 'line', 'arrow', 'polygon', 'star', 'image', 'group', 'bool', 'instance']);
+const TRIGGERS = ['单击', '悬停', '按下', '拖拽', '滚动'];
+const ACTIONS = ['打开画板', '打开弹层', '关闭弹层', '返回上一页', '切换变体'];
+const ANIMS = ['无', '淡入', '左滑', '右滑', '上滑', '下滑'];
+const OV_KEYS = ['fill', 'fillType', 'grad', 'gradAngle', 'gradStops', 'stroke', 'strokeW', 'sw', 'opacity',
+  'radius', 'r', 'visible', 'hidden', 'locked', 'text', 'fontSize', 'fontWeight', 'color', 'letterSpacing', 'lh', 'ls', 'align',
+  'icon', 'paths', 'ibv'];
+
+let __uid = 0;
+const uid = () => 'n' + (++__uid);
+
+/* ---------------- 文本度量（与编辑器 canvas 测量近似，误差 < 2%） ---------------- */
+function measureText(t) {
+  const lines = String(t.text ?? '').split('\n');
+  const fs = t.fontSize || 14;
+  const ls = t.letterSpacing || 0;
+  let w = 0;
+  for (const line of lines) {
+    let lw = 0;
+    for (const ch of line) {
+      const c = ch.codePointAt(0);
+      if (c > 0x2e80) lw += fs;                         // CJK / 全角
+      else if (ch === ' ') lw += fs * 0.28;
+      else if (c >= 65 && c <= 90) lw += fs * 0.63;      // A-Z
+      else lw += fs * 0.52;
+      lw += ls;
+    }
+    w = Math.max(w, lw);
+  }
+  return { w: Math.max(1, Math.round(w)), h: Math.round(lines.length * (t.lineHeight || 1.4) * fs) };
+}
+
+/* ---------------- 节点规范化 ---------------- */
+const isColor = (v) => typeof v === 'string' && (/^#([0-9a-f]{3,8})$|^rgba?\(|^transparent$|^var\(/i.test(v));
+const num = (v, d) => (v === undefined || v === null ? d : +v);
+
+function baseNode(spec, name) {
+  const n = {
+    id: uid(),
+    type: spec.type,
+    name: String(spec.name || name || ''),
+    x: num(spec.x, 0),
+    y: num(spec.y, 0),
+    opacity: num(spec.opacity, 1),
+  };
+  if (spec.rot) n.rot = +spec.rot;
+  if (spec.flipX) n.flipX = true;
+  if (spec.flipY) n.flipY = true;
+  if (spec.hidden) n.hidden = true;
+  if (spec.locked) n.locked = true;
+  return n;
+}
+
+/** DSL → 编辑器节点；返回节点（不含 parent） */
+function buildNode(spec, ctx, indexPath) {
+  if (!spec || typeof spec !== 'object') throw new Error(`节点必须是对象（${indexPath}）`);
+  const type = String(spec.type || 'rect');
+  if (!NODE_TYPES.has(type)) throw new Error(`未知节点类型 "${type}"（${indexPath}）；可用：${[...NODE_TYPES].join(', ')}`);
+  if (type === 'instance') return buildInstance(spec, ctx, indexPath);
+  if (type === 'group' || type === 'bool') return buildContainer(spec, ctx, indexPath);
+
+  const n = baseNode({ ...spec, type: type === 'icon' ? 'svg' : type }, type === 'icon' ? '图标' : type);
+  if (type === 'icon') {
+    n.type = 'svg';
+    n.w = num(spec.w, num(spec.size, 24));
+    n.h = num(spec.h, num(spec.size, 24));
+    n.icon = String(spec.icon || '');
+    n.color = isColor(spec.color) ? spec.color : ctx.palette.text1;
+    if (!n.icon && !(spec.paths && spec.paths.length)) throw new Error(`icon 节点需要 icon 或 paths（${indexPath}）`);
+    if (spec.paths && spec.paths.length) {
+      n.paths = spec.paths.map(String);
+      n.ibv = num(spec.ibv, 24);
+      n.icon = spec.icon ? String(spec.icon) : '';
+    }
+    return n;
+  }
+
+  if (type === 'rect') {
+    n.w = num(spec.w, 100); n.h = num(spec.h, 40);
+    n.fill = isColor(spec.fill) ? spec.fill : (spec.fill === null ? null : ctx.palette.brand);
+    n.stroke = isColor(spec.stroke) ? spec.stroke : null;
+    n.strokeW = num(spec.strokeW, 0);
+    n.radius = num(spec.radius, 0);
+    if (Array.isArray(spec.rc)) n.rc = spec.rc.map((v) => num(v, 0));
+  } else if (type === 'ellipse') {
+    n.w = num(spec.w, 80); n.h = num(spec.h, 80);
+    n.fill = isColor(spec.fill) ? spec.fill : ctx.palette.brand;
+    n.stroke = isColor(spec.stroke) ? spec.stroke : null;
+    n.strokeW = num(spec.strokeW, 0);
+  } else if (type === 'text') {
+    n.text = String(spec.text ?? '文本');
+    n.fontSize = num(spec.fontSize, 14);
+    n.fontWeight = num(spec.fontWeight, 500);
+    n.color = isColor(spec.color) ? spec.color : ctx.palette.text1;
+    n.align = spec.align || null;
+    if (spec.valign) n.valign = spec.valign;
+    if (spec.lineHeight) n.lineHeight = +spec.lineHeight;
+    if (spec.letterSpacing) n.letterSpacing = +spec.letterSpacing;
+    if (spec.textCase) n.textCase = spec.textCase;
+    const m = measureText(n);
+    n.w = n.align ? num(spec.w, m.w) : m.w;
+    n.h = num(spec.h, m.h);
+  } else if (type === 'line' || type === 'arrow') {
+    n.w = num(spec.w, 100); n.h = num(spec.h, 2);
+    n.stroke = isColor(spec.stroke) ? spec.stroke : ctx.palette.text3;
+    n.strokeW = num(spec.strokeW, 1.5);
+    n.dir = spec.dir === '/' ? '/' : '\\';
+  } else if (type === 'polygon' || type === 'star') {
+    n.w = num(spec.w, 80); n.h = num(spec.h, 80);
+    n.fill = isColor(spec.fill) ? spec.fill : ctx.palette.brand;
+    n.stroke = isColor(spec.stroke) ? spec.stroke : null;
+    n.strokeW = num(spec.strokeW, 0);
+    if (type === 'polygon') n.sides = Math.max(3, num(spec.sides, 5));
+    else n.points = Math.max(5, num(spec.points, 5));
+  } else if (type === 'image') {
+    n.w = num(spec.w, 160); n.h = num(spec.h, 120);
+    n.src = String(spec.src || '');
+    if (spec.radius) n.radius = +spec.radius;
+  }
+
+  if (Array.isArray(spec.fills)) n.fills = spec.fills;
+  if (Array.isArray(spec.strokes)) n.strokes = spec.strokes;
+  if (Array.isArray(spec.effects)) n.effects = spec.effects;
+  const p = collectProto(spec);
+  if (p.length) n.proto = p;
+  return n;
+}
+
+/** group / bool：子节点坐标仍为画板坐标；包围盒自动计算 */
+function buildContainer(spec, ctx, indexPath) {
+  const type = spec.type;
+  const kids = (spec.children || []).map((c, i) => buildNode(c, ctx, `${indexPath}/${i}`));
+  if (!kids.length) throw new Error(`${type} 需要 children（${indexPath}）`);
+  const n = baseNode(spec, type === 'bool' ? '布尔' : '编组');
+  n.type = type;
+  n.children = kids;
+  if (type === 'bool') n.op = spec.op || 'union';
+  for (const k of kids) k.parent = n;
+  const b = bbox(kids);
+  n.x = b.x; n.y = b.y; n.w = b.w; n.h = b.h;
+  const p = collectProto(spec);
+  if (p.length) n.proto = p;
+  return n;
+}
+
+function bbox(nodes) {
+  let x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
+  for (const n of nodes || []) {
+    x1 = Math.min(x1, n.x); y1 = Math.min(y1, n.y);
+    x2 = Math.max(x2, n.x + (n.w || 0)); y2 = Math.max(y2, n.y + (n.h || 0));
+  }
+  if (!Number.isFinite(x1)) return { x: 0, y: 0, w: 0, h: 0 };
+  return { x: x1, y: y1, w: x2 - x1, h: y2 - y1 };
+}
+
+/* ---------------- 组件实例 ---------------- */
+function pickOv(n) {
+  const o = {};
+  for (const k of OV_KEYS) if (n[k] !== undefined) o[k] = JSON.parse(JSON.stringify(n[k]));
+  if (n.type === 'text') { o.w = n.w; o.h = n.h; }
+  return o;
+}
+
+function cloneTree(src, parent, dx, dy) {
+  const n = JSON.parse(JSON.stringify(src, (k, v) => (k === 'parent' ? undefined : v)));
+  const walk = (node, par) => {
+    node.id = uid();
+    node.parent = par;
+    node.x = num(node.x, 0) + dx;
+    node.y = num(node.y, 0) + dy;
+    for (const c of node.children || []) walk(c, node);
+  };
+  walk(n, parent);
+  return n;
+}
+
+function buildInstance(spec, ctx, indexPath) {
+  const compRef = String(spec.comp || spec.component || '');
+  const master = ctx.masters.find((m) => m.master === compRef || m.name === compRef);
+  if (!master) {
+    throw new Error(`组件不存在："${compRef}"（${indexPath}）；可用：${ctx.masters.map((m) => m.master).join(', ')}`);
+  }
+  const x = num(spec.x, 0), y = num(spec.y, 0);
+  const g = {
+    id: uid(), type: 'group', cont: 1, inst: master.master, iid: 'i' + uid(),
+    name: String(spec.name || master.name), x, y,
+    w: num(spec.w, master.w), h: num(spec.h, master.h),
+    opacity: num(spec.opacity, 1), ov: {}, base: {}, children: [],
+  };
+  if (spec.hidden) g.hidden = true;
+  if (spec.locked) g.locked = true;
+
+  const originX = master._originX ?? 0, originY = master._originY ?? 0; // 母版画板内坐标 → 画板局部
+  const pairs = []; // [克隆节点, 母版节点]
+  master.children.forEach((c, k) => {
+    const clone = cloneTree(c, g, x - originX, y - originY);
+    walkPair(clone, c, (cl, src, idx) => {
+      cl.mc = src.id;
+      cl.kp = idx;
+      g.base[src.id] = pickOv(src);
+      pairs.push([cl, src]);
+    });
+    g.children.push(clone);
+  });
+
+  // 覆盖：按母版节点 name / mc id / 索引路径
+  const ovs = spec.overrides || {};
+  for (const [key, props] of Object.entries(ovs)) {
+    const lenient = key.replace(/^#/, '');
+    const hits = pairs.filter(([, src], i) =>
+      src.name === key || src.id === key || src.id === lenient || String(i) === key);
+    if (!hits.length) throw new Error(`实例覆盖找不到母版节点："${key}"（${indexPath}）`);
+    for (const [cl, src] of hits) {
+      const o = Object.assign({}, g.ov[src.id] || {});
+      for (const [k, v] of Object.entries(props || {})) {
+        if (!OV_KEYS.includes(k)) continue;
+        if (k === 'color' || k === 'icon' || k === 'paths') o[k] = v;
+        else o[k] = v;
+      }
+      if (props && 'text' in props && !cl.align) {
+        // 自动宽度文本：覆盖文字后重算包围盒；固定框（align 非空）保持母版宽度
+        Object.assign(o, measureText({ ...cl, text: String(props.text) }));
+      }
+      g.ov[src.id] = o;
+      // 视觉即时：容器子层直接落覆盖值（编辑器 rebuildContainer 时以母版 + ov 重建，结果一致）
+      for (const [k, v] of Object.entries(o)) cl[k] = v;
+    }
+  }
+  const p = collectProto(spec);
+  if (p.length) g.proto = p;
+  return g;
+}
+
+function walkPair(clone, src, fn, idx = 0) {
+  fn(clone, src, idx);
+  const cs = clone.children || [], ss = src.children || [];
+  for (let i = 0; i < cs.length; i++) walkPair(cs[i], ss[i], fn, i);
+}
+
+/* ---------------- 交互（proto）规范化 ---------------- */
+const TRIGGER_ALIAS = { click: '单击', hover: '悬停', press: '按下', drag: '拖拽', scroll: '滚动' };
+
+function collectProto(spec) {
+  const out = [];
+  if (Array.isArray(spec.proto)) out.push(...spec.proto);
+  for (const [alias, trigger] of Object.entries(TRIGGER_ALIAS)) {
+    const v = spec[alias];
+    if (!v) continue;
+    const arr = Array.isArray(v) ? v : [v];
+    for (const it of arr) out.push({ ...it, trigger: it.trigger || trigger });
+  }
+  return out.map((p) => ({
+    trigger: p.trigger || '单击',
+    action: p.action || '打开画板',
+    target: p.target == null ? '' : String(p.target),
+    variant: p.variant == null ? '' : String(p.variant),
+    dir: p.dir || '任意',
+    opos: p.opos || '居中',
+    ox: num(p.ox, 0), oy: num(p.oy, 0),
+    dim: num(p.dim, 40),
+    bdclose: p.bdclose === undefined ? true : !!p.bdclose,
+    anim: p.anim || '无',
+    easing: p.easing || 'ease-out',
+    duration: num(p.duration, 300),
+  }));
+}
+
+/* ---------------- 页面 / 画板构建 ---------------- */
+function buildArtboard(spec, ctx, pageName) {
+  const ab = {
+    type: 'artboard', id: uid(),
+    name: String(spec.name || '画板'),
+    x: num(spec.x, 0), y: num(spec.y, 0),
+    w: num(spec.w, 375), h: num(spec.h, 812),
+    bg: isColor(spec.bg) ? spec.bg : '#FFFFFF',
+    children: [],
+  };
+  if (spec.hidden) ab.hidden = true;
+  if (spec.locked) ab.locked = true;
+  const ctx2 = { ...ctx, ab };
+  for (const [i, s] of (spec.nodes || spec.children || []).entries()) {
+    const n = buildNode(s, ctx2, `${pageName}/${ab.name}/${i}`);
+    n.parent = ab;
+    ab.children.push(n);
+  }
+  if (Array.isArray(spec.proto)) ab.proto = spec.proto;
+  return ab;
+}
+
+/* ---------------- 组件库 ---------------- */
+function buildKitPage(kit, customComps, ctx) {
+  const page = { name: '组件库', comp: true, kit: true, artboards: [] };
+  const masters = [];
+
+  for (const [i, m] of (kit.masters || []).entries()) {
+    const ab = {
+      type: 'artboard', id: uid(), name: m.name, master: m.id,
+      x: num(m.x, (i % 3) * 560), y: num(m.y, Math.floor(i / 3) * 320),
+      w: m.w, h: m.h, bg: '#FFFFFF', children: [],
+    };
+    let k = 0;
+    const walk = (list, parent) => {
+      for (const src of list || []) {
+        const n = JSON.parse(JSON.stringify(src, (k, v) => (k === 'parent' ? undefined : v)));
+        n.id = uid();
+        n.parent = parent;
+        if (n.children) walk(n.children, n);
+        parent.children.push(n);
+        k++;
+      }
+    };
+    walk(m.children, ab);
+    page.artboards.push(ab);
+    masters.push({ master: m.id, name: m.name, w: m.w, h: m.h, children: ab.children, _originX: 0, _originY: 0 });
+  }
+
+  let idx = page.artboards.length;
+  for (const c of customComps || []) {
+    const id = String(c.id || c.name);
+    if (masters.some((m) => m.master === id)) throw new Error(`组件 id 重复："${id}"`);
+    const ab = {
+      type: 'artboard', id: uid(), name: String(c.name || id), master: id,
+      x: num(c.x, (idx % 3) * 560), y: num(c.y, Math.floor(idx / 3) * 320),
+      w: num(c.w, 200), h: num(c.h, 100), bg: isColor(c.bg) ? c.bg : '#FFFFFF', children: [],
+    };
+    const sub = { ...ctx, masters, ab };
+    for (const [i, s] of (c.nodes || c.children || []).entries()) {
+      const n = buildNode(s, sub, `components/${id}/${i}`);
+      n.parent = ab;
+      ab.children.push(n);
+    }
+    page.artboards.push(ab);
+    masters.push({ master: id, name: ab.name, w: ab.w, h: ab.h, children: ab.children, _originX: 0, _originY: 0 });
+    idx++;
+  }
+  return { page, masters };
+}
+
+/* ---------------- target / variant 解析 ---------------- */
+function resolveTargets(pages, masters) {
+  const abIndex = new Map();
+  const abByPage = new Map();
+  pages.forEach((p) => p.artboards.forEach((ab) => {
+    abIndex.set(ab.id, ab);
+    if (!abIndex.has(ab.name)) abIndex.set(ab.name, ab);
+    abByPage.set(p.name + '/' + ab.name, ab);
+    abByPage.set(p.name + '/' + ab.id, ab);
+  }));
+  const masterIndex = new Map(masters.map((m) => [m.master, m]).concat(masters.map((m) => [m.name, m])));
+  const fix = (n) => {
+    if (!Array.isArray(n.proto)) return;
+    n.proto = n.proto.map((p) => {
+      if (!TRIGGERS.includes(p.trigger)) throw new Error(`交互 trigger 非法：${p.trigger}`);
+      if (!ACTIONS.includes(p.action)) throw new Error(`交互 action 非法：${p.action}`);
+      if (!ANIMS.includes(p.anim)) throw new Error(`交互 anim 非法：${p.anim}`);
+      const q = { ...p };
+      if (p.action === '切换变体') {
+        const m = masterIndex.get(p.variant);
+        if (!m) throw new Error(`变体母版不存在：${p.variant}`);
+        q.variant = m.master;
+        q.target = '';
+      } else if (p.action === '打开画板' || p.action === '打开弹层') {
+        const t = abIndex.get(p.target) || abByPage.get(p.target);
+        if (!t) throw new Error(`交互目标画板不存在："${p.target}"（节点 ${n.name || n.id}）`);
+        q.target = t.id;
+      } else {
+        q.target = '';
+      }
+      return q;
+    });
+  };
+  const walk = (list) => (list || []).forEach((n) => { fix(n); walk(n.children); });
+  pages.forEach((p) => p.artboards.forEach((ab) => { fix(ab); walk(ab.children); walk(ab.loose); }));
+}
+
+/* ---------------- 主流程 ---------------- */
+function validateIcons(page, iconSet, errors) {
+  const walk = (list, where) => (list || []).forEach((n) => {
+    if (n.type === 'svg' && n.icon && !(n.paths && n.paths.length) && !iconSet.has(n.icon)) {
+      errors.push(`图标未收录："${n.icon}"（${where}/${n.name || '未命名'}）`);
+    }
+    walk(n.children, where);
+  });
+  const where = page.name;
+  (page.artboards || []).forEach((ab) => walk(ab.children, `${where}/${ab.name}`));
+  walk(page.loose, where);
+}
+
+export async function compile(spec, opts = {}) {
+  const warnings = [];
+  const errors = [];
+  if (!spec || typeof spec !== 'object') throw new Error('规格必须是 JSON 对象');
+  if (!Array.isArray(spec.pages) || !spec.pages.length) throw new Error('规格需要 pages 数组');
+
+  const kit = JSON.parse(await readFile(KIT_FILE, 'utf8'));
+  const iconJson = JSON.parse(await readFile(ICONS_FILE, 'utf8'));
+  const iconSet = new Set(Object.keys(iconJson.icons || {}));
+  const palette = kit.palette[spec.theme === 'dark' ? 'dark' : 'light'];
+
+  const useKit = spec.kit === undefined ? true : !!spec.kit;
+  const ctx0 = { palette, masters: [], warnings };
+
+  let kitPage = null, masters = [];
+  if (useKit) {
+    const r = buildKitPage(kit, spec.components || [], ctx0);
+    kitPage = r.page;
+    masters = r.masters;
+  } else if (spec.components && spec.components.length) {
+    const r = buildKitPage({ masters: [] }, spec.components, ctx0);
+    kitPage = r.page;
+    masters = r.masters;
+  }
+  const ctx = { ...ctx0, masters };
+
+  const pages = [];
+  const pageIndex = new Map();
+  for (const [pi, ps] of spec.pages.entries()) {
+    const page = {
+      name: String(ps.name || ('页面 ' + (pi + 1))),
+      artboards: [],
+    };
+    if (isColor(ps.bg)) page.bg = ps.bg;
+    if (Array.isArray(ps.guides)) page.guides = ps.guides.map((g) => ({ axis: g.axis === 'y' ? 'y' : 'x', pos: num(g.pos, 0) }));
+    if (Array.isArray(ps.comments)) page.comments = ps.comments.map((c) => ({ x: num(c.x, 0), y: num(c.y, 0), text: String(c.text || ''), replies: c.replies || [] }));
+    if (Array.isArray(ps.loose)) page.loose = [];
+    const subs = ps.artboards && ps.artboards.length ? ps.artboards : [{ name: page.name, x: 0, y: 0, w: 1440, h: 900, nodes: ps.nodes || [] }];
+    for (const as of subs) page.artboards.push(buildArtboard(as, ctx, page.name));
+    pages.push(page);
+    pageIndex.set(page.name, page);
+  }
+  if (kitPage) pages.push(kitPage);
+
+  resolveTargets(pages, masters);
+
+  // 图标校验
+  for (const p of pages) {
+    validateIcons(p, iconSet, errors);
+  }
+  // 结构校验（id 唯一）
+  const ids = new Set();
+  const dup = [];
+  const scan = (list) => (list || []).forEach((n) => {
+    if (ids.has(n.id)) dup.push(n.id); else ids.add(n.id);
+    scan(n.children);
+  });
+  pages.forEach((p) => p.artboards.forEach((ab) => { if (ids.has(ab.id)) dup.push(ab.id); else ids.add(ab.id); scan(ab.children); scan(ab.loose); }));
+  if (dup.length) errors.push(`节点 id 重复：${dup.slice(0, 5).join(', ')}`);
+  if (errors.length) {
+    const e = new Error('规格校验失败：\n - ' + errors.join('\n - '));
+    e.errors = errors;
+    throw e;
+  }
+
+  const tree = Array.isArray(spec.tree) && spec.tree.length
+    ? spec.tree.map((t) => normalizeTree(t, pageIndex, pages))
+    : pages.map((p, i) => ({ label: p.name, page: i }));
+
+  const doc = {
+    version: 1,
+    ...(spec.name ? { name: String(spec.name) } : {}),
+    theme: spec.theme === 'dark' ? 'dark' : 'light',
+    pages,
+    tree,
+  };
+  stripParents(doc);
+  return { doc, masters, warnings, stats: statsOf(doc) };
+}
+
+/** 编辑器运行时重建 parent，序列化前剔除（避免循环引用） */
+function stripParents(doc) {
+  const walk = (list) => (list || []).forEach((n) => {
+    delete n.parent;
+    for (const c of n.children || []) { delete c.parent; }
+    walk(n.children);
+  });
+  doc.pages.forEach((p) => { p.artboards.forEach((ab) => { delete ab.parent; walk(ab.children); }); walk(p.loose); });
+}
+
+/** 文档 → 可内嵌 JSON（转义 `<` 防止提前闭合；v1.2.2 强制带 aiHint） */
+export function docJson(doc) {
+  return JSON.stringify({ ...doc, aiHint: AI_HINT }, (k, v) => (k === 'parent' ? undefined : v)).replace(/</g, '\\u003c');
+}
+
+function normalizeTree(t, pageIndex, pages) {
+  const out = {};
+  if (t.label) out.label = String(t.label);
+  if (t.page !== undefined) {
+    if (typeof t.page === 'number') out.page = t.page;
+    else if (pageIndex.has(t.page)) out.page = pages.indexOf(pageIndex.get(t.page));
+    else throw new Error(`页面树引用了不存在的页面："${t.page}"`);
+  }
+  if (t.open) out.open = true;
+  if (t.children) out.children = t.children.map((c) => normalizeTree(c, pageIndex, pages));
+  return out;
+}
+
+function statsOf(doc) {
+  let nodes = 0, icons = 0, instances = 0, artboards = 0;
+  const walk = (l) => (l || []).forEach((n) => { nodes++; if (n.type === 'svg') icons++; if (n.cont && n.inst) instances++; walk(n.children); });
+  doc.pages.forEach((p) => p.artboards.forEach((ab) => { artboards++; walk(ab.children); }));
+  return { pages: doc.pages.length, artboards, nodes, icons, instances };
+}
+
+async function main() {
+  const argv = process.argv.slice(2);
+  const checkOnly = argv.includes('--check');
+  const oIdx = argv.indexOf('-o');
+  const outArg = oIdx >= 0 ? argv[oIdx + 1] : null;
+  const specPath = argv.find((a, i) => !a.startsWith('-') && (oIdx < 0 || i !== oIdx + 1));
+  if (!specPath) {
+    console.error('用法：node scripts/build-prototype.mjs <spec.json> [-o out.prototype.html] [--check]');
+    process.exit(1);
+  }
+  const spec = JSON.parse(await readFile(path.resolve(specPath), 'utf8'));
+  const { doc, stats, warnings } = await compile(spec);
+
+  const tpl = await readFile(TEMPLATE, 'utf8');
+  const json = docJson(doc);
+  let html = tpl.replace(/(<script type="application\/json" id="__doc">)[\s\S]*?(<\/script>)/, (m, a, b) => a + json + b);
+  if (html.length === tpl.length) throw new Error('模板缺少 __doc 容器');
+  html = embedAIBlocks(html, doc); // v1.2.1：嵌入 AI-GUIDE 注释 + __ai_view 逐行清单
+
+  const out = outArg ? path.resolve(outArg)
+    : path.join(path.dirname(path.resolve(specPath)), (spec.name || 'prototype').replace(/[\\/:*?"<>|]/g, '_') + '.prototype.html');
+
+  if (!checkOnly) {
+    await writeFile(out, html, 'utf8');
+  }
+  console.log(`${checkOnly ? '编译通过（未落盘）' : '已生成：' + out}`);
+  console.log(`  页面 ${stats.pages} · 画板 ${stats.artboards} · 节点 ${stats.nodes} · 图标 ${stats.icons} · 组件实例 ${stats.instances} · ${html.length} 字节`);
+  if (warnings.length) console.log('  提示：' + warnings.join('；'));
+}
+
+const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isMain) {
+  main().catch((e) => {
+    console.error(e.message);
+    process.exit(1);
+  });
+}

@@ -30,12 +30,14 @@
 
 > 注意：路径渲染位置只由锚点决定，移动/微调/编组均已同步平移锚点（v1.2.0 修复框形分离 bug）。
 
-**v1.2.1 AI 协作（P35）**：产物内嵌 `PROTOTYPE-AI-GUIDE` 头注释（坐标约定 / 字段字典 / 交互 schema / 修改约定）与 `#__ai_view` 逐行设计清单（每节点一行精确几何样式，保存时自动再生），AI 只凭一个 HTML 即可：①像素级复刻（直读 ai_view）②修改设计稿（输出 `__doc` 同构 JSON）③编写需求文档。编辑器「打开」支持 `.json` 直接载入 AI 输出；`ProtoAPI.exportAI()` 一次导出清单 + 文档。
+**v1.2.2 AI 协作（P35/P35b/P35c）**：产物内嵌四层 AI 入口——`<head>` 的 `AI-NOTICE` + `meta[name=prototype-ai]`、`__doc.aiHint`、`PROTOTYPE-AI-GUIDE v1.2`（实现约定/坐标约定/字段字典/交互 schema/修改约定）、`#__ai_view` 逐行布局清单（保存时自动再生）。AI 只凭一个 HTML 即可：①实现界面 ②修改设计稿（输出 `__doc` 同构 JSON）③编写需求文档。编辑器「打开」支持 `.json` 直接载入 AI 输出；`ProtoAPI.exportAI()` 一次导出清单 + 文档。
+
+> **实现约定（最高优先）**：原型只提供空间布局与 UI 元素整体效果（结构/层级/间距节奏/配色/状态/交互）参考，**不是逐像素代码规范**。实现必须遵循项目既定开发规范（Vue3/React 标准组件、组件库与设计系统 Token、路由/状态/响应式/可访问性）；母版/实例 → 可复用组件 + props/slot；禁止把清单逐节点翻译成绝对定位硬编码 DOM/CSS。验收 = 布局与视觉整体一致且符合规范，不要求像素 diff=0。
 
 ## AI 协作工作流
 
 ```
-设计稿 HTML ──给 AI──▶ ① 像素级复刻（读 #__ai_view 转译代码）
+设计稿 HTML ──给 AI──▶ ① 实现界面（读 #__ai_view 布局清单 + #__doc，按开发规范用标准组件实现）
             ├─给 AI──▶ ② 修改设计稿（AI 输出 __doc 同构 JSON → apply-doc.mjs 合回）
             └─给 AI──▶ ③ 需求文档（以 ai_view 画板/图层结构为纲）
 ```
@@ -58,11 +60,12 @@ node scripts/apply-doc.mjs 原型.prototype.html AI输出.json -o 新文件.html
 | `editor-prototype/index.html` | 编辑器壳（内嵌 218 个 SVG 图标，与 master 同源） |
 | `空白原型.prototype.html` | 空白起点文件（1 页 1 画板） |
 | `选矿设备管理.prototype.html` | 实际设计文档（选矿设备管理，3 页 8 画板） |
-| `skill-versions/prototype-html-builder/` | skill 版本归档（v1.0.0–v1.2.1 + CHANGELOG） |
+| `skill-versions/prototype-html-builder/` | skill 版本归档（v1.0.0–v1.2.2 + CHANGELOG） |
+| `tools/regen-aiview.mjs` | AI 指引/清单再生工具；`--shell <新版壳>` 可只换编辑器壳、保留全部设计数据 |
 
-## prototype-html-builder skill（v1.2.1）
+## prototype-html-builder skill（v1.2.2）
 
-声明式 JSON 规格编译为 `.prototype.html`，内置 Element Plus / Ant Design 图标与 27 个组件母版，产物自动嵌入 AI 协作块（GUIDE 注释 + `__ai_view` 清单）。live skill 位于 `~/.workbuddy/skills/prototype-html-builder/`。
+声明式 JSON 规格编译为 `.prototype.html`，内置 Element Plus / Ant Design 图标与 27 个组件母版，产物自动嵌入四层 AI 协作块（GUIDE v1.2 + NOTICE/meta + aiHint + `__ai_view` 清单）。live skill 位于 `~/.workbuddy/skills/prototype-html-builder/`。
 
 ```bash
 # 规格编译 + 校验

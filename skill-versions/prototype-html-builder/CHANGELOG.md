@@ -5,6 +5,52 @@
 
 ---
 
+## v1.2.2（2026-11-05）
+
+定位修正：原型是**空间布局与 UI 元素整体效果的参考**，不是逐像素代码规范；实现必须遵循项目开发规范（Vue3 等标准组件/设计系统），不得因复刻放弃标准组件库。
+
+### AI 指引：GUIDE v1.2 + 三层可发现性
+
+| # | 项 | 说明 |
+| --- | --- | --- |
+| 1 | 实现约定（最高优先） | GUIDE 新增开篇段：原型仅作结构/层级/间距节奏/配色/状态/交互参考；实现须用 Vue3/React 标准组件 + 组件库与设计系统 Token + 路由/状态/响应式/可访问性；母版/实例→可复用组件 + props/slot；禁止逐节点绝对定位硬编码；验收非像素 diff=0 |
+| 2 | 头部钩子 | 新增 `AI-NOTICE` 注释与 `<meta name="prototype-ai">`（置于 `<head>` 最前），解决 Agent 读文件头漏规范（旧 GUIDE 藏在文件中部） |
+| 3 | JSON 钩子 | `__doc` 顶层新增 `aiHint` 键（`docJson` 强制注入），只抽 JSON 的 Agent/脚本也能看到规范入口 |
+| 4 | 措辞清理 | 删除全部「像素级复刻 / 可直接映射 CSS / 唯一真源逐行转译 CSS / 像素复刻源」；静态 title 改「布局与 UI 设计参考」；【实现建议】改为分组→组件边界、颜色/圆角→设计 Token |
+
+### 生成器修复（`#__ai_view` 与 `__doc` 对账无损）
+
+| 项 | 修复 | 红外测温平台实测 |
+| --- | --- | --- |
+| svg 图标 | 输出 `icon=` + `color=`（此前落入矩形分支丢失） | 35/35 |
+| hidden | 判断改 `n.hidden || n.visible===false`（此前只查 visible） | 36/36 |
+| 文本 | text/name/src 改 JSON 字符串字面量（`\n`/引号/尖括号无损，可 JSON.parse 还原） | 多行 2/2 |
+| 数值 | 几何/pts/画板坐标不再取整，保留原始精度 | 小数行 764/764 |
+| 类型 | 补 arrow（dir）/bool（op）；画板名改 JSON 字符串 | — |
+| proto | 保持不变（此前文档误报"全部丢失"，实测 75/75 一直在） | 75/75 |
+
+### 工具链
+
+- `ai-view.mjs`：新增导出 `AI_NOTICE`/`META_AI`/`AI_HINT`；GUIDE/NOTICE/meta 整块替换（CRLF 兼容、去重）；`embedAIBlocks` 归一化区间空白，**反复补嵌/保存幂等**（此前每次多 1 个换行）。
+- `docJson()` 强制注入 `aiHint`；`gen-template.mjs --empty`、`apply-doc.mjs`、`embed-ai-view.mjs` 同步。
+- 项目本地 `tools/regen-aiview.mjs` 新增 `--shell <新版壳>`：用今日编辑器壳重建旧文件，完整保留其 `__doc` 设计数据并自检一致性。已用于红外测温平台文件壳升级（2 页 43 画板数据 0 变化；升级前备份 `2026-11-05-红外测温平台.prototype.壳升级前备份.html`）。
+
+### 验证
+
+- skill：模板/空白/示例重建，`validate-doc` 全 PASS；`embed-ai-view.mjs` 连续 3 次补嵌字节数不变；`apply-doc.mjs` 全量合入 + aiHint 保留 + ai_view 再生通过。
+- 编辑器：master/editor-prototype×2/空白/选矿/红外五文件 GUIDE v1.2 与工具常量一致、view 头带实现约定、旧措辞 0 残留、主脚本语法 OK。
+- 无头 Chrome：master 与红外零报错；`exportAI().doc.aiHint`、`genAIView()` 头部均含新约定；`buildFile()` 产物含 aiHint + ai_view。
+
+### 升级方式
+
+```bash
+node scripts/embed-ai-view.mjs 旧原型.prototype.html            # 补嵌 v1.2 指引 + 再生清单 + 刷新 aiHint
+node scripts/apply-doc.mjs 原型.prototype.html AI输出.json        # AI 改稿合入
+node scripts/validate-doc.mjs 原型.prototype.html                # 校验
+```
+
+---
+
 ## v1.2.1（2026-11-03）
 
 AI 协作三件套：让 AI 只凭一个 HTML 完成像素级复刻 / 修改设计稿 / 需求文档编写（P35）。
