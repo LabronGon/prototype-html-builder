@@ -2,6 +2,8 @@
 
 **自研**单文件高保真原型编辑器——纯 Canvas 渲染、零外部依赖，`一个 HTML = 编辑器 + 内嵌文档`，双击即可编辑与演示。设计规格、交互规则与验收基线均来自自研设计系统与内部实测，不以任何第三方产品作为对标或规格来源。
 
+仓库同步维护两个远端：[GitCode](https://gitcode.com/Gon7/prototype.html)（主）与 [GitHub](https://github.com/LabronGon/prototype-html-builder)（公开镜像），同步命令见 `CONTRIBUTING.md`。
+
 ## 功能总览
 
 **编辑器基础**（自研交互基线）

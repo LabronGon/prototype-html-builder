@@ -68,3 +68,23 @@ git status --short
 - 过程性材料一律放 `archive/`，**本地保留、不删除、不入库**。
 - 第三方专项调研、旧版备份、以第三方为基准的走查报告属于历史研究材料，不进入版本库，也不改写为自研表述。
 - 若确需引用其中的结论，须重新用自研设计系统术语表述后写入 `docs/`。
+
+## 六、双仓库同步
+
+| remote | 地址 | 用途 |
+| --- | --- | --- |
+| `origin` | `https://gitcode.com/Gon7/prototype.html` | 主仓库 |
+| `github` | `https://github.com/LabronGon/prototype-html-builder` | 公开镜像 |
+
+每次提交后**两边都要推**，避免两侧分叉：
+
+```bash
+# GitCode：清掉环境代理直连
+env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY \
+  git -c http.proxy= -c https.proxy= push origin main
+
+# GitHub：走本机 7892 代理（直连会被拦截）
+git -c http.proxy=http://127.0.0.1:7892 -c https.proxy=http://127.0.0.1:7892 push github main
+```
+
+> 2026-11-05 首次镜像时，GitHub 原有 `main` 是另一条分叉历史（宣传页 / 微信文章 / 旧版 Skill 打包），已先备份为远程分支 `backup/main-20261105`（`6ceb8a9`），再以 `--force-with-lease` 覆盖 `main`。需要旧物料时从该分支取回。

@@ -9,3 +9,6 @@ archive/
 *.tmp.js
 *.tmp
 *.bak
+
+# 根级压缩包（版本归档 zip 统一放 skill-versions/）
+/*.zip
