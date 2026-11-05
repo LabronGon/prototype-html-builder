@@ -1,10 +1,10 @@
 # prototype.html
 
-单文件高保真原型编辑器——纯 Canvas 渲染、零外部依赖，`一个 HTML = 编辑器 + 内嵌文档`，双击即可编辑与演示。
+**自研**单文件高保真原型编辑器——纯 Canvas 渲染、零外部依赖，`一个 HTML = 编辑器 + 内嵌文档`，双击即可编辑与演示。设计规格、交互规则与验收基线均来自自研设计系统与内部实测，不以任何第三方产品作为对标或规格来源。
 
 ## 功能总览
 
-**编辑器基础**（对齐 MasterGo / Penpot 交互）
+**编辑器基础**（自研交互基线）
 
 - 图层：矩形 / 椭圆 / 直线 / 箭头 / 多边形 / 星形 / 文本 / 图片 / SVG 图标 / 画板 / 编组 / 布尔
 - 属性面板：填充（纯色/线性/径向渐变）、描边、圆角、效果（投影/模糊）、不透明度、对齐分布
@@ -43,25 +43,33 @@
 ```
 
 ```bash
-# 旧原型补嵌 AI 块（可批量、原地更新）
-node scripts/embed-ai-view.mjs 原型.prototype.html
+# 旧原型补嵌 AI 块（可批量、原地更新；脚本位于 live skill）
+node ~/.workbuddy/skills/prototype-html-builder/scripts/embed-ai-view.mjs 原型.prototype.html
 
 # AI 改稿合入（支持全量文档 / 变更页补丁 [{page, artboards}]；合入前自动校验，合入后再生 ai_view）
-node scripts/apply-doc.mjs 原型.prototype.html AI输出.json -o 新文件.html
+node ~/.workbuddy/skills/prototype-html-builder/scripts/apply-doc.mjs 原型.prototype.html AI输出.json -o 新文件.html
+
+# 项目本地：AI 指引 / 清单再生；--shell 可只换编辑器壳、保留全部设计数据
+node tools/regen-aiview.mjs sample.prototype.html
+node tools/regen-aiview.mjs --shell sample.prototype.html 目标.prototype.html
 ```
 
-约定：AI 修改设计稿输出与 `__doc` 同构的 JSON `{version:1,name,theme,pages,tree}`，**不重写 HTML、编辑器壳原样保留**；文档 >100KB 时可只输出变更页。所有节点 x/y 均为画板局部坐标，可直接映射 CSS。
+约定：AI 修改设计稿输出与 `__doc` 同构的 JSON `{version:1,name,theme,pages,tree}`，**不重写 HTML、编辑器壳原样保留**；文档 >100KB 时可只输出变更页。所有节点 x/y 均为画板局部坐标，仅用于理解相对层级与间距，不作为绝对定位依据。
 
 ## 文件结构
 
-| 文件 | 说明 |
+| 路径 | 说明 |
 | --- | --- |
-| `sample.prototype.html` | 编辑器 master（示例文档） |
-| `editor-prototype/index.html` | 编辑器壳（内嵌 218 个 SVG 图标，与 master 同源） |
+| `sample.prototype.html` | 编辑器 master（唯一真源，示例文档） |
+| `editor-prototype/` | 编辑器壳 `index.html` 与同源副本 `sample.prototype.html` |
 | `空白原型.prototype.html` | 空白起点文件（1 页 1 画板） |
 | `选矿设备管理.prototype.html` | 实际设计文档（选矿设备管理，3 页 8 画板） |
-| `skill-versions/prototype-html-builder/` | skill 版本归档（v1.0.0–v1.2.2 + CHANGELOG） |
-| `tools/regen-aiview.mjs` | AI 指引/清单再生工具；`--shell <新版壳>` 可只换编辑器壳、保留全部设计数据 |
+| `docs/` | 自研验收基线、验收报告与演示证据截图 |
+| `tools/regen-aiview.mjs` | AI 指引 / 清单再生工具；`--shell <新版壳>` 只换编辑器壳、保留全部设计数据 |
+| `tools/check-wording.mjs` | 提交前禁用表述门禁 |
+| `skill-versions/prototype-html-builder/` | skill 版本归档（v1.0.0–v1.2.2 + CHANGELOG），冻结快照 |
+| `CONTRIBUTING.md` | 提交规范（目录约定、措辞、检查清单） |
+| `archive/` | 本地过程性 / 历史资料，**已忽略、不入库、不删除** |
 
 ## prototype-html-builder skill（v1.2.2）
 
@@ -69,15 +77,24 @@ node scripts/apply-doc.mjs 原型.prototype.html AI输出.json -o 新文件.html
 
 ```bash
 # 规格编译 + 校验
-node scripts/build-prototype.mjs spec.json -o out.prototype.html
-node scripts/validate-doc.mjs out.prototype.html
+node ~/.workbuddy/skills/prototype-html-builder/scripts/build-prototype.mjs spec.json -o out.prototype.html
+node ~/.workbuddy/skills/prototype-html-builder/scripts/validate-doc.mjs out.prototype.html
 
 # 升级编辑器壳 / 生成空白原型
-node scripts/gen-template.mjs --shell <editor-prototype/index.html>
-node scripts/gen-template.mjs --empty --shell <editor-prototype/index.html> -o 空白原型.prototype.html
+node ~/.workbuddy/skills/prototype-html-builder/scripts/gen-template.mjs --shell <editor-prototype/index.html>
+node ~/.workbuddy/skills/prototype-html-builder/scripts/gen-template.mjs --empty --shell <editor-prototype/index.html> -o 空白原型.prototype.html
 ```
 
 版本历史见 [`skill-versions/prototype-html-builder/CHANGELOG.md`](skill-versions/prototype-html-builder/CHANGELOG.md)。
+
+## 提交规范
+
+```bash
+node tools/check-wording.mjs   # 禁用表述扫描，必须 PASS / 0 命中
+git status --short             # 复核 archive/、备份、临时文件未误入
+```
+
+自研定位、目录约定、壳与 skill 的同步要求、提交信息格式详见 [`CONTRIBUTING.md`](CONTRIBUTING.md)；验收标准见 [`docs/自研验收基线.md`](docs/自研验收基线.md)。
 
 ## 快捷键
 

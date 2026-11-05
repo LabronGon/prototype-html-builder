@@ -1,4 +1,11 @@
+# 本地归档（过程性 / 历史资料，不入库、不删除）
+archive/
+
+# 会话记忆与自动化产物
 .playwright-cli/
-*.tmp.js
 .workbuddy/
+
+# 临时文件与备份
+*.tmp.js
+*.tmp
 *.bak

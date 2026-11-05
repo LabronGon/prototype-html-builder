@@ -35,7 +35,7 @@ PROTOTYPE-AI-GUIDE v1.2（静态说明块，保存时随文件保留；勿改动
 【效果 effects】{type:drop/inner/blur/bgblur, on, x,y,blur,color,opacity} 模糊类用 value；旧数据回落 effect.shadow / blur。
 【圆角】radius 单值；4 角不同时用 radii:[左上,右上,右下,左下]。
 【交互 proto】节点上数组 [{trigger:单击|悬停|按下|拖拽|滚动, dir:方向, action:打开画板|打开弹层|关闭弹层|返回上一页|切换变体, target:目标画板id, variant, anim:过渡动画, duration:ms, easing}]
-【组件实例】group + inst:母版画板id + iid；ov:{子节点id:{字段:值}} 为实例级覆盖；导出/复刻时须先用 ov 覆盖母版对应字段再渲染。实现时母版→可复用组件、ov→props/slot，不要复制节点树。
+【组件实例】group + inst:母版画板id + iid；ov:{子节点id:{字段:值}} 为实例级覆盖；导出/渲染时须先用 ov 覆盖母版对应字段再渲染。实现时母版→可复用组件、ov→props/slot，不要复制节点树。
 【AI 修改设计稿约定】输出一个与 #__doc 完全同构的 JSON：{version:1,name,theme,pages,tree}（全量最稳）。文档过大(>100KB)时可只输出变更页：[{page:<索引或页名>, artboards:[...]}]，用 apply-doc.mjs 合入或编辑器「打开 JSON」整份载入。禁止改动本注释、编辑器脚本以及两个内嵌 script 标签之外的任何 HTML 内容。
 【实现建议】以 #__ai_view 的画板/分组理解页面结构与组件边界；组件实例(inst)对应复用组件；图片用节点 src/fit；颜色/圆角/描边映射到项目设计 Token；以画板宽度作参考视口检查布局层级与对齐，不要求逐像素一致。
 ================================================================== -->`;
