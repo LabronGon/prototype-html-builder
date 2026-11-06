@@ -76,10 +76,10 @@ footer{text-align:center;color:#9aa3b2;font-size:12px;margin-top:30px}
 
 <div class="banner warn">
   <b>⚠ 交付副本未同步（遗留事项，本轮未改动产品代码）</b><br>
-  产品主文件 index.html 与交付副本 sample.prototype.html 内容不一致，二者自上一轮修复后未同步：
+  产品主文件 index.html 与交付副本 sample.chao.html 内容不一致，二者自上一轮修复后未同步：
   <div class="hash">index.html&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SHA256 = 5D2FA84980A30F0AA41696932B32FE22C29E8FBC3CC9F866127F0DCFD139ACE1（509,102 B）<br>
-  sample.prototype.html SHA256 = F91339E553A0B3023DBAC8F900683A5D3054E1D7926614CF669E1A13DE82E6D6（508,059 B）</div>
-  本轮验收以产品主文件 index.html 为准。建议后续将修复同步至 sample.prototype.html（本轮遵约未做任何修改）。
+  sample.chao.html SHA256 = F91339E553A0B3023DBAC8F900683A5D3054E1D7926614CF669E1A13DE82E6D6（508,059 B）</div>
+  本轮验收以产品主文件 index.html 为准。建议后续将修复同步至 sample.chao.html（本轮遵约未做任何修改）。
 </div>
 
 <div class="banner info">
@@ -163,11 +163,11 @@ footer{text-align:center;color:#9aa3b2;font-size:12px;margin-top:30px}
   <td class="cid">1.10</td>
   <td>保存文件回落下载</td>
   <td class="st"><span class="pill p">通过</span></td>
-  <td class="dt"><code>{"file":"未命名原型.prototype.html","bytes":509629,"toast":"已下载 未命名原型.prototype.html"}</code></td>
+  <td class="dt"><code>{"file":"未命名原型.chao.html","bytes":509629,"toast":"已下载 未命名原型.chao.html"}</code></td>
 </tr>
 <tr class="ok">
   <td class="cid">1.11</td>
-  <td>导入 .prototype.html 恢复</td>
+  <td>导入 .chao.html 恢复</td>
   <td class="st"><span class="pill p">通过</span></td>
   <td class="dt"><code>{"pages":4,"marker":true,"fname":"默认名称","toast":"已打开 v2-save.html"}</code></td>
 </tr>
@@ -819,7 +819,7 @@ footer{text-align:center;color:#9aa3b2;font-size:12px;margin-top:30px}
 </tr>
 <tr class="ok">
   <td class="cid">8.12</td>
-  <td>保存文件校验（.prototype.html 含文档 JSON）</td>
+  <td>保存文件校验（.chao.html 含文档 JSON）</td>
   <td class="st"><span class="pill p">通过</span></td>
   <td class="dt"><code>{"bytes":474026,"hasDoc":true,"hasArtboards":true,"hasComment":true}</code></td>
 </tr>
@@ -868,7 +868,7 @@ footer{text-align:center;color:#9aa3b2;font-size:12px;margin-top:30px}
       <tr><td>发现缺陷</td><td>3 项（BUG-1 星形 / BUG-2 段落 / BUG-3 画板框选）</td><td class="st"><b style="color:var(--ok)">0 项</b></td></tr>
       <tr><td>覆盖范围</td><td>8 模块 93 用例矩阵（首轮建立基线）</td><td>8 模块 94 用例 + 8 项错误监控，含 3 项修复回归用例（2.13 / 3.6b / 3.10）</td></tr>
       <tr><td>验证深度</td><td>功能与状态断言为主</td><td>增加像素级采样（星形凹口、布尔四运算、蒙版内外）、五格式导出落盘校验、刷新持久化与导入回读、22 处脚本适配交叉确认</td></tr>
-      <tr><td>结论</td><td>有条件通过（需修复 3 项 BUG）</td><td class="st"><b style="color:var(--ok)">验收通过</b>（唯一遗留：交付副本 sample.prototype.html 未同步，属流程事项）</td></tr>
+      <tr><td>结论</td><td>有条件通过（需修复 3 项 BUG）</td><td class="st"><b style="color:var(--ok)">验收通过</b>（唯一遗留：交付副本 sample.chao.html 未同步，属流程事项）</td></tr>
     </tbody>
   </table>
 </section>
@@ -876,7 +876,7 @@ footer{text-align:center;color:#9aa3b2;font-size:12px;margin-top:30px}
 <section class="block">
   <h2>验收结论</h2>
   <p>本轮以最终用户视角对编辑器原型进行了第二轮全量验收：8 大模块、94 项功能用例、8 项页面错误监控 <b>全部通过</b>；第一轮提出的 3 项缺陷（星形凹口、段落定宽、画板框选）修复有效，回归用例全部通过；全程无新增缺陷、无页面 JS 报错。</p>
-  <p><b>验收结论：通过。</b>唯一的流程性遗留事项为交付副本 sample.prototype.html 与产品主文件 index.html 未同步（见页首警告），建议在归档前同步一次；产品代码本身达到可交付状态。</p>
+  <p><b>验收结论：通过。</b>唯一的流程性遗留事项为交付副本 sample.chao.html 与产品主文件 index.html 未同步（见页首警告），建议在归档前同步一次；产品代码本身达到可交付状态。</p>
   <p class="meta">报告生成时间：2026-10-30 · 测试脚本与原始 JSON 结果、22 张截图证据存档于测试工作目录（本轮测试为只读验收，未修改任何产品代码）。</p>
 </section>
 

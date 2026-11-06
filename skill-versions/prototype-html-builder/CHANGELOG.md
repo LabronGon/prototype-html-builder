@@ -5,6 +5,39 @@
 
 ---
 
+## v1.3.0（2026-11-06）
+
+产物后缀全量切换：`.prototype.html` → `.chao.html`，**不保留旧后缀兼容**。属于行为变更（默认输出名、编辑器保存、文件识别均改变），故升版本。
+
+### 改动
+
+| # | 项 | 说明 |
+| --- | --- | --- |
+| 1 | 默认输出名 | `build-prototype.mjs` 无 `-o` 时输出 `<spec.name>.chao.html`；skill 触发词、脚本用法提示同步 |
+| 2 | 编辑器保存 | 回退名 `未命名原型.chao.html`、新建名、下载后缀 `+'.chao.html'`、打开/保存 accept、导出去后缀正则 `/\.(chao\.)?html?$/i` |
+| 3 | 内部资源路径 | `assets/template.chao.html`、`assets/empty.chao.html`、`examples/demo.chao.html`、`examples/选矿设备管理.chao.html`；`gen-template.mjs` 默认输出路径同步 |
+| 4 | 全量同步 | 项目 4 个产物 + `editor-prototype/index.html` + 全部内嵌壳副本，共 28 个文件、约 230 处字面；README / CONTRIBUTING / docs / tools 命令示例同步 |
+| 5 | 文件选择器修复 | `showOpenFilePicker` / `showSaveFilePicker` 的 accept 由双点扩展名改为合法的 `.html`，靠 `suggestedName` 保留 `.chao.html`；规避 Chrome File System Access API 拒绝非法扩展名 |
+| 6 | 活测试脚本 | `.workbuddy/smoke.cjs`、`verify-rebuild.cjs` 的产物路径同步 |
+
+### 冻结未改
+
+`skill-versions/v*` 归档与 zip、`.workbuddy/backup-samples/`、`idempotent-test.html`、`archive/*.corrupted.bak`、memory 历史日志、远端仓库名 `gitcode.com/Gon7/prototype.html`、工作区目录名。均为历史快照或外部引用，按 `CONTRIBUTING.md` 冻结策略不回溯改写。
+
+### 验证
+
+- `build-prototype.mjs --check` 通过；无 `-o` 实际生成 `选矿设备管理.chao.html`。
+- `gen-template.mjs` 空文档 / 常规模板重建成功；`validate-doc.mjs` 11 个文件全 PASS。
+- 9 个 HTML 主脚本 `new Function` 语法通过，`__doc` / `__ai_view` 标记齐全，运行时范围旧后缀 0 残留。
+- 项目 `verify-rebuild.cjs`、`smoke.cjs`（无头 Chrome）通过：设计数据一致、壳同源、控制台零报错、`ProtoAPI.exportAI()` 可用。
+- `tools/check-wording.mjs` PASS，0 命中。
+
+### 升级方式
+
+旧 `.prototype.html` 产物仍可作为普通 HTML 打开，但编辑器保存会落成 `.chao.html`。建议批量重命名后继续编辑；无 `-o` 编译默认即新后缀。
+
+---
+
 ## 样本壳升级（2026-11-05 · 不升版本）
 
 **发现**：`空白原型.prototype.html`、`选矿设备管理.prototype.html`、live skill `examples/选矿设备管理.prototype.html` 共 3 份仍是旧编辑器壳——静态 AI 块（GUIDE v1.2 / AI-NOTICE / meta / aiHint / `__ai_view`）已事后补嵌，但运行时 `ProtoAPI.exportAI()` 不存在，保存时也会把 AI 块退回旧常量。与红外测温平台此前遇到的壳遗留同源。`validate-doc.mjs` 只校验文档、不校验编辑器壳，因此该问题只能靠浏览器冒烟发现。

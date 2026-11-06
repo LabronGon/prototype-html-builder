@@ -319,7 +319,7 @@ body.lay-drag{cursor:grabbing!important;user-select:none}
 .zoom-menu .chk{margin-left:auto;color:var(--brand);font-size:12px}
 .zoom-menu .zinfo{padding:4px 10px 2px;color:var(--text-3);font-size:11px;line-height:16px}
 
-/* 文件菜单（P1：打开/保存 .prototype.html） */
+/* 文件菜单（P1：打开/保存 .chao.html） */
 .file-menu{position:fixed;z-index:30;background:#fff;border-radius:var(--r-sm);box-shadow:var(--shadow-pop);padding:4px;min-width:196px}
 .file-menu button{display:flex;width:100%;height:32px;align-items:center;border-radius:4px;padding:0 12px;font-size:12px;font-weight:500;color:var(--text-1)}
 .file-menu button:hover{background:var(--fill)}
@@ -1926,7 +1926,7 @@ const FONT='Inter,"PingFang SC","Microsoft YaHei",sans-serif';
 let __uid=100;
 const uid=()=>'n'+(++__uid);
 const uidBump=v=>{if(v>__uid)__uid=v};
-/* 纯净模板：在 UI 组装前捕获（保存 .prototype.html 时以它为壳回填最新文档 JSON） */
+/* 纯净模板：在 UI 组装前捕获（保存 .chao.html 时以它为壳回填最新文档 JSON） */
 const PRISTINE_HTML=document.documentElement.outerHTML;
 const docEl=document.getElementById('__doc');
 
@@ -7236,7 +7236,7 @@ function fitView(keepZ){
 }
 
 /* ================================================================
- * P1 文件层：.prototype.html = 编辑器 + 文档（单文件即软件）
+ * P1 文件层：.chao.html = 编辑器 + 文档（单文件即软件）
  * 文档 JSON 内嵌于 <script type="application/json" id="__doc">，
  * 变更即回写 DOM；保存时以启动纯净模板（PRISTINE_HTML）为壳回填最新 JSON。
  * ================================================================ */
@@ -7251,7 +7251,7 @@ function detectFileName(){
       if(/\.html?$/i.test(n))return n;
     }
   }catch(e){}
-  return '未命名原型.prototype.html';
+  return '未命名原型.chao.html';
 }
 function persistDoc(){
   if(!docEl)return;
@@ -7334,7 +7334,7 @@ async function openDoc(){
   if(window.showOpenFilePicker){
     try{
       const [h]=await showOpenFilePicker({types:[
-        {description:'Prototype 文档',accept:{'text/html':['.prototype.html','.html']}},
+        {description:'Prototype 文档',accept:{'text/html':['.html']}},
         {description:'文档 JSON（AI 输出）',accept:{'application/json':['.json']}}
       ]});
       const text=await (await h.getFile()).text();
@@ -7343,7 +7343,7 @@ async function openDoc(){
         try{doc=JSON.parse(text)}catch(e){}
         if(doc&&!doc.pages)doc=null;
       }
-      if(!doc){toast('无效的 .prototype.html（缺少内嵌文档）');return}
+      if(!doc){toast('无效的 .chao.html（缺少内嵌文档）');return}
       applyDoc(doc);fileHandle=h;setFileName(h.name);clearAutosave();toast('已打开 '+h.name);
     }catch(e){if(e&&e.name!=='AbortError')toast('打开失败：'+(e.message||e))}
   }else $('#fileInput').click();
@@ -7355,7 +7355,7 @@ function openFromInput(file){
       try{doc=JSON.parse(text)}catch(e){}
       if(doc&&!doc.pages)doc=null;
     }
-    if(!doc){toast('无效的 .prototype.html（缺少内嵌文档）');return}
+    if(!doc){toast('无效的 .chao.html（缺少内嵌文档）');return}
     applyDoc(doc);fileHandle=null;setFileName(file.name);clearAutosave();toast('已打开 '+file.name);
   }).catch(()=>toast('读取文件失败'));
 }
@@ -7501,7 +7501,7 @@ async function saveDoc(saveAs){
   if(window.showSaveFilePicker){
     try{
       if(!fileHandle||saveAs){
-        fileHandle=await showSaveFilePicker({suggestedName:fileName,types:[{description:'Prototype 文档',accept:{'text/html':['.prototype.html']}}]});
+        fileHandle=await showSaveFilePicker({suggestedName:fileName,types:[{description:'Prototype 文档',accept:{'text/html':['.html']}}]});
         setFileName(fileHandle.name);
       }
       await writeFile(fileHandle);
@@ -7523,7 +7523,7 @@ $('#btnSaveAs').addEventListener('click',()=>saveDoc(true));
 function downloadFile(){
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([buildFile()],{type:'text/html'}));
-  a.download=fileName.endsWith('.html')?fileName:fileName+'.prototype.html';
+  a.download=fileName.endsWith('.html')?fileName:fileName+'.chao.html';
   a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
   markSaved(false); // P33：仅下载副本，原文件未变，保留自动存档指纹
   toast('已下载 '+a.download);
@@ -7535,7 +7535,7 @@ function blankDoc(){
 }
 function newDoc(){
   if(!confirm('新建将丢弃当前未保存的更改，确定继续？'))return;
-  applyDoc(blankDoc());fileHandle=null;setFileName('未命名原型.prototype.html');clearAutosave();
+  applyDoc(blankDoc());fileHandle=null;setFileName('未命名原型.chao.html');clearAutosave();
   toast('已新建空白文档');
 }
 /* ---- 主菜单（仅保留本项目已实现能力的入口，无占位/演示项） ---- */
@@ -7856,7 +7856,7 @@ function updateDemoIdx(){
   if(!ab)return;
   const pg=demoPageOf(ab);
   $('#demoSitemapName').textContent=ab.name||'画板';
-  const fn=String(fileName||'').replace(/\.html?$/i,'')||'未命名';
+  const fn=String(fileName||'').replace(/\.(chao\.)?html?$/i,'')||'未命名';
   $('#demoCrumb').textContent=fn+' / '+(pg?pg.name:'页面');
   const strip=$('#demoThumbStrip');
   if(strip.children.length){
@@ -8307,7 +8307,7 @@ document.addEventListener('mousedown',e=>{
  * ZIP 批量采用内联 store（无压缩）打包 —— 保持单文件零依赖
  * ================================================================ */
 function cleanName(s){
-  return String(s||'导出').replace(/[\\/:*?"<>|]/g,'_').replace(/\.(prototype\.)?html?$/i,'');
+  return String(s||'导出').replace(/[\\/:*?"<>|]/g,'_').replace(/\.(chao\.)?html?$/i,'');
 }
 /* 离屏渲染整个画板（scale 倍）：drawNode 内部经 w2s() 绘制，
  * 故临时切换 cam（z=scale、画板原点归零）而非仅设 setTransform */
@@ -9195,7 +9195,7 @@ const ProtoAPI=(()=>{
     version:'1.0',
     __schema:{
       api:'ProtoAPI',
-      desc:'.prototype.html 内嵌原型编辑器的 AI 桥接层。所有方法同步调用、返回 JSON（含 ok 标志）。用于生成原型初稿，随后人类在编辑器中精调。',
+      desc:'.chao.html 内嵌原型编辑器的 AI 桥接层。所有方法同步调用、返回 JSON（含 ok 标志）。用于生成原型初稿，随后人类在编辑器中精调。',
       nodeTypes:{rect:'矩形（卡片/按钮/色块）',text:'文本（text 必填，w/h 自动测量）',ellipse:'圆形/椭圆',artboard:'画板（手机建议 375x812，大屏 1440x1024）'},
       props:{x:'数字',y:'数字',w:'数字',h:'数字',fill:'颜色 #RRGGBB 或 rgba()',stroke:'颜色|null',strokeW:'数字',radius:'圆角数字',text:'文本内容',fontSize:'数字',fontWeight:'数字(300-800)',color:'文字颜色',align:'null|left|center|right',opacity:'0-1',bg:'画板背景色',name:'语义名，供 findNode 引用（建议唯一）'},
       interactions:{trigger:'单击|悬停|按下|拖拽|滚动',anim:'无|淡入|左滑|右滑|上滑|下滑',action:'打开画板|打开弹层|关闭弹层|返回上一页',target:'打开画板/打开弹层时的目标画板 id',dir:'拖拽/滚动触发方向（任意|向左|向右|向上|向下 / 任意|向下|向上）',opos:'弹层位置（居中|左上|右上|底部）',ox:'弹层偏移 X（画板单位）',oy:'弹层偏移 Y',dim:'遮罩不透明度 0-100',bdclose:'点击遮罩是否关闭弹层（默认 true）'},

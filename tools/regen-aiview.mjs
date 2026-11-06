@@ -2,18 +2,18 @@
 /**
  * regen-aiview.mjs — 项目本地工具（P35b，2026-11-04）
  *
- * 对 .prototype.html 原地执行三件事（与编辑器 P35b 行为一致）：
+ * 对 .chao.html 原地执行三件事（与编辑器 P35b 行为一致）：
  *   1. GUIDE 注释升级到 v1.2（实现约定最高优先：布局/视觉参考 + 开发规范优先，不逐像素硬编码；NOTICE/meta/aiHint/view 头同步）
  *   2. 用修复版生成器再生 #__ai_view：svg 图标 icon=/color=、hidden 标记、text/name/src 用 JSON 字符串字面量（多行/引号/尖括号无损）、数值保留原始精度
  *   3. 向 __doc 注入 aiHint 键（缺则加，不覆盖已有；Agent 只抽 JSON 时也能看到规范入口）
  *
- * 用法：node tools/regen-aiview.mjs <file.prototype.html> [...] [--shell <新版壳.html>]
+ * 用法：node tools/regen-aiview.mjs <file.chao.html> [...] [--shell <新版壳.html>]
  *   --shell  用指定编辑器壳重建目标文件（仅替换壳，完整保留其 __doc 设计数据），用于旧壳文件升级
  * 说明：skill 冻结期间的临时工具，逻辑验证后可平移至 skill ai-view.mjs。
  */
 import { readFile, writeFile } from 'node:fs/promises';
 
-/* ---------------- GUIDE v1.1（与 master sample.prototype.html 保持同步） ---------------- */
+/* ---------------- GUIDE v1.1（与 master sample.chao.html 保持同步） ---------------- */
 const AI_GUIDE = `<!-- ==================================================================
 PROTOTYPE-AI-GUIDE v1.2（静态说明块，保存时随文件保留；勿改动本注释结构）
 本文件 = 单文件高保真原型：编辑器脚本 + 内嵌设计文档（script#__doc，JSON）+ AI 视图（script#__ai_view，逐行清单）。
@@ -243,7 +243,7 @@ const si = argv.indexOf('--shell');
 const shellPath = si >= 0 ? argv[si + 1] : null;
 const files = argv.filter((a, i) => !a.startsWith('-') && (si < 0 || (i !== si && i !== si + 1)));
 if (!files.length || (si >= 0 && !shellPath)) {
-  console.error('用法：node tools/regen-aiview.mjs <file.prototype.html> [...] [--shell <新版壳.html>]');
+  console.error('用法：node tools/regen-aiview.mjs <file.chao.html> [...] [--shell <新版壳.html>]');
   process.exit(1);
 }
 const DOC_TEXT = (h) => h.match(DOC_RE)[0].replace(/^<script[^>]*>/, '').replace(/<\/script>$/, '');

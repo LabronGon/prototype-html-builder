@@ -76,8 +76,8 @@ footer{margin-top:34px;color:#98a1b5;font-size:12px;text-align:center}
     <td><span class="badge ok">通过</span></td></tr><tr><td class="mono">1.7</td><td>热区显隐开关</td><td>点击按钮 / Shift+H</td><td>热点显示切换，localStorage p32.hotspots 记忆</td>
     <td><span class="badge ok">通过</span></td></tr><tr><td class="mono">1.8</td><td>自动保存</td><td>修改后等待 ~2s</td><td>localStorage p33.autosave:doc 写入</td>
     <td><span class="badge ok">通过</span></td></tr><tr><td class="mono">1.9</td><td>刷新恢复</td><td>F5 重载</td><td>页面/画板/节点修改全部还原（含标记节点）</td>
-    <td><span class="badge ok">通过</span></td></tr><tr><td class="mono">1.10</td><td>保存文件</td><td>点击保存（FS API 受限时）</td><td>回落下载 .prototype.html（476KB 含 JSON），toast 提示</td>
-    <td><span class="badge ok">通过</span></td></tr><tr><td class="mono">1.11</td><td>导入文档</td><td>导入 .prototype.html</td><td>页面/画板/文件名恢复</td>
+    <td><span class="badge ok">通过</span></td></tr><tr><td class="mono">1.10</td><td>保存文件</td><td>点击保存（FS API 受限时）</td><td>回落下载 .chao.html（476KB 含 JSON），toast 提示</td>
+    <td><span class="badge ok">通过</span></td></tr><tr><td class="mono">1.11</td><td>导入文档</td><td>导入 .chao.html</td><td>页面/画板/文件名恢复</td>
     <td><span class="badge ok">通过</span></td></tr><tr><td class="mono">1.12</td><td>撤销/重做</td><td>Ctrl+Z ×3 / Ctrl+Shift+Z ×3</td><td>页面增删、属性修改按步回退/前进，按钮禁用态联动</td>
     <td><span class="badge ok">通过</span></td></tr><tr><td class="mono">1.13</td><td>导入异常兜底</td><td>非法文件</td><td>toast 报错，不崩溃</td>
     <td><span class="badge ok">通过</span></td></tr></tbody></table></section><section class="mod"><div class="mod-h"><h2>2. 画布与选择</h2><span class="score">12/13</span></div>
@@ -166,7 +166,7 @@ footer{margin-top:34px;color:#98a1b5;font-size:12px;text-align:center}
     <td><span class="badge ok">通过</span></td></tr><tr><td class="mono">8.9</td><td>评论回复</td><td>回复框输入+Enter</td><td>replies=[「收到回复」]</td>
     <td><span class="badge ok">通过</span></td></tr><tr><td class="mono">8.10</td><td>评论删除</td><td>#cmtDel</td><td>评论清空</td>
     <td><span class="badge ok">通过</span></td></tr><tr><td class="mono">8.11</td><td>刷新持久化</td><td>F5</td><td>页面结构与评论保留</td>
-    <td><span class="badge ok">通过</span></td></tr><tr><td class="mono">8.12</td><td>保存文件校验</td><td>下载 .prototype.html</td><td>476KB，含 artboards JSON</td>
+    <td><span class="badge ok">通过</span></td></tr><tr><td class="mono">8.12</td><td>保存文件校验</td><td>下载 .chao.html</td><td>476KB，含 artboards JSON</td>
     <td><span class="badge ok">通过</span></td></tr></tbody></table></section>
 
 <section class="mod"><div class="mod-h"><h2>缺陷清单</h2><span class="score">2 中 · 1 低</span></div>
@@ -177,7 +177,7 @@ footer{margin-top:34px;color:#98a1b5;font-size:12px;text-align:center}
   <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAF0AAABACAIAAAD3W+zRAAAFLklEQVR4nOyaS2wbRRjHZ/aR2HHSJE6cQNrQIChNaYl4NIRKLUiFAxGCQ4XUSqBekCohegApogcuvfSAioSEEEgVp6CKVJyogAoEjUITaGkAQdMUCIiUlrSNHbsOceLX7vLf7GaTrCcPG1seW/OTZc2uZ8ae/3zzzbffWEkmk6qqEsFyJCJgIXRhI3RhI3RhoxiGQQQZCHthI3Rho5ACkEgk8F5ZWUlKljzrgigxHA5Ho1GUa2tr/X5/RUUFKUEo5jYvPz2dTkORSCTiul9fXw91FKUghlk48qCLpmnheVap459HlmVSIvwvXXRdtxRZz2ZPKbXUkaQScPa56wInEgwGYSxZtYLJBAIBuB7CN7noAuc6OTkZi8VIrvh8vqamJp5dcta6wLNCFJIPIA28MuGSLHSJx+NYOLOzsyR/VFVVYVl5PB7CGevVZWpqKhQKkcLQ2NjY0NBAeGJtXVKp1MTEBIyFFBKYTEtLCz+ZQ2XPER1LZK1qzSSvUEp2bIof3B1urk05N7lKpxYnlEC4c+map3fQ79ypqakhPFHM8Hzk+qK7ra6uJjyhDL7l6f06feJMGhdv7Fefe8wM1YNR4+jJ1PCYvv6ODnUrB59UVJmkNOJ0+O7LFZ33mSb5103jwJsJVxMnSPZ6vbzFMsruHtu5QJSnHpIhx5nh7EJYi51bpGN9ZltT3C75xz/0h++Vtmyk6NBU+QUV94+dSjHb8mYsxFlHGNWubdJXP2kriYJRPdAmWXO+tOxw6J2kVQhOG6pCArW0o00a+8ewOhy/ZaDJSj+CN+cCpL4jZvYIw8D71k30wtsevGD/rnqY6tC0gcr4KFOUpeztkCP/EsjRuIHeCNtLBYVqr6l+Zn0sIg4P9qTmeor5R8nnodOzpOu1OCwf9g9/4ap6+P0kpMFoVxIFw/70qKnyKqplwuEiAtLlq/qdftNYYnHjs4umzWOqMeGBDdRVFZYCUSANBp8589Dx+EsVpy9ojiioafUMUJiZI5mOHDkHPp+tpe2bJRg5tMDvfqbT3IwwQhgR3MTSerApy1JgNd9d0Xv2LbN8yPT0I/JHA/Y2ZIFu0Xn3ThmftjXTS+OM3a2uro7PZBX9/jcNQyXzY8OuYTma0+e1lfYOJhj868+rVQt5bmerdvbpi7/r1re4GDqu8JnipI++OkeKB3w84RJxfsSmmDZMKeGWYurStZXf44Hi6AJLgSg9+/g9VMrbuZoDDk+sYxPEJpTnpbIq+Z+xkjgeWhOxH7Fh2MsHX6R/vbYY7F4P6cm0vRwQuWGVxFP2pUclLQ2LK+UOP+XZZWQFexjtrRTP1la5/xej3ic9eI99OXRZk2RpV7vbcdwMG1eDpGxg6IKU0ujfhrKwh2o6EmvaJ+fN8oEnZDxzf3tF+/IHdytUu6upVL1sJgxd5pLGi3vl/Y+7g4tT32jjt/TJqN5xt9TdaTumjQ2OHekDI1nkPTmHocvtGfO9xsuY/MFRHWsKx2snPjclSKSNOp9dDc+K8SyeNHknOzd5f6v03it2sPPh2XQ0Rg4/a/fw8bl0b38uiWE+Efs0G6ELG6ELG4Z/8eb691KPWtb7NLaYk/1a34DbiSJC2da62sirSvj/um4YumzfTPHas8O9xM6N6JEZ488bi0HK7diyy/bW8lmVDF0qVXr2Z31o1LYXnJ/EFzLWeFQeHkvNLZwOIZOPyNhpiINXUi7kP/9SHoj9iI3QhY3QhY3QhY3QhY3QhY3QhY3QhY3QhY3QhY3QhY1SukfIBeU/AAAA//91pf1+AAAABklEQVQDAHn3+G8RtvZRAAAAAElFTkSuQmCC" alt="BUG-2 证据"></div><div class="bug"><div class="bug-h"><span class="sev 低">低severity</span><b>BUG-3 · 画板空白处按下拖拽会选中/移动画板，无法框选</b><span class="badge" style="background:#e7f6ec;color:#177a3d">已修复 · 回归通过</span></div>
   <p>鼠标自画板内部空白区域按下并拖拽时，直接命中画板进行选中/移动，而不是从该点开始框选。与自研交互基线「画板内空白拖拽=框选」的约定不一致，影响多选效率。</p><p class="repro"><b>复现：</b>在大屏首页画板内空白处按下并拖拽</p>
   </div>
-<p class="note">备注（非缺陷）：① 顶栏无「分享/帮助」入口，与自研设计基线存在差异，按当前产品定位可接受；② 主菜单「组件」分组在无选中时为空，为按选中态动态生成，符合预期；③ Ctrl+S 在支持文件系统访问 API 的浏览器中弹出系统另存对话框，API 受限时自动回落为下载 .prototype.html 并 toast 提示，行为正确。</p>
+<p class="note">备注（非缺陷）：① 顶栏无「分享/帮助」入口，与自研设计基线存在差异，按当前产品定位可接受；② 主菜单「组件」分组在无选中时为空，为按选中态动态生成，符合预期；③ Ctrl+S 在支持文件系统访问 API 的浏览器中弹出系统另存对话框，API 受限时自动回落为下载 .chao.html 并 toast 提示，行为正确。</p>
 </section>
 
 <section class="mod"><div class="mod-h"><h2>本轮已修复并回归</h2></div><div class="fixitem"><b>双击文字编辑重影</b><p>画布绘制跳过编辑中节点（n===editing），文字编辑覆盖层 #textEditor 与画布字体栈（fontFamily/lineHeight/letterSpacing/textTransform）逐项对齐；输入实时写回并同步宽高；Esc 还原原文、提交仅在实际变更时入栈。回归：编辑/取消/提交/撤销四段断言 + 截图全部通过。</p></div></section>

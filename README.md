@@ -46,14 +46,14 @@
 
 ```bash
 # 旧原型补嵌 AI 块（可批量、原地更新；脚本位于 live skill）
-node ~/.workbuddy/skills/prototype-html-builder/scripts/embed-ai-view.mjs 原型.prototype.html
+node ~/.workbuddy/skills/prototype-html-builder/scripts/embed-ai-view.mjs 原型.chao.html
 
 # AI 改稿合入（支持全量文档 / 变更页补丁 [{page, artboards}]；合入前自动校验，合入后再生 ai_view）
-node ~/.workbuddy/skills/prototype-html-builder/scripts/apply-doc.mjs 原型.prototype.html AI输出.json -o 新文件.html
+node ~/.workbuddy/skills/prototype-html-builder/scripts/apply-doc.mjs 原型.chao.html AI输出.json -o 新文件.html
 
 # 项目本地：AI 指引 / 清单再生；--shell 可只换编辑器壳、保留全部设计数据
-node tools/regen-aiview.mjs sample.prototype.html
-node tools/regen-aiview.mjs --shell sample.prototype.html 目标.prototype.html
+node tools/regen-aiview.mjs sample.chao.html
+node tools/regen-aiview.mjs --shell sample.chao.html 目标.chao.html
 ```
 
 约定：AI 修改设计稿输出与 `__doc` 同构的 JSON `{version:1,name,theme,pages,tree}`，**不重写 HTML、编辑器壳原样保留**；文档 >100KB 时可只输出变更页。所有节点 x/y 均为画板局部坐标，仅用于理解相对层级与间距，不作为绝对定位依据。
@@ -62,29 +62,31 @@ node tools/regen-aiview.mjs --shell sample.prototype.html 目标.prototype.html
 
 | 路径 | 说明 |
 | --- | --- |
-| `sample.prototype.html` | 编辑器 master（唯一真源，示例文档） |
-| `editor-prototype/` | 编辑器壳 `index.html` 与同源副本 `sample.prototype.html` |
-| `空白原型.prototype.html` | 空白起点文件（1 页 1 画板） |
-| `选矿设备管理.prototype.html` | 实际设计文档（选矿设备管理，3 页 8 画板） |
+| `sample.chao.html` | 编辑器 master（唯一真源，示例文档） |
+| `editor-prototype/` | 编辑器壳 `index.html` 与同源副本 `sample.chao.html` |
+| `空白原型.chao.html` | 空白起点文件（1 页 1 画板） |
+| `选矿设备管理.chao.html` | 实际设计文档（选矿设备管理，3 页 8 画板） |
 | `docs/` | 自研验收基线、验收报告与演示证据截图 |
 | `tools/regen-aiview.mjs` | AI 指引 / 清单再生工具；`--shell <新版壳>` 只换编辑器壳、保留全部设计数据 |
 | `tools/check-wording.mjs` | 提交前禁用表述门禁 |
-| `skill-versions/prototype-html-builder/` | skill 版本归档（v1.0.0–v1.2.2 + CHANGELOG），冻结快照 |
+| `skill-versions/prototype-html-builder/` | skill 版本归档（v1.0.0–v1.3.0 + CHANGELOG），冻结快照 |
 | `CONTRIBUTING.md` | 提交规范（目录约定、措辞、检查清单） |
 | `archive/` | 本地过程性 / 历史资料，**已忽略、不入库、不删除** |
 
-## prototype-html-builder skill（v1.2.2）
+## prototype-html-builder skill（v1.3.0）
 
-声明式 JSON 规格编译为 `.prototype.html`，内置 Element Plus / Ant Design 图标与 27 个组件母版，产物自动嵌入四层 AI 协作块（GUIDE v1.2 + NOTICE/meta + aiHint + `__ai_view` 清单）。live skill 位于 `~/.workbuddy/skills/prototype-html-builder/`。
+声明式 JSON 规格编译为 `.chao.html`，内置 Element Plus / Ant Design 图标与 27 个组件母版，产物自动嵌入四层 AI 协作块（GUIDE v1.2 + NOTICE/meta + aiHint + `__ai_view` 清单）。live skill 位于 `~/.workbuddy/skills/prototype-html-builder/`。
+
+> **v1.3.0**：产物后缀由 `.prototype.html` 全量切换为 `.chao.html`（默认输出名、编辑器保存、内部资源路径、触发词、文档），不保留旧后缀兼容；文件选择器 accept 改用合法扩展名 `.html`，由 `suggestedName` 保留新后缀。
 
 ```bash
 # 规格编译 + 校验
-node ~/.workbuddy/skills/prototype-html-builder/scripts/build-prototype.mjs spec.json -o out.prototype.html
-node ~/.workbuddy/skills/prototype-html-builder/scripts/validate-doc.mjs out.prototype.html
+node ~/.workbuddy/skills/prototype-html-builder/scripts/build-prototype.mjs spec.json -o out.chao.html
+node ~/.workbuddy/skills/prototype-html-builder/scripts/validate-doc.mjs out.chao.html
 
 # 升级编辑器壳 / 生成空白原型
 node ~/.workbuddy/skills/prototype-html-builder/scripts/gen-template.mjs --shell <editor-prototype/index.html>
-node ~/.workbuddy/skills/prototype-html-builder/scripts/gen-template.mjs --empty --shell <editor-prototype/index.html> -o 空白原型.prototype.html
+node ~/.workbuddy/skills/prototype-html-builder/scripts/gen-template.mjs --empty --shell <editor-prototype/index.html> -o 空白原型.chao.html
 ```
 
 版本历史见 [`skill-versions/prototype-html-builder/CHANGELOG.md`](skill-versions/prototype-html-builder/CHANGELOG.md)。
