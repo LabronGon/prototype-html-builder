@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta name="prototype-ai" content="AI 必读：本原型仅作空间布局与 UI 元素整体效果参考；实现须遵循项目开发规范（Vue3 等标准组件/设计系统 Token），勿逐节点硬编码绝对定位。规范见 PROTOTYPE-AI-GUIDE；#__ai_view 为布局清单；#__doc 为设计 JSON（改稿输出同构 JSON 用 apply-doc.mjs 合入）。">
+<meta name="prototype-ai" content="AI 必读：本原型仅作空间布局与 UI 元素整体效果参考；实现须遵循项目开发规范（Vue3 等标准组件/设计系统 Token），勿逐节点硬编码绝对定位。规范见 PROTOTYPE-AI-GUIDE；#__ai_view 为布局清单 + LOGIC 页面逻辑说明附录；#__doc 为设计 JSON（改稿输出同构 JSON 用 apply-doc.mjs 合入）；首版页面规范见 __doc.pageSpec（PC=Element Plus / APP=Android Material，锁定后不得静默切换）；首版编组规划见 __doc.pageSpec.grouping（语义区块 group 树，锁定后不得拆散回平铺叶子）。">
 <!-- AI-NOTICE（给读取本文件的 AI/Agent，请勿删除）：
   0) 【最高优先·实现约定】本原型只提供空间布局与 UI 元素整体效果（结构/层级/间距节奏/配色/状态/交互）参考，不是逐像素代码规范。实现必须遵循项目既定技术栈与开发规范（Vue3/React 标准组件、组件库与设计系统 Token、路由/状态管理、响应式与可访问性）；用可复用组件抽象重复 UI，禁止把设计清单逐节点翻译成绝对定位的硬编码 DOM/CSS。
   1) 界面实现 → 读 script#__ai_view（逐行布局清单，坐标=画板局部坐标）＋ script#__doc（完整字段），按开发规范用标准组件实现
   2) 修改设计稿 → 不要改 HTML/壳；输出与 #__doc 同构的 JSON（{version:1,name,theme,pages,tree}），用 apply-doc.mjs 合入或编辑器「打开 JSON」载入
-  3) 字段字典 / 坐标约定 / 交互 schema / 组件实例映射 → 全文搜索 PROTOTYPE-AI-GUIDE 注释（位于 #__doc 之前）
-  4) __doc JSON 内的 aiHint 键是同样的提示（程序化读取用）
+  3) 页面逻辑与说明 → 读 script#__ai_view 末尾 LOGIC 段（全量聚合），或 __doc 中 page/artboard/node 的 notes 字段；演示模式「逻辑」抽屉同样可见
+  4) 字段字典 / 坐标约定 / 交互 schema / notes schema / 组件实例映射 → 全文搜索 PROTOTYPE-AI-GUIDE 注释（位于 #__doc 之前）
+  5) __doc JSON 内的 aiHint 键是同样的提示（程序化读取用）；AI 输出节点漏写 notes 时 apply-doc.mjs 会沿用原值，不会抹掉人工说明
+  6) 风格方向 → __doc.direction（product/character/world/moments/signature）；用户未给视觉参考时按 GUIDE「默认风格基线」执行，给了参考图则以参考图为准
+  7) 首版页面规范 → __doc.pageSpec（PC=Element Plus/ElementUI，APP=Android Material；locked=true 不得静默切换）；#__ai_view 头部有 pageSpec 段
+  8) 首版编组规划 → __doc.pageSpec.grouping（语义区块 group 树，locked=true 不得拆散回平铺叶子）；#__ai_view 头部有编组规划段，check-grouping.mjs --strict 为交付门禁
   注意：本文件很大，直接从文件中部读起会漏规范；务必先定位 PROTOTYPE-AI-GUIDE 再动手。 -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -372,6 +376,163 @@ body.hide-ui .help-btn{display:none}
 #findBar button:disabled:hover{background:none}
 #findBar .fclose{color:var(--text-2);padding:0 5px;font-size:14px;line-height:1}
 
+/* ============ P36/P37/P38 页面逻辑与说明 ============ */
+.tabbar.r .tabs{gap:8px}
+.note-hd{margin:2px 6px 10px;padding:8px 10px;border-radius:8px;background:var(--hover);display:flex;align-items:center;gap:6px;min-width:0}
+.note-scope{font-size:10px;font-weight:600;color:#fff;background:var(--brand);border-radius:4px;padding:2px 6px;flex:none}
+.note-obj{font-size:12px;font-weight:600;color:var(--text-strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.note-id{font-size:10px;color:var(--text-3);flex:none;max-width:62px;overflow:hidden;text-overflow:ellipsis}
+.note-inp,.note-ta{width:100%;box-sizing:border-box;border:1px solid var(--line-04);border-radius:6px;background:var(--bg-input,transparent);color:var(--text-1);font-size:12px;line-height:1.6;padding:6px 8px;outline:0;font-family:inherit}
+.note-inp:focus,.note-ta:focus{border-color:var(--brand)}
+.note-line{margin-bottom:6px}
+.note-line .fld-sel{width:100%}
+.note-ta{height:180px;resize:vertical;white-space:pre-wrap}
+.note-tabs{display:flex;gap:4px;margin-bottom:6px}
+.nt-btn{font-size:11px;padding:3px 10px;border-radius:5px;color:var(--text-2);border:1px solid var(--line-04)}
+.nt-btn.on{color:var(--brand);border-color:var(--brand);background:rgba(54,112,247,.08)}
+.note-md{font-size:12px;line-height:1.7;color:var(--text-1);word-break:break-word}
+.note-md h1,.note-md h2,.note-md h3,.note-md h4{font-size:12px;font-weight:600;margin:8px 0 4px;color:var(--text-strong)}
+.note-md p{margin:4px 0}
+.note-md ul{margin:4px 0;padding-left:18px}
+.note-md li{margin:2px 0}
+.note-md code{background:var(--hover);border-radius:3px;padding:0 3px;font-size:11px}
+.note-md pre{background:var(--hover);border-radius:6px;padding:6px;overflow:auto;font-size:11px;white-space:pre-wrap}
+.nr-head{display:none}
+.nr-row{position:relative;display:flex;flex-direction:column;gap:4px;margin-bottom:8px;
+  padding:8px 30px 8px 8px;border:1px solid var(--line-04);border-radius:7px;background:var(--hover)}
+.nr-lb{display:flex;flex-direction:column;gap:2px;font-size:10px;font-weight:400;color:var(--text-3)}
+.nr-f{min-width:0;width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid var(--line-04);border-radius:5px;background:var(--bg-panel);color:var(--text-1);outline:0}
+.nr-f:focus{border-color:var(--brand)}
+.nr-del{position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:4px;color:var(--text-3);font-size:14px;line-height:1}
+.nr-del:hover{background:var(--bg-panel);color:var(--text-1)}
+.note-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.note-btns .mini-btn{font-size:11px;padding:5px 2px;justify-content:center;white-space:nowrap}
+.note-chk{display:flex;align-items:center;gap:6px;color:var(--text-2);cursor:pointer;font-size:12px}
+.nt-btn{display:inline-flex;align-items:center;gap:3px}
+.rc-swatches{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:6px 0 2px}
+.rc-swatches:empty{display:none}
+.rc-swatches::before{content:'最近';font-size:10px;color:var(--text-3);margin-right:2px}
+.rc-swatches i{width:14px;height:14px;border-radius:3px;cursor:pointer;border:1px solid rgba(127,127,127,.28);transition:transform .12s ease}
+.rc-swatches i:hover{transform:scale(1.18);box-shadow:0 0 0 1px var(--brand)}
+.rc-bar{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:6px 10px;border-bottom:1px solid var(--line-04);flex:none}
+.rc-bar[hidden]{display:none}
+.rc-bar b{font-size:10px;font-weight:500;color:var(--text-3);margin-right:2px}
+.rc-bar i{width:14px;height:14px;border-radius:3px;cursor:pointer;border:1px solid rgba(127,127,127,.28);transition:transform .12s ease}
+.rc-bar i:hover{transform:scale(1.18);box-shadow:0 0 0 1px var(--brand)}
+.right{position:relative}
+.rsplitter{position:absolute;top:0;left:-3px;width:7px;height:100%;cursor:col-resize;z-index:6}
+.rsplitter::after{content:"";position:absolute;top:0;bottom:0;left:3px;width:1px;background:transparent;transition:background .12s ease}
+.rsplitter:hover::after,.rsplitter.drag::after{background:rgba(0,0,0,.12)}
+.note-bar{display:flex;align-items:center;gap:6px;margin:0 6px 8px;padding:0 2px;min-width:0}
+.note-bar .note-chk{font-size:11px;white-space:nowrap;flex:none;gap:4px}
+.note-bar .note-tabs{margin:0 0 0 auto;flex:none;gap:3px}
+/* 说明栏：对象卡片 */
+.note-hd{margin:2px 6px 10px;padding:9px 10px 9px 12px;border-radius:10px;border:1px solid var(--line-04);
+  background:linear-gradient(135deg,rgba(54,112,247,.08),rgba(54,112,247,.02));
+  display:flex;align-items:center;gap:9px;min-width:0;position:relative;overflow:hidden}
+.note-hd::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brand)}
+.nh-badge{width:28px;height:28px;flex:none;border-radius:8px;background:var(--brand);color:#fff;
+  font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 6px rgba(54,112,247,.25)}
+.nh-main{min-width:0;flex:1}
+.nh-name{font-size:13px;font-weight:600;color:var(--text-strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35}
+.nh-meta{font-size:10px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+/* 摘要可拖高 / 结构模板按钮 / 清空独立 */
+.note-sum{display:block;height:52px;min-height:52px;max-height:600px;resize:none;line-height:1.55}
+.ta-wrap{position:relative;margin-bottom:2px}
+.ta-wrap .note-sum,.ta-wrap .note-ta{resize:none;display:block}
+.note-resizer{height:10px;margin-top:-1px;border-radius:0 0 6px 6px;cursor:ns-resize;touch-action:none;
+  display:flex;align-items:center;justify-content:center;color:var(--text-3);
+  background:var(--hover);border:1px solid var(--line-04);border-top:0}
+.note-resizer::before{content:"";width:24px;height:2px;border-radius:2px;background:currentColor;opacity:.6}
+.note-resizer:hover{color:var(--brand);background:rgba(54,112,247,.08)}
+.tpl-bar{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.tpl-btn{display:flex;align-items:center;gap:6px;min-width:0;padding:6px 8px;border:1px solid var(--line-04);
+  border-radius:7px;background:var(--bg-panel);color:var(--text-1);font-size:11px;font-weight:600;
+  cursor:pointer;transition:border-color .14s ease,background .14s ease,color .14s ease}
+.tpl-btn:hover{border-color:var(--brand);background:rgba(54,112,247,.06);color:var(--brand)}
+.tpl-ic{width:18px;height:18px;flex:none;border-radius:5px;background:rgba(54,112,247,.12);color:var(--brand);
+  font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.tpl-tx{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note-clear-row{display:flex;justify-content:flex-end;margin-top:6px}
+.note-clear{font-size:10px;color:var(--text-3);padding:2px 4px;border-radius:4px}
+.note-clear:hover{color:#F04438;background:rgba(240,68,56,.08)}
+/* 业务规则：长文本用可拖高 textarea */
+.nr-row{padding:8px}
+.nr-hd{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.nr-no{width:16px;height:16px;border-radius:4px;background:var(--brand);color:#fff;font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex:none}
+.nr-tt{font-size:10px;font-weight:600;color:var(--text-2)}
+.nr-del{position:static;margin-left:auto;width:18px;height:18px;flex:none}
+.nr-f.nr-ta{resize:vertical;min-height:38px;max-height:220px;line-height:1.5;word-break:break-word;font-family:inherit}
+.nr-f.nr-note{min-height:28px}
+.note-add{width:100%;height:30px;justify-content:center;border:1px dashed var(--line-04);border-radius:7px;
+  color:var(--brand);font-size:11px;font-weight:600;margin-top:4px}
+.note-add:hover{border-color:var(--brand);background:rgba(54,112,247,.06)}
+.np-doc{padding:2px 0}
+.np-sum{font-size:13px;font-weight:600;color:var(--text-1);line-height:1.5;margin-bottom:6px}
+.np-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.np-tag{font-size:10px;color:var(--brand);background:rgba(54,112,247,.08);border-radius:4px;padding:2px 6px}
+.np-kind{font-size:10px;color:var(--text-2);background:var(--hover);border:1px solid var(--line-04);border-radius:4px;padding:1px 6px;cursor:help}
+/* 演示逻辑抽屉：左缘拖拽调宽 */
+.dlp-splitter{position:absolute;top:0;left:-4px;width:9px;height:100%;cursor:col-resize;z-index:6;touch-action:none}
+.dlp-splitter::after{content:"";position:absolute;left:3px;top:50%;width:3px;height:36px;margin-top:-18px;
+  border-radius:2px;background:rgba(20,22,27,.14);transition:background .14s ease,height .14s ease,margin .14s ease}
+.dlp-splitter:hover::after,.dlp-splitter.drag::after{background:var(--brand);height:56px;margin-top:-28px}
+.np-sec{font-size:11px;font-weight:600;color:var(--text-2);border-top:1px solid var(--line-04);margin-top:10px;padding-top:8px;display:flex;justify-content:space-between}
+.np-sec span{font-weight:400;color:var(--text-3)}
+.np-rule{display:flex;gap:6px;padding:6px 0;border-bottom:1px dashed var(--line-04)}
+.np-rule>b{font-size:10px;color:#fff;background:var(--brand);border-radius:4px;width:16px;height:16px;line-height:16px;text-align:center;flex:none}
+.np-when{font-size:11px;color:var(--text-1);font-weight:600}
+.np-then{font-size:11px;color:var(--brand);margin-top:2px}
+.np-note{font-size:10px;color:var(--text-3);margin-top:2px}
+#demoLogicPanel{position:fixed;top:48px;right:0;bottom:0;width:340px;z-index:44;background:#fff;
+  box-shadow:-2px 0 16px rgba(20,22,27,.14);border-left:1px solid rgba(20,22,27,.08);
+  display:flex;flex-direction:column;color:#1D2129}
+#demoLogicPanel[hidden]{display:none}
+.dlp-head{height:46px;flex:none;display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid rgba(20,22,27,.08)}
+.dlp-head b{font-size:13px;font-weight:600}
+.dlp-count{margin-left:auto;font-size:11px;color:#86909C}
+.dlp-x{width:26px;height:26px;border-radius:6px;color:#4E5969;display:flex;align-items:center;justify-content:center}
+.dlp-x:hover{background:rgba(20,22,27,.06)}
+.dlp-tools{flex:none;padding:8px 12px;border-bottom:1px solid rgba(20,22,27,.08);display:flex;flex-direction:column;gap:6px}
+.dlp-search{width:100%;box-sizing:border-box;height:30px;border:1px solid #E5E6EB;border-radius:6px;padding:0 10px;font-size:12px;outline:0;color:#1D2129}
+.dlp-search:focus{border-color:#3670F7}
+.dlp-scopes{display:flex;gap:4px}
+.dlp-scope{font-size:11px;padding:4px 10px;border-radius:5px;color:#4E5969;background:#F2F3F5}
+.dlp-scope.on{background:#3670F7;color:#fff}
+.dlp-body{flex:1;overflow:auto;padding:4px 12px 24px}
+.dlp-group{margin-top:10px}
+.dlp-gt{font-size:11px;font-weight:600;color:#86909C;padding:4px 0 6px;display:flex;align-items:center;gap:6px}
+.dlp-gt>span{margin-left:auto;font-weight:400}
+.dlp-lv{font-style:normal;font-size:10px;font-weight:500;color:#98A2B3;padding:1px 5px;border:1px solid var(--line-04);border-radius:4px}
+.dlp-gt span{font-weight:400}
+.dlp-item{border:1px solid #E5E6EB;border-radius:8px;padding:10px;margin-bottom:8px;cursor:default;transition:border-color .15s,box-shadow .15s}
+.dlp-item:hover,.dlp-item.focus{border-color:#3670F7;box-shadow:0 0 0 2px rgba(54,112,247,.12)}
+.dlp-ih{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.dlp-kind{font-size:10px;padding:2px 6px;border-radius:4px;background:#E8F3FF;color:#165DFF;flex:none}
+.dlp-kind.k-component{background:#E8FFEA;color:#00B42A}
+.dlp-kind.k-rule{background:#FFF7E8;color:#FF7D00}
+.dlp-path{font-size:10px;color:#86909C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dlp-name{font-size:13px;font-weight:600;color:#1D2129;margin-bottom:4px}
+.dlp-sum{font-size:12px;color:#4E5969;line-height:1.6;margin-bottom:6px}
+.dlp-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.dlp-tag{font-size:10px;padding:1px 6px;border-radius:4px;background:#F2F3F5;color:#4E5969}
+.dlp-md{font-size:12px;color:#4E5969;border-top:1px dashed #E5E6EB;padding-top:6px;margin-top:6px}
+.dlp-md h1,.dlp-md h2,.dlp-md h3,.dlp-md h4{font-size:12px;font-weight:600;color:#1D2129;margin:6px 0 3px}
+.dlp-md p{margin:3px 0}
+.dlp-md ul{margin:3px 0;padding-left:16px}
+.dlp-md pre{background:#F7F8FA;border-radius:5px;padding:6px;font-size:11px;overflow:auto}
+.dlp-md code{background:#F2F3F5;border-radius:3px;padding:0 3px}
+.dlp-rules{margin-top:6px;border-top:1px dashed #E5E6EB;padding-top:6px}
+.dlp-rule{display:flex;flex-wrap:wrap;gap:4px;font-size:11px;line-height:1.6;margin-bottom:3px;color:#4E5969}
+.dlp-when{color:#1D2129;font-weight:600}
+.dlp-rule i{font-style:normal;color:#3670F7}
+.dlp-rule em{font-style:normal;color:#86909C}
+.dlp-foot{font-size:10px;color:#C9CDD4;margin-top:6px}
+.dlp-empty{text-align:center;padding:40px 12px;font-size:13px;color:#86909C;line-height:1.8}
+.dlp-empty span{font-size:11px;color:#C9CDD4}
+.dbtn.dbtn-txt{width:auto;min-width:46px;padding:0 8px;font-size:12px;font-weight:600;gap:4px}
 /* ============ P2 演示模式 ============ */
 body.demo-mode .nav,body.demo-mode .left,body.demo-mode .right,
 body.demo-mode .help-btn{display:none}
@@ -1209,13 +1370,16 @@ body[data-theme=dark] ::-webkit-scrollbar-thumb:active{background:rgba(255,255,2
 
     <!-- ================= 右栏 252px ================= -->
     <aside class="right">
+      <div class="rsplitter" id="rsplitter" title="拖动调整属性面板宽度"></div>
       <div class="tabbar r">
         <div class="tabs">
           <button class="tab on" data-rtab="design">设计</button>
           <button class="tab" data-rtab="proto">原型</button>
           <button class="tab" data-rtab="assets">组件</button>
+          <button class="tab" data-rtab="notes">说明</button>
         </div>
       </div>
+      <div class="rc-bar" id="rcBar" hidden></div>
       <div class="panel" id="panel"></div>
     </aside>
   </div>
@@ -1264,6 +1428,7 @@ body[data-theme=dark] ::-webkit-scrollbar-thumb:active{background:rgba(255,255,2
   </div>
   <button class="dt-sitemap" id="demoSitemapBtn"><span id="demoSitemapName">画板</span><i></i></button>
   <div class="dt-right">
+    <button class="dbtn" id="demoLogic" title="页面逻辑与说明（L）" aria-label="页面逻辑与说明"></button>
     <button class="dbtn" id="demoThumbs" title="缩略图（T）"></button>
     <span class="dt-sep"></span>
     <button class="dbtn" id="demoZoomOut" title="缩小（-）"></button>
@@ -1296,40 +1461,90 @@ body[data-theme=dark] ::-webkit-scrollbar-thumb:active{background:rgba(255,255,2
   <button class="dth-nav" id="demoThumbR" title="向右滚动"></button>
 </div>
 <div id="demoPageIdx"></div>
+<div id="demoLogicPanel" hidden>
+  <div class="dlp-splitter" id="dlpSplitter" title="拖动调整逻辑面板宽度（双击复位）"></div>
+  <div class="dlp-head">
+    <b>页面逻辑与说明</b>
+    <span class="dlp-count" id="dlpCount">0 条说明</span>
+    <button class="dlp-x" id="dlpClose" title="关闭（L）"></button>
+  </div>
+  <div class="dlp-tools">
+    <input class="dlp-search" id="dlpQuery" placeholder="搜索说明 / 规则 / 标签">
+    <div class="dlp-scopes">
+      <button class="dlp-scope on" data-dlpscope="board">当前画板</button>
+      <button class="dlp-scope" data-dlpscope="cur">当前页面</button>
+      <button class="dlp-scope" data-dlpscope="all">全部页面</button>
+    </div>
+  </div>
+  <div class="dlp-body" id="dlpBody"></div>
+</div>
 <input type="file" id="fileInput" accept=".html,.json" hidden>
 <!-- ==================================================================
-PROTOTYPE-AI-GUIDE v1.2（静态说明块，保存时随文件保留；勿改动本注释结构）
-本文件 = 单文件高保真原型：编辑器脚本 + 内嵌设计文档（script#__doc，JSON）+ AI 视图（script#__ai_view，逐行清单）。
+PROTOTYPE-AI-GUIDE v1.7（静态说明块，保存时随文件保留；勿改动本注释结构）
+本文件 = 单文件高保真原型：编辑器脚本 + 内嵌设计文档（script#__doc，JSON）+ AI 视图（script#__ai_view，逐行清单 + LOGIC 说明附录）。
 【实现约定（最高优先，先读本段）】
  本原型只提供空间布局与 UI 元素整体效果（结构/层级/间距节奏/配色/状态/交互）的参考，不是逐像素代码规范。
  实现必须遵循项目既定技术栈与开发规范：Vue3/React 等标准组件、组件库与设计系统 Token、路由/状态管理、响应式与可访问性。
  用可复用组件抽象重复 UI（母版/实例 → 组件 + props/slot），禁止把 #__ai_view 逐节点翻译成绝对定位的硬编码 DOM/CSS。
  ai_view 的坐标/尺寸用于理解相对关系与间距节奏，不作强制 CSS 数值；验收 = 布局与视觉整体一致且符合开发规范，不要求像素 diff 为 0。
+【风格方向 direction（可选顶层键）】__doc 顶层可挂 direction:{product:产品一句话, character:[气质词 1-3 个，禁「简洁/现代/高级」类万金油], world:产品所属的物质世界, moments:[允许色彩与细节丰富的 1-2 个焦点区], signature:仅此产品会有的签名细节}。实现界面或改稿时先读它并遵循；缺失时不要凭流行趋势发明方向。
+【默认风格基线（用户未给视觉参考时适用；给了参考图则以参考图为准）】① 表面克制：应用/后台的背景、卡片、边框保持中性色，世界感只进 accent、图表与 moments；② 一屏一 accent（标主操作/选中/关键数字），文本三角色（主/次/弱）；③ 禁 slop：色相渐变表面、渐变文字、彩色发光与阴影、emoji 当图标、大写加字距标签、循环动画（animate-pulse 等）、transition-all；④ 圆角嵌套：内=外−间距且≥4，控件 8–10、卡片 12–16；⑤ 间距 4px 网格、同物同尺寸、组内<组间，导航行高 32–36；⑥ 数字 tabular-nums 且全屏一种格式，mock 数据要真实（禁 [X]/123,456）；⑦ 图表一主多辅，单 accent 强调当前关注项；⑧ 模板自检：把产品名换成别家这屏还成立吗？成立=方向不够；⑨ 反简陋三件套（v1.5）：页面底用浅灰（#F5F7FA 级），白卡配描边（#E5E6EB 1px）+ 中性色低透明度投影（y2 blur8 #101828 6%，③ 禁的是彩色发光，此投影不受限），图标配主色 10% tinted 圆底，卡片标题左侧加 4px 品牌竖条，表格行斑马纹，告警/状态行左缘 3px 语义色竖条；渐变只做同色明度/透明度（hero 带、顶栏高亮线），监控/视频画面加取景框角标与扫描线，禁文字发光与跨色相。细则见 skill references/design-system.md §6/§7。
+【首版页面规范 pageSpec（v1.8，首版锁定）】首次生成界面必须先在规格里声明 platform（pc / app）并把规范写进 __doc.pageSpec：PC 端以 Element Plus（ElementUI）页面规范为主（1440×900 参考视口 / 24px 页边距 / gutter 16 / 8px 纵向节奏 / 卡内边距 16 / 控件高 32 / 字号 14 / 圆角 6 / 色板取 assets/design-kit.json）；APP 端以 Android（Material 3）页面规范为主（360×800dp 参考视口 / 16dp 页边距 / 8dp 栅格 / 状态栏 24dp / 顶部应用栏 56dp / 底部导航 56dp / 触控目标≥48dp / 字号 14sp）。第一版输出即锁定：后续改稿、实现、追加页面必须沿用同一端型与规范，不得静默切换；确需换端型须用户明确要求并同时更新 pageSpec。细则见 skill references/design-system.md §9；本段随 #__ai_view 的「=== 首版页面规范 ===」段一起输出。
+【首版语义编组 grouping（v1.9，首版锁定）】首次生成界面必须先规划页面编组：画板顶层只允许「语义区块」group（PC 基线：顶栏 / 侧栏导航 / 页面标题区 / 筛选·工具区 / 内容区 / 卡片区 / 表格·列表区 / 图表区 / 底栏·分页 / 弹层·浮层；APP 基线：状态栏 / 顶部应用栏 / 内容区 / 卡片区 / 列表区 / 底部导航 / 弹层·浮层），业务元素一律归入所属区块，禁止把几十个叶子平铺在画板顶层。规格用画板级 sections:[{name,children:[...]}] 或 sections:["顶栏","内容区"] + 每节点 section 标签显式声明；未声明时 build-prototype.mjs 按几何行带自动编组并给出提示。编组覆盖率 ≥80%、顶层散落叶子 ≤3、嵌套 ≤3 层、每组直接子元素 ≤12；交付前 node scripts/check-grouping.mjs <产物> --strict 必须 PASS。规划随 __doc.pageSpec.grouping 锁定：后续改稿、实现、追加页面沿用同一套区块命名与层级，不得拆散回平铺；#__ai_view 头部「=== 首版编组规划 ===」段列出每画板的编组树摘要。细则见 skill references/design-system.md §10 与 references/spec.md §2。
 【给 AI 的读法】
  1) 实现界面 → 读 #__ai_view 获取布局与元素清单（每行一节点，坐标均为「画板局部坐标」）＋ #__doc 获取完整字段；按上文「实现约定」用标准组件实现。
  2) 修改设计稿 → 读 #__doc JSON，按下文「AI 修改约定」输出新文档 JSON（不要重写整个 HTML，编辑器壳必须原样保留）。
- 3) 编写需求文档 → 以 #__ai_view 的画板/图层分组与命名为结构依据。
+ 3) 编写需求文档 / 理解页面逻辑 → 读 #__ai_view 末尾「=== 页面逻辑与说明（LOGIC）===」全量聚合清单，再看画板/图层分组。
+ 4) 精确读写说明 → 编辑器内用 ProtoAPI.getNotes / setNotes / listNotes / exportLogic；或在输出 JSON 中带 notes 字段。
 【坐标约定】叶子与组的 x/y 一律相对所在画板左上角；画板自身 x/y 为页面坐标。数值保留原始精度（可能带小数，勿取整）。rotation 单位度、顺时针、绕节点中心。path 的 pts 即画板局部坐标（n.x/y 仅作包围盒参考）。
 【节点类型】artboard 画板 | rect 矩形 | text 文本 | image 图片 | line 线 | arrow 箭头 | group 组(容器/组件实例) | path 矢量路径 | ellipse 椭圆 | polygon 多边形(sides) | star 星形(points) | svg 图标(icon=名称 color=着色 paths=自定义路径数) | bool 布尔(op=union/subtract/…)
 【显隐】hidden:true 为隐藏节点（默认不渲染，交互/状态切换时可显示）；locked 为锁定。
-【文本字段】text 值为 JSON 字符串字面量（含 \n、\" 等转义，可 JSON.parse 精确还原原文，多行文本不会断行）；fontSize 字号 fontWeight 字重(400/500/600/700) color 颜色 align 对齐(left/center/right) lineHeight 行高 letterSpacing 字距
+【文本字段】text 值为 JSON 字符串字面量（含 
+、" 等转义，可 JSON.parse 精确还原原文，多行文本不会断行）；fontSize 字号 fontWeight 字重(400/500/600/700) color 颜色 align 对齐(left/center/right) lineHeight 行高 letterSpacing 字距
 【填充 fills】数组自底向上叠加；项为 {type:'solid',color,opacity,on} 或 {type:'linear',angle,stops:[{color,pos,opacity}]} / {type:'radial',stops:[...]}；text 用 color 字段；旧数据回落单值 fill/stroke。
 【描边 strokes】{color,width,align:center/inside/outside,style:solid/dashed/dotted,cap,join,on}；旧数据回落 stroke/strokeW/strokeAlign。
 【效果 effects】{type:drop/inner/blur/bgblur, on, x,y,blur,color,opacity} 模糊类用 value；旧数据回落 effect.shadow / blur。
 【圆角】radius 单值；4 角不同时用 radii:[左上,右上,右下,左下]。
 【交互 proto】节点上数组 [{trigger:单击|悬停|按下|拖拽|滚动, dir:方向, action:打开画板|打开弹层|关闭弹层|返回上一页|切换变体, target:目标画板id, variant, anim:过渡动画, duration:ms, easing}]
+【说明 notes（v1.4）】page / artboard / 任意 node 上均可挂 notes 对象：{kind:page|component|rule, summary:一句话, body:Markdown 正文, rules:[{when:条件/触发, then:动作/结果, note:备注}], tags:[string], source:ai|human, updated:YYYY-MM-DD}。
+ notes 随节点复制/删除/撤销；省略字段按空值处理；无说明的节点不写该字段。演示模式「逻辑」抽屉与 #__ai_view 的 LOGIC 段均由此生成。
 【组件实例】group + inst:母版画板id + iid；ov:{子节点id:{字段:值}} 为实例级覆盖；导出/渲染时须先用 ov 覆盖母版对应字段再渲染。实现时母版→可复用组件、ov→props/slot，不要复制节点树。
 【AI 修改设计稿约定】输出一个与 #__doc 完全同构的 JSON：{version:1,name,theme,pages,tree}（全量最稳）。文档过大(>100KB)时可只输出变更页：[{page:<索引或页名>, artboards:[...]}]，用 apply-doc.mjs 合入或编辑器「打开 JSON」整份载入。禁止改动本注释、编辑器脚本以及两个内嵌 script 标签之外的任何 HTML 内容。
-【实现建议】以 #__ai_view 的画板/分组理解页面结构与组件边界；组件实例(inst)对应复用组件；图片用节点 src/fit；颜色/圆角/描边映射到项目设计 Token；以画板宽度作参考视口检查布局层级与对齐，不要求逐像素一致。
+【AI 修改说明约定】① 精确改：调用 ProtoAPI.getNotes/setNotes/listNotes/exportLogic，或输出含 notes 的同构 JSON；② 批量生成：按 LOGIC 段结构为无说明的画板/组件补 notes，source 标 'ai'；③ 不得静默删除已有说明——apply-doc.mjs 采用保护性合并，AI 输出节点未带 notes 时沿用原值，仅显式 notes:null 才删除；④ source='human' 的人工说明如需调整，应保留原语义并在 body/rules 中体现改动。
+【实现建议】以 #__ai_view 的画板/分组理解页面结构与组件边界；组件实例(inst)对应复用组件；图片用节点 src/fit；颜色/圆角/描边映射到项目设计 Token；以画板宽度作参考视口检查布局层级与对齐，不要求像素一致。
 ================================================================== -->
-<script type="application/json" id="__doc">{"version":1,"name":"空白原型","theme":"light","pages":[{"name":"页面 1","artboards":[{"type":"artboard","id":"n1","name":"画板 1","x":0,"y":0,"w":1440,"h":900,"bg":"#FFFFFF","children":[]}]}],"tree":[{"label":"页面 1","page":0}],"aiHint":"AI 必读：本 JSON 为单文件原型的设计文档。原型仅提供空间布局与 UI 元素整体效果参考；实现须遵循项目既定开发规范（Vue3/React 标准组件、组件库与设计系统 Token、响应式与可访问性），禁止逐节点硬编码绝对定位，重复 UI 应抽象为可复用组件。界面结构→读 script#__ai_view 布局清单；修改设计稿→输出与本 JSON 同构的 {version:1,name,theme,pages,tree}（用 apply-doc.mjs 合入，勿改 HTML）；字段字典/坐标约定/交互 schema→全文搜索 PROTOTYPE-AI-GUIDE 注释。所有叶子/组 x/y 均为画板局部坐标。"}</script>
+<script type="application/json" id="__doc">{"version":1,"name":"空白原型","theme":"light","pageSpec":{"version":"v1","locked":true,"platform":"pc","standard":"Element Plus（ElementUI）页面规范","viewport":"1440x900","grid":"24px 页边距 / 统一 gutter 16 / 8px 纵向节奏 / 卡内边距 16 / 4px 网格","controls":"常规控件高 32 / 主按钮 40 / 正文 14 / 圆角 6 / 描边 #E5E6EB 1px","token":"assets/design-kit.json（Element Plus 色板）","pages":[{"name":"页面 1","platform":"pc","standard":"Element Plus（ElementUI）页面规范","viewport":"1440x900"}],"grouping":{"version":"v1","locked":true,"mode":"semantic","platform":"pc","sections":["顶栏","侧栏导航","页面标题区","筛选/工具区","内容区","卡片区","表格/列表区","图表区","底栏/分页","弹层/浮层"],"minGroupRatio":0.8,"maxTopLevelLoose":3,"maxDepth":3,"maxChildrenPerGroup":12}},"pages":[{"name":"页面 1","artboards":[{"type":"artboard","id":"n1","name":"画板 1","x":0,"y":0,"w":1440,"h":900,"bg":"#FFFFFF","children":[]}]}],"tree":[{"label":"页面 1","page":0}],"aiHint":"AI 必读：本 JSON 为单文件原型的设计文档。原型仅提供空间布局与 UI 元素整体效果参考；实现须遵循项目既定开发规范（Vue3/React 标准组件、组件库与设计系统 Token、响应式与可访问性），禁止逐节点硬编码绝对定位，重复 UI 应抽象为可复用组件。界面结构→读 script#__ai_view 布局清单；页面逻辑与说明→读 LOGIC 段或 page/artboard/node 的 notes 字段（kind/summary/body/rules/tags/source/updated），可用 ProtoAPI.getNotes/setNotes 精确读写；修改设计稿→输出与本 JSON 同构的 {version:1,name,theme,pages,tree}（用 apply-doc.mjs 合入，勿改 HTML，漏写 notes 会沿用原值，漏写 direction 亦然）；风格方向→读 __doc.direction（product/character/world/moments/signature），用户未给视觉参考时按 GUIDE「默认风格基线」执行；首版页面规范→读 __doc.pageSpec 与 #__ai_view 的 pageSpec 段（PC=Element Plus/ElementUI，APP=Android Material，locked=true 不得静默切换）；首版编组规划→读 __doc.pageSpec.grouping 与 #__ai_view 的编组规划段（画板顶层只放语义区块 group，改稿/续页沿用，不得拆回平铺叶子）；字段字典/坐标约定/交互 schema→全文搜索 PROTOTYPE-AI-GUIDE 注释。所有叶子/组 x/y 均为画板局部坐标。"}</script>
 <script type="text/plain" id="__ai_view">
 # AI-VIEW 设计清单（自动生成，勿手改；再生：编辑器保存或 regen-aiview.mjs）
 # 用途：空间布局与 UI 元素整体效果参考；实现须遵循项目开发规范（Vue3 标准组件/设计系统 Token），勿逐节点硬编码绝对定位，母版/实例→可复用组件。
 doc: 空白原型
 
+=== 首版页面规范（pageSpec，已锁定）===
+# 实现 / 改稿 / 续页生成必须沿用同一端型规范；切换端型需用户明确要求
+# version=v1 locked=true
+# platform=pc standard=Element Plus（ElementUI）页面规范 viewport=1440x900
+# grid=24px 页边距 / 统一 gutter 16 / 8px 纵向节奏 / 卡内边距 16 / 4px 网格 controls=常规控件高 32 / 主按钮 40 / 正文 14 / 圆角 6 / 描边 #E5E6EB 1px token=assets/design-kit.json（Element Plus 色板）
+# pages: 页面 1=pc
+# grouping=semantic locked=true sections=顶栏/侧栏导航/页面标题区/筛选/工具区/内容区/卡片区/表格/列表区/图表区/底栏/分页/弹层/浮层 minGroupRatio=0.8 maxTopLevelLoose=3 maxDepth=3 maxChildrenPerGroup=12
+=== /pageSpec ===
+
+=== 首版编组规划（grouping，已锁定）===
+# 画板顶层只放语义区块 group；业务元素归入所属区块，禁止平铺
+# 改稿 / 实现 / 追加页面沿用同一套区块命名与层级；不得把编组拆散回平铺叶子
+# mode=semantic platform=pc locked=true
+# 基线区块: 顶栏 / 侧栏导航 / 页面标题区 / 筛选/工具区 / 内容区 / 卡片区 / 表格/列表区 / 图表区 / 底栏/分页 / 弹层/浮层
+# 门禁: 编组覆盖率 ≥0.8 · 顶层散落叶子 ≤3 · 嵌套 ≤3 层 · 每组直接子元素 ≤12
+- page 0 / 画板 1: 顶层 0 · 语义区块 0 · 散落叶子 0 · OK
+=== /grouping ===
+
 ## page 0: 页面 1
 ## artboard n1 "画板 1" page=0,0 size=1440x900 bg=#FFFFFF
+
+=== 页面逻辑与说明（LOGIC）===
+# 每行一条：scope / 页 / 画板 / 节点 id与名称 / kind / 摘要 / 规则 / 标签 / 来源
+# 修改说明：输出含 notes 的 __doc 同构 JSON（apply-doc.mjs 合入）或调用 ProtoAPI.setNotes
+# （暂无说明）
+=== /LOGIC ===
 </script>
 <script>
 'use strict';
@@ -1565,10 +1780,455 @@ function makePage2(){
   C(T({name:'按钮文字',text:'登  录',x:24,y:482,w:327,align:'center',fontSize:15,fontWeight:600,color:'#FFFFFF'}));
   return ab;
 }
+/* ================================================================
+ * P36 页面逻辑与说明（notes）· 数据层
+ * 说明作为普通字段挂在 page / artboard / 任意 node 上，随节点复制、
+ * 删除、撤销、保存；不新增外挂文件，__doc 仍是唯一真源。
+ * 半结构化：kind / summary / body(Markdown) / rules[{when,then,note}]
+ *           / tags[] / source(ai|human) / updated(YYYY-MM-DD)
+ * ================================================================ */
+const NOTE_KINDS=[['page','页面说明'],['component','组件说明'],['rule','业务规则']];
+const NOTE_TPL={
+  page:{kind:'page',summary:'',body:'## 用途\n\n## 入口与前置条件\n\n## 主流程\n\n## 异常与边界\n\n## 权限与数据\n',rules:[],tags:[]},
+  component:{kind:'component',summary:'',body:'## 触发条件\n\n## 处理规则\n\n## 状态与反馈\n\n## 边界情况\n',rules:[],tags:[]},
+  rule:{kind:'rule',summary:'',body:'',rules:[{when:'',then:'',note:''}],tags:[]}
+};
+let noteShow=(()=>{try{return localStorage.getItem('p36.notesBadge')!=='0'}catch(e){return true}})();
+function setNoteShow(v){
+  noteShow=!!v;
+  try{localStorage.setItem('p36.notesBadge',noteShow?'1':'0')}catch(e){}
+  drawSoon();
+}
+function noteToday(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function notesOf(n){return n&&n.notes&&typeof n.notes==='object'?n.notes:null}
+function noteEmpty(nt){
+  if(!nt||typeof nt!=='object')return true;
+  return !String(nt.summary||'').trim()
+    &&!String(nt.body||'').trim()
+    &&!(Array.isArray(nt.rules)&&nt.rules.some(r=>String(r.when||'').trim()||String(r.then||'').trim()||String(r.note||'').trim()))
+    &&!(Array.isArray(nt.tags)&&nt.tags.length);
+}
+function hasNotes(n){return !noteEmpty(notesOf(n))}
+/* 只建空白骨架；结构章节由「页面结构 / 组件结构」按钮按需追加。
+   预填 NOTE_TPL 会让清空后的插入被误判为「已存在」，也会凭空多出空标题。 */
+function ensureNotes(n,kind){
+  if(!n)return null;
+  if(noteEmpty(notesOf(n))){
+    n.notes={kind:(NOTE_KINDS.some(k=>k[0]===kind)?kind:(n.type==='artboard'||!n.type?'page':'component')),
+      summary:'',body:'',rules:[],tags:[],source:'human',updated:noteToday()};
+  }
+  return n.notes;
+}
+function setNotesObj(n,obj,source){
+  if(!n)return false;
+  if(obj==null||noteEmpty(obj)){delete n.notes;return true}
+  const kind=NOTE_KINDS.some(k=>k[0]===obj.kind)?obj.kind:(n.type==='artboard'||!n.type?'page':'component');
+  n.notes={
+    kind:kind,
+    summary:String(obj.summary||''),
+    body:String(obj.body||''),
+    rules:(Array.isArray(obj.rules)?obj.rules:[]).map(r=>({
+      when:String(r.when||''),then:String(r.then||''),note:String(r.note||'')
+    })).filter(r=>r.when||r.then||r.note),
+    tags:(Array.isArray(obj.tags)?obj.tags:[]).map(t=>String(t)).filter(Boolean),
+    source:source||obj.source||'human',
+    updated:noteToday()
+  };
+  return true;
+}
+/* 聚合全部说明：{pageIdx,pageName,abId,abName,scope,id,name,type,notes} */
+function collectNotes(scope){
+  const out=[];
+  pages.forEach((p,pi)=>{
+    if(scope==='cur'&&pi!==state.page)return;
+    const push=(n,ab,sc)=>{
+      const nt=notesOf(n);if(noteEmpty(nt))return;
+      out.push({pageIdx:pi,pageName:p.name||'',abId:ab&&ab.id||'',abName:ab&&ab.name||'',
+        scope:sc,id:n.id||'',name:n.name||n.type||'页面',type:n.type||'page',notes:nt});
+    };
+    push(p,null,'page');
+    (p.artboards||[]).forEach(ab=>{
+      push(ab,ab,'artboard');
+      const walk=list=>(list||[]).forEach(n=>{push(n,ab,'node');if(n.children)walk(n.children)});
+      walk(ab.children);
+    });
+    const walkLoose=list=>(list||[]).forEach(n=>{push(n,null,'node');if(n.children)walkLoose(n.children)});
+    walkLoose(p.loose);
+  });
+  return out;
+}
+/* #__ai_view 末尾的 LOGIC 附录：AI 读一个块即可拿到全部页面逻辑 */
+function genLogicView(){
+  const list=collectNotes('all');
+  const out=['','=== 页面逻辑与说明（LOGIC）===',
+    '# 每行一条：scope / 页 / 画板 / 节点 id与名称 / kind / 摘要 / 规则 / 标签 / 来源',
+    '# 详细说明见 notes.body（Markdown）；修改方式与 __doc 同构：输出含 notes 的 JSON，或调用 ProtoAPI.setNotes'];
+  if(!list.length){out.push('# （暂无说明）');out.push('=== /LOGIC ===');return out.join('\n')}
+  let curKey='';
+  list.forEach(e=>{
+    const key='page '+e.pageIdx+': '+(e.pageName||'');
+    if(key!==curKey){out.push('');out.push('## '+key);curKey=key}
+    const where=e.scope==='page'?'[PAGE]':e.scope==='artboard'?'[ARTBOARD '+aiStr(e.abName)+']':'[NODE'+(e.abName?' '+aiStr(e.abName):'')+']';
+    out.push('- '+where+' '+e.id+' '+aiStr(e.name)+' kind='+(e.notes.kind||'')
+      +' summary='+aiStr(e.notes.summary||'')
+      +' tags='+JSON.stringify(e.notes.tags||[])
+      +' source='+(e.notes.source||'human')+' updated='+(e.notes.updated||''));
+    (e.notes.rules||[]).forEach(r=>out.push('    rule: '+aiStr(r.when||'')+' => '+aiStr(r.then||'')+(r.note?' ('+aiStr(r.note)+')':'')));
+    const body=String(e.notes.body||'').trim();
+    if(body)out.push('    body='+aiStr(body));
+  });
+  out.push('=== /LOGIC ===');
+  return out.join('\n');
+}
+/* 极简 Markdown 渲染（零外部依赖；先转义再放行白名单标签） */
+function mdRender(src){
+  const esc=s=>escapeHtml(String(s||''));
+  const inline=t=>esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`([^`]+)`/g,'<code>$1</code>');
+  let html='',inList=false,inCode=false;
+  for(const raw of String(src||'').split(/\r?\n/)){
+    const l=raw.trimEnd();
+    if(/^\s*```/.test(l)){if(inCode){html+='</code></pre>';inCode=false}else{html+='<pre><code>';inCode=true}continue}
+    if(inCode){html+=esc(raw)+'\n';continue}
+    if(/^\s*[-*]\s+/.test(l)){if(!inList){html+='<ul>';inList=true}html+='<li>'+inline(l.replace(/^\s*[-*]\s+/,''))+'</li>';continue}
+    if(inList){html+='</ul>';inList=false}
+    const h=/^(#{1,4})\s+(.*)$/.exec(l);
+    if(h){const lv=Math.min(4,h[1].length);html+='<h'+lv+'>'+inline(h[2])+'</h'+lv+'>';continue}
+    if(!l.trim()){html+='<div style="height:6px"></div>';continue}
+    html+='<p>'+inline(l)+'</p>';
+  }
+  if(inList)html+='</ul>';
+  if(inCode)html+='</code></pre>';
+  return html;
+}
+/* 画布说明角标：绘制与命中共用同一矩形 */
+function noteBadgeAt(n){
+  const r=worldRect(n),p=w2s(r.x,r.y);
+  return{x:p.x+Math.max(2,r.w*cam.z-18),y:p.y+2,w:16,h:16};
+}
+function drawNoteBadge(x,y,active){
+  const r=8;
+  ctx.save();
+  ctx.beginPath();ctx.arc(x+r,y+r,r,0,Math.PI*2);
+  ctx.fillStyle=active?'#F5A623':'rgba(54,112,247,.9)';ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=1.2;ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font='700 10px '+FONT;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('i',x+r,y+r+.5);
+  ctx.restore();
+}
+/* 编辑态：说明标记用极小平点，避免说明写满后密集角标遮挡设计稿 */
+function drawNoteDots(list){
+  ctx.save();
+  for(const o of list||[]){
+    if(o.hidden||hiddenByAncestor(o))continue;
+    if(hasNotes(o)){
+      const r=worldRect(o),p=w2s(r.x,r.y);
+      ctx.beginPath();ctx.arc(p.x+Math.max(4,r.w*cam.z-4),p.y+4,3,0,Math.PI*2);
+      ctx.fillStyle='rgba(54,112,247,.72)';ctx.fill();
+    }
+    if(o.children)drawNoteDots(o.children);
+  }
+  ctx.restore();
+}
+/* ================================================================
+ * P37 说明 tab · 人工编辑
+ * 作用域：选中图层→组件说明；选中画板→画板说明；无选中→页面说明。
+ * 每次提交经 snapshot() → 撤销历史 + persistDoc() 回写 __doc。
+ * ================================================================ */
+const NOTE_SCOPE_LABEL={page:'页面说明',artboard:'画板说明',node:'组件说明'};
+function notesTarget(){
+  const n=single();
+  if(n)return{n:n,scope:n.type==='artboard'?'artboard':'node',label:n.name||n.type||'图层'};
+  return{n:curPage(),scope:'page',label:curPage().name||'当前页面'};
+}
+let noteMode='edit'; // 'edit' 编辑全部字段 | 'prev' 预览整条说明（含业务规则）
+/* 预览：把摘要 / 标签 / Markdown 正文 / 业务规则合成一份完整说明，演示抽屉同款读法 */
+function notePreviewHtml(nt){
+  if(noteEmpty(nt))return '<div class="hint-3">暂无说明，切到「编辑」添加。</div>';
+  const rules=((nt&&nt.rules)||[]).filter(r=>r.when||r.then||r.note);
+  let h='<div id="notePrev" class="np-doc">';
+  if(nt.summary)h+='<div class="np-sum">'+escapeHtml(nt.summary)+'</div>';
+  const tags=(nt.tags||[]).filter(Boolean);
+  /* 分类 / 标签是给 AI、演示抽屉分组与搜索用的元数据，人工编辑区不再暴露；
+     只在预览里以只读徽标呈现，并说明用途。 */
+  h+='<div class="np-tags"><span class="np-kind" title="分类供演示抽屉分组与 AI 识别；标签供搜索和 LOGIC 聚合。二者是元数据，人工编辑无需填写">'+escapeHtml(noteKindLabel((nt&&nt.kind)||'page'))+'</span>'+
+    tags.map(x=>'<span class="np-tag">'+escapeHtml(x)+'</span>').join('')+'</div>';
+  if(nt.body&&nt.body.trim())h+='<div class="note-md">'+mdRender(nt.body)+'</div>';
+  if(rules.length){
+    h+='<div class="np-sec">业务规则<span>'+rules.length+' 条</span></div><div class="np-rules">';
+    rules.forEach((r,i)=>{
+      h+='<div class="np-rule"><b>'+(i+1)+'</b><div>'+
+        '<div class="np-when">'+escapeHtml(r.when||'—')+'</div>'+
+        '<div class="np-then">→ '+escapeHtml(r.then||'—')+'</div>'+
+        (r.note?'<div class="np-note">'+escapeHtml(r.note)+'</div>':'')+'</div></div>';
+    });
+    h+='</div>';
+  }
+  return h+'</div>';
+}
+/* 统一的可拖拽高度手柄：摘要与详细说明共用，拖拽只改 style.height，不写撤销历史 */
+function bindNoteResize(root){
+  [...(root||document).querySelectorAll('.note-resizer')].forEach(bar=>{
+    bar.addEventListener('pointerdown',e=>{
+      const ta=$('#'+bar.dataset.rtz);if(!ta)return;
+      const y0=e.clientY,h0=ta.offsetHeight;
+      try{bar.setPointerCapture(e.pointerId)}catch(_){}
+      const move=ev=>{ta.style.height=Math.max(52,Math.min(600,h0+ev.clientY-y0))+'px'};
+      const up=()=>{bar.removeEventListener('pointermove',move);bar.removeEventListener('pointerup',up)};
+      bar.addEventListener('pointermove',move);bar.addEventListener('pointerup',up);
+      e.preventDefault();
+    });
+  });
+}
+function notesPanelHtml(){
+  const t=notesTarget(),nt=notesOf(t.n);
+  const isPrev=noteMode==='prev';
+  const pg=curPage();
+  const ab=t.scope==='artboard'?t.n:(t.scope==='node'&&typeof abOf==='function'?abOf(t.n):null);
+  const meta=[NOTE_SCOPE_LABEL[t.scope],pg&&pg.name,ab&&ab.name].filter(Boolean).join(' · ');
+  const badge=t.scope==='page'?'页':t.scope==='artboard'?'板':'件';
+  /* 顶部 = 对象卡片（身份）+ 视图设置 + 查看方式；与下方「内容」分层 */
+  const head=`<div class="note-hd">
+      <span class="nh-badge">${badge}</span>
+      <div class="nh-main">
+        <div class="nh-name" title="${escapeHtml(t.label)}">${escapeHtml(t.label)}</div>
+        <div class="nh-meta" title="${escapeHtml(meta)}">${escapeHtml(meta)}</div>
+      </div>
+    </div>
+    <div class="note-bar">
+      <label class="note-chk" title="在画布上标记「此对象有说明」：编辑态为小蓝点，演示态为可点角标。仅影响显示，不改动说明内容">
+        <input type="checkbox" id="noteShow" ${noteShow?'checked':''} style="accent-color:${BRAND}">画布角标</label>
+      <div class="note-tabs">
+        <button class="nt-btn ${isPrev?'':'on'}" data-nmode="edit" title="编辑摘要、详细说明与业务规则">${icon('pen',12)}编辑</button>
+        <button class="nt-btn ${isPrev?'on':''}" data-nmode="prev" title="预览整条说明：摘要 + 正文 + 业务规则">${icon('eye',12)}预览</button>
+      </div>
+    </div>`;
+  if(isPrev)return head+sec('说明预览',notePreviewHtml(nt));
+  const rules=(nt&&Array.isArray(nt.rules))?nt.rules:[];
+  const ruleRows=rules.map((r,i)=>
+    `<div class="nr-row" data-nri="${i}">
+      <div class="nr-hd"><span class="nr-no">${i+1}</span><span class="nr-tt">规则 ${i+1}</span>
+        <button class="nr-del" data-nrdel="${i}" title="删除这条规则">×</button></div>
+      <label class="nr-lb">条件 / 触发<textarea class="nr-f nr-ta" data-nrf="when" rows="2">${escapeHtml(r.when||'')}</textarea></label>
+      <label class="nr-lb">动作 / 结果<textarea class="nr-f nr-ta" data-nrf="then" rows="2">${escapeHtml(r.then||'')}</textarea></label>
+      <label class="nr-lb">备注<textarea class="nr-f nr-ta nr-note" data-nrf="note" rows="1">${escapeHtml(r.note||'')}</textarea></label>
+    </div>`).join('');
+  return head+
+    sec('摘要',`<div class="ta-wrap">
+        <textarea id="noteSummary" class="note-inp note-sum" rows="2" placeholder="一句话说明">${escapeHtml((nt&&nt.summary)||'')}</textarea>
+        <div class="note-resizer" data-rtz="noteSummary" title="拖动调整高度"></div></div>`)+
+    sec('详细说明',`<div class="tpl-bar">
+        <button class="tpl-btn" id="noteTplPage" title="把页面结构章节追加到正文末尾：用途 / 入口与前置条件 / 主流程 / 异常与边界 / 权限与数据。不会覆盖已有内容">
+          <span class="tpl-ic">页</span><span class="tpl-tx">页面结构</span></button>
+        <button class="tpl-btn" id="noteTplComp" title="把组件结构章节追加到正文末尾：触发条件 / 处理规则 / 状态与反馈 / 边界情况。不会覆盖已有内容，可与页面结构并存">
+          <span class="tpl-ic">件</span><span class="tpl-tx">组件结构</span></button>
+      </div>
+      <div class="ta-wrap">
+        <textarea id="noteBody" class="note-ta">${escapeHtml((nt&&nt.body)||'')}</textarea>
+        <div class="note-resizer" data-rtz="noteBody" title="拖动调整高度"></div></div>
+      <div class="note-clear-row"><button class="note-clear" id="noteClear" title="清空当前对象的整条说明（摘要 / 正文 / 规则 / 标签）">清空本条说明</button></div>`)+
+    sec('业务规则',`<div id="noteRules">${ruleRows}</div>
+      <button class="mini-btn wide note-add" id="noteRuleAdd">${icon('plus',14)}<span>添加规则</span></button>`);
+}
+function collectNoteForm(withHistory=true,silent=false){
+  const t=notesTarget();
+  const nt=ensureNotes(t.n,t.scope==='node'?'component':'page');
+  const sum=$('#noteSummary'),body=$('#noteBody'),kind=$('#noteKind'),tags=$('#noteTags');
+  if(sum)nt.summary=sum.value;
+  if(body)nt.body=body.value;
+  if(kind)nt.kind=kind.value;
+  if(tags)nt.tags=tags.value.split(/[,，]/).map(s=>s.trim()).filter(Boolean);
+  const rules=[];
+  $$('#noteRules .nr-row').forEach(row=>{
+    const g=f=>{const el=row.querySelector('[data-nrf="'+f+'"]');return el?el.value:''};
+    const r={when:g('when'),then:g('then'),note:g('note')};
+    if(r.when||r.then||r.note)rules.push(r);
+  });
+  nt.rules=rules;
+  if(!silent){nt.source='human';nt.updated=noteToday()}
+  if(noteEmpty(nt))delete t.n.notes;
+  if(withHistory)snapshot();
+  drawSoon();
+  return nt;
+}
+function bindNotesPanel(){
+  const p=$('#panel');
+  ['#noteSummary','#noteBody','#noteKind','#noteTags'].forEach(sel=>{
+    const el=p.querySelector(sel);if(el)el.addEventListener('change',()=>collectNoteForm());
+  });
+  bindNoteResize(p);
+  $$('#noteRules .nr-f').forEach(el=>el.addEventListener('change',()=>collectNoteForm()));
+  $$('#noteRules .nr-del').forEach(b=>b.addEventListener('click',()=>{
+    b.closest('.nr-row').remove();collectNoteForm();renderPanel();
+  }));
+  const add=$('#noteRuleAdd');
+  if(add)add.addEventListener('click',()=>{
+    /* 同样先静默提交，避免新增规则时丢掉尚未失焦的摘要 / 正文 */
+    collectNoteForm(false,true);
+    const t=notesTarget(),nt=ensureNotes(t.n,t.scope==='node'?'component':'page');
+    if(!Array.isArray(nt.rules))nt.rules=[];
+    nt.rules.push({when:'',then:'',note:''});
+    snapshot();renderPanel();drawSoon();
+  });
+  /* 编辑 / 预览是面板级切换：预览覆盖摘要 + 正文 + 业务规则，切换不写撤销历史 */
+  $$('.nt-btn').forEach(b=>b.addEventListener('click',()=>{
+    const to=b.dataset.nmode;
+    if(to===noteMode)return;
+    if(noteMode==='edit')collectNoteForm(false,true);
+    noteMode=to;renderPanel();
+  }));
+  /* 结构模板 = 追加章节到正文末尾，绝不覆盖整条 notes；两套章节可并存 */
+  const tpl=kind=>{
+    /* 先静默提交当前输入框（含尚未触发 change 的正文 / 规则），再追加章节，
+       保证点结构按钮绝不会丢掉已经写好的内容。 */
+    collectNoteForm(false,true);
+    const t=notesTarget(),nt=ensureNotes(t.n,t.scope==='node'?'component':'page');
+    const src=String((NOTE_TPL[kind]&&NOTE_TPL[kind].body)||'').trim();
+    const cur=String(nt.body||'').trim();
+    /* 判重用前两个标题同时命中：单个标题可能是用户自己写的，避免误伤；
+       模板插入一定同时带这两个标题，重复点击仍能拦住。 */
+    const heads=src.split('\n').map(x=>x.trim()).filter(x=>/^##\s/.test(x));
+    const exists=heads.length>0&&heads.slice(0,2).every(h=>cur.includes(h));
+    if(cur&&exists){toast('该结构已存在，未重复插入');return}
+    nt.body=cur?cur+'\n\n'+src:src;
+    nt.source='human';nt.updated=noteToday();
+    snapshot();renderPanel();drawSoon();toast('已插入结构（追加到正文末尾）');
+  };
+  const tp=$('#noteTplPage');if(tp)tp.addEventListener('click',()=>tpl('page'));
+  const tc=$('#noteTplComp');if(tc)tc.addEventListener('click',()=>tpl('component'));
+  const cl=$('#noteClear');if(cl)cl.addEventListener('click',()=>{
+    const t=notesTarget();delete t.n.notes;
+    snapshot();renderPanel();drawSoon();toast('已清空说明');
+  });
+  const ns=$('#noteShow');if(ns)ns.addEventListener('change',()=>setNoteShow(ns.checked));
+}
+/* ================================================================
+ * P38 演示逻辑抽屉 + 画布角标
+ * 抽屉为 DOM 层（与 demoTop 一致），角标由 Canvas 绘制；
+ * 逻辑视图开启时角标优先命中，不触发 proto 跳转，避免与热区冲突。
+ * ================================================================ */
+const NOTE_SCOPE_OPTS=[['board','当前画板'],['cur','当前页面'],['all','全部页面']];
+function logicPanelOpen(){const el=$('#demoLogicPanel');return !!el&&!el.hidden}
+function toggleLogicPanel(force){
+  const el=$('#demoLogicPanel');if(!el)return;
+  const on=force==null?!logicPanelOpen():!!force;
+  el.hidden=!on;
+  const b=$('#demoLogic');if(b)b.classList.toggle('on',on);
+  demo.logic=on;
+  if(on)buildLogicPanel();
+  demoFit();drawSoon();
+}
+function noteKindLabel(k){return(NOTE_KINDS.find(x=>x[0]===k)||['','说明'])[1]}
+function noteItemHtml(e){
+  const nt=e.notes;
+  const rules=(nt.rules||[]).map(r=>`<div class="dlp-rule"><span class="dlp-when">${escapeHtml(r.when||'—')}</span><i>→</i><span>${escapeHtml(r.then||'')}</span>${r.note?`<em>${escapeHtml(r.note)}</em>`:''}</div>`).join('');
+  const tags=(nt.tags||[]).map(t=>`<span class="dlp-tag">${escapeHtml(t)}</span>`).join('');
+  return `<div class="dlp-item" data-note-id="${escapeHtml(e.id||'')}" data-note-page="${e.pageIdx}" data-note-ab="${escapeHtml(e.abId||'')}">
+    <div class="dlp-ih"><span class="dlp-kind k-${escapeHtml(nt.kind||'page')}">${noteKindLabel(nt.kind)}</span>
+      <span class="dlp-path">${escapeHtml(e.pageName||'')}${e.abName?' / '+escapeHtml(e.abName):''}</span></div>
+    <div class="dlp-name">${escapeHtml(e.name||'')}</div>
+    ${nt.summary?`<div class="dlp-sum">${escapeHtml(nt.summary)}</div>`:''}
+    ${tags?`<div class="dlp-tags">${tags}</div>`:''}
+    ${nt.body?`<div class="dlp-md note-md">${mdRender(nt.body)}</div>`:''}
+    ${rules?`<div class="dlp-rules">${rules}</div>`:''}
+    <div class="dlp-foot">来源 ${escapeHtml(nt.source||'human')} · ${escapeHtml(nt.updated||'')}</div>
+  </div>`;
+}
+function buildLogicPanel(){
+  const body=$('#dlpBody');if(!body)return;
+  const q=(demo.logicQuery||'').trim().toLowerCase();
+  const scope=demo.logicScope||'board';
+  let list=collectNotes(scope==='all'?'all':'cur');
+  if(scope==='board'){
+    const ab=activeAb();
+    list=list.filter(e=>!e.abId||e.abId===(ab&&ab.id));
+  }
+  if(q)list=list.filter(e=>[e.name,e.pageName,e.abName,e.notes.summary,e.notes.body,
+    JSON.stringify(e.notes.rules||[]),(e.notes.tags||[]).join(' ')].join(' ').toLowerCase().includes(q));
+  const groups=[];
+  const curAbId=activeAb()&&activeAb().id;
+  list.forEach(e=>{
+    const key=e.pageIdx+'|'+(e.abId||'');
+    let g=groups.find(x=>x.key===key);
+    if(!g){g={key:key,title:(e.pageName||'页面')+(e.abName?' / '+e.abName:''),pageLevel:!e.abId,cur:!!(e.abId&&e.abId===curAbId),items:[]};groups.push(g)}
+    g.items.push(e);
+  });
+  // 当前画板优先：画板/组件说明置顶，页面级说明置底，避免第一屏被页面级长文占满
+  if(scope==='board')groups.sort((a,b)=>(b.cur?1:0)-(a.cur?1:0)||(a.pageLevel?1:0)-(b.pageLevel?1:0));
+  body.innerHTML=groups.length
+    ?groups.map(g=>`<div class="dlp-group"><div class="dlp-gt">${escapeHtml(g.title)}${g.pageLevel?'<em class="dlp-lv">页面级</em>':''}<span>${g.items.length} 条</span></div>${g.items.map(noteItemHtml).join('')}</div>`).join('')
+    :`<div class="dlp-empty">暂无说明${q?'（可清空搜索词）':''}<br><span>在编辑器「说明」tab 添加说明后，演示时即可在此查看。</span></div>`;
+  const cnt=$('#dlpCount');if(cnt)cnt.textContent=list.length+' 条说明';
+  $$('[data-dlpscope]').forEach(b=>b.classList.toggle('on',b.dataset.dlpscope===scope));
+}
+function focusLogicItem(id){
+  if(!logicPanelOpen())toggleLogicPanel(true);
+  else buildLogicPanel();
+  demo.noteHover=id;
+  const items=$$('.dlp-item');
+  items.forEach(x=>x.classList.remove('focus'));
+  const hit=items.find(x=>x.dataset.noteId===id);
+  if(hit){hit.classList.add('focus');hit.scrollIntoView({block:'center',behavior:'smooth'})}
+  drawSoon();
+}
+function paintNoteBadges(ab){
+  const test=n=>{
+    if(!hasNotes(n)||n.hidden||hiddenByAncestor(n))return;
+    const q=noteBadgeAt(n);
+    drawNoteBadge(q.x,q.y,demo.noteHover===n.id||demo.badgeHover===n.id);
+  };
+  test(ab);
+  const walk=list=>(list||[]).forEach(n=>{test(n);if(n.children)walk(n.children)});
+  walk(ab.children);
+}
+function demoBadgeHit(sx,sy){
+  if(!demo.logic)return null;
+  const ab=activeAb();if(!ab)return null;
+  let hit=null;
+  const test=n=>{
+    if(!hasNotes(n)||n.hidden||hiddenByAncestor(n))return;
+    const q=noteBadgeAt(n);
+    if(sx>=q.x-2&&sx<=q.x+q.w+2&&sy>=q.y-2&&sy<=q.y+q.h+2)hit=n;
+  };
+  test(ab);
+  const walk=list=>(list||[]).forEach(n=>{test(n);if(n.children)walk(n.children)});
+  walk(ab.children);
+  return hit;
+}
+function initLogicPanel(){
+  const btn=$('#demoLogic');if(btn)btn.addEventListener('click',()=>toggleLogicPanel());
+  const x=$('#dlpClose');if(x)x.addEventListener('click',()=>toggleLogicPanel(false));
+  const q=$('#dlpQuery');if(q)q.addEventListener('input',()=>{demo.logicQuery=q.value;buildLogicPanel()});
+  $$('[data-dlpscope]').forEach(b=>b.addEventListener('click',()=>{demo.logicScope=b.dataset.dlpscope;buildLogicPanel()}));
+  const body=$('#dlpBody');
+  if(body){
+    body.addEventListener('mouseover',e=>{
+      const it=e.target.closest('.dlp-item');if(!it)return;
+      demo.noteHover=it.dataset.noteId||null;drawSoon();
+    });
+    body.addEventListener('mouseout',e=>{
+      const it=e.target.closest('.dlp-item');if(!it)return;
+      if(it.contains(e.relatedTarget))return;
+      demo.noteHover=null;drawSoon();
+    });
+    body.addEventListener('click',e=>{
+      const it=e.target.closest('.dlp-item');if(!it)return;
+      focusLogicItem(it.dataset.noteId||'');
+      const abId=it.dataset.noteAb;
+      if(abId){
+        const i=demoSeq().findIndex(a=>String(a.id)===String(abId));
+        if(i>=0&&i!==demo.pos)demoJump(i,'淡入');
+      }
+    });
+  }
+}
+
 /* ---------------- 文档容器（P1：文档 JSON 内嵌于 <script id="__doc">） ---------------- */
 const DOC_VER=1;
 /* P35b：随 __doc 输出的 AI 提示键（Agent 只抽 __doc JSON 时也能看到规范入口） */
-const AI_HINT='AI 必读：本 JSON 为单文件原型的设计文档。原型仅提供空间布局与 UI 元素整体效果参考；实现须遵循项目既定开发规范（Vue3/React 标准组件、组件库与设计系统 Token、响应式与可访问性），禁止逐节点硬编码绝对定位，重复 UI 应抽象为可复用组件。界面结构→读 script#__ai_view 布局清单；修改设计稿→输出与本 JSON 同构的 {version:1,name,theme,pages,tree}（用 apply-doc.mjs 合入，勿改 HTML）；字段字典/坐标约定/交互 schema→全文搜索 PROTOTYPE-AI-GUIDE 注释。所有叶子/组 x/y 均为画板局部坐标。';
+const AI_HINT="AI 必读：本 JSON 为单文件原型的设计文档。原型仅提供空间布局与 UI 元素整体效果参考；实现须遵循项目既定开发规范（Vue3/React 标准组件、组件库与设计系统 Token、响应式与可访问性），禁止逐节点硬编码绝对定位，重复 UI 应抽象为可复用组件。界面结构→读 script#__ai_view 布局清单；页面逻辑与说明→读 LOGIC 段或 page/artboard/node 的 notes 字段（kind/summary/body/rules/tags/source/updated），可用 ProtoAPI.getNotes/setNotes 精确读写；修改设计稿→输出与本 JSON 同构的 {version:1,name,theme,pages,tree}（用 apply-doc.mjs 合入，勿改 HTML，漏写 notes 会沿用原值）；首版页面规范→读 __doc.pageSpec 与 #__ai_view 的 pageSpec 段（PC=Element Plus/ElementUI，APP=Android Material，locked=true 不得静默切换）；字段字典/坐标约定/交互 schema→全文搜索 PROTOTYPE-AI-GUIDE 注释。所有叶子/组 x/y 均为画板局部坐标。";
 let pages=[], tree=[];
 function defaultDoc(){
   return {version:DOC_VER,
@@ -1634,6 +2294,27 @@ function translateNode(n,dx,dy){
   }
   if(n.type==='group'||n.type==='bool')for(const c of n.children||[])translateNode(c,dx,dy);
 }
+/* v1.8：画板移动时同步带走压在画板上的自由图层。
+   loose 节点用页面绝对坐标、不属于画板，默认不随画板移动；交互热区与临时组件常放这里。 */
+function looseForBoards(abs){
+  const seen=new Set(),out=[];
+  for(const ab of abs||[]){
+    if(!ab||ab.type!=='artboard')continue;
+    for(const n of curPage().loose||[]){
+      if(n.hidden||n.locked||seen.has(n))continue;
+      const r=worldRect(n);
+      if(r.x<ab.x+ab.w&&r.y<ab.y+ab.h&&r.x+r.w>ab.x&&r.y+r.h>ab.y){seen.add(n);out.push(n)}
+    }
+  }
+  return out;
+}
+function moveLoose(start,dx,dy){
+  if(!start||!start.loose||!start.loose.length)return;
+  const ap=start.looseApplied||{x:0,y:0};
+  for(const n of start.loose)translateNode(n,dx-ap.x,dy-ap.y);
+  start.looseApplied={x:dx,y:dy};
+}
+
 /* 选中集合去掉"祖先也被选中"的节点，避免重复变换 */
 function effectiveSel(){
   return dedupeRoots(selNodes());
@@ -1858,7 +2539,7 @@ imgInput.addEventListener('change',()=>{
   const f=imgInput.files[0];imgInput.value='';
   if(!f)return;
   const rd=new FileReader();
-  rd.onload=()=>insertImage(String(rd.result));
+  rd.onload=()=>insertImageSrc(String(rd.result)); // v1.8：等图片解码再按真实尺寸插入
   rd.readAsDataURL(f);
 });
 const imgCache=new Map(); // src→HTMLImageElement
@@ -1867,9 +2548,9 @@ function getImg(src){
   if(!im){im=new Image();im.onload=()=>drawSoon();im.src=src;imgCache.set(src,im)}
   return im;
 }
-function insertImage(src){
+function insertImage(src,dims){
   const im=getImg(src);
-  const w0=im.naturalWidth||200,h0=im.naturalHeight||150;
+  const w0=(dims&&+dims.w)||im.naturalWidth||200,h0=(dims&&+dims.h)||im.naturalHeight||150;
   const fit=Math.min(1,320/Math.max(w0,h0));
   const w=Math.max(20,Math.round(w0*fit)),h=Math.max(20,Math.round(h0*fit));
   const cxw=(canvas.clientWidth/2-cam.x)/cam.z,cyw=(canvas.clientHeight/2-cam.y)/cam.z;
@@ -1879,6 +2560,93 @@ function insertImage(src){
   n.parent=ab;ab.children.push(n);
   state.sel.clear();state.sel.add(n.id);setTool('select');syncSelection();snapshot();drawSoon();
 }
+
+/* ---------------- v1.8：系统剪贴板粘贴（截图 / 图片 / 文本；file:// 场景可用） ----------------
+   旧行为：Ctrl+V 只搬编辑器内部 clipNodes，且无条件 preventDefault，把原生 paste 事件一起吃掉，
+   系统外复制的截图 / 图片 / 文本在 file:// 打开产物时完全粘不进来。
+   新行为三级兜底：① 原生 paste 事件的 clipboardData（无需权限，最可靠）；
+   ② navigator.clipboard.read()（keydown 后 420ms 无有效 paste 内容时兜底）；
+   ③ 右键菜单「粘贴系统剪贴板图片」手动触发。 */
+function blobToDataURL(blob){
+  return new Promise((res,rej)=>{
+    const rd=new FileReader();
+    rd.onload=()=>res(String(rd.result));rd.onerror=()=>rej(rd.error||new Error('read-fail'));
+    rd.readAsDataURL(blob);
+  });
+}
+function imageSize(src){
+  return new Promise(res=>{
+    const im=new Image();
+    im.onload=()=>res({w:im.naturalWidth,h:im.naturalHeight});
+    im.onerror=()=>res({w:0,h:0});im.src=src;
+  });
+}
+async function insertImageSrc(src){ // 等解码完成再插入，避免同步读 naturalWidth 退化成 200x150
+  const s=await imageSize(src);
+  insertImage(src,s.w?s:null);
+}
+function insertPastedText(txt){
+  const cxw=(canvas.clientWidth/2-cam.x)/cam.z,cyw=(canvas.clientHeight/2-cam.y)/cam.z;
+  const ab=containingAb(cxw,cyw)||curPage().artboards[0];
+  if(!ab){toast('请先创建画板');return false}
+  const t=String(txt||'').replace(/\r\n/g,'\n').slice(0,2000);
+  if(!t.trim())return false;
+  const w=Math.min(360,Math.max(120,Math.round(ab.w/4)));
+  const n=T({id:uid(),name:nextName('text'),text:t,x:cxw-ab.x-w/2,y:cyw-ab.y-12,w,
+    h:Math.max(22,t.split('\n').length*20),fontSize:14,align:'left',valign:'top',color:'#1F2329'});
+  n.parent=ab;ab.children.push(n);reflowText(n);
+  state.sel.clear();state.sel.add(n.id);setTool('select');syncSelection();snapshot();drawSoon();
+  return true;
+}
+let sysPasteSeq=0,sysPasteBusy=false;
+async function pasteSystemClipboard(verbose){
+  if(sysPasteBusy)return false;
+  sysPasteBusy=true;
+  let ok=false;
+  try{
+    if(navigator.clipboard&&navigator.clipboard.read){
+      const items=await navigator.clipboard.read();
+      for(const it of items||[]){
+        const tp=(it.types||[]).find(t=>/^image\//i.test(t));
+        if(!tp)continue;
+        const blob=await it.getType(tp);
+        await insertImageSrc(await blobToDataURL(blob));
+        toast('已粘贴剪贴板图片');ok=true;break;
+      }
+      if(!ok&&navigator.clipboard.readText){
+        const t=await navigator.clipboard.readText().catch(()=>'');
+        if(t&&t.trim()){ok=insertPastedText(t);if(ok)toast('已粘贴文本图层')}
+      }
+    }
+  }catch(err){/* 权限被拒 / 浏览器不支持：交给原生 paste 事件 */}
+  finally{sysPasteBusy=false}
+  if(!ok&&verbose)toast('剪贴板为空或浏览器未授权读取图片');
+  return ok;
+}
+function pasteAny(){ // 内部图层优先；否则读系统剪贴板
+  if(clipNodes.length){pasteSel();return}
+  pasteSystemClipboard(true);
+}
+document.addEventListener('paste',async e=>{
+  if(demo.on)return;
+  const ae=document.activeElement;
+  if(ae&&(/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)||ae.isContentEditable)){sysPasteSeq++;return}
+  if(clipNodes.length){sysPasteSeq++;e.preventDefault();pasteSel();return}
+  const dt=e.clipboardData;
+  if(!dt)return; // 留给 keydown 兜底
+  const img=[...(dt.items||[])].find(it=>it.kind==='file'&&/^image\//i.test(it.type));
+  if(img){
+    const f=img.getAsFile();
+    if(f){
+      sysPasteSeq++;e.preventDefault();
+      try{await insertImageSrc(await blobToDataURL(f));toast('已粘贴截图')}
+      catch(err){toast('图片读取失败')}
+      return;
+    }
+  }
+  const t=dt.getData('text/plain');
+  if(t&&t.trim()){sysPasteSeq++;e.preventDefault();if(insertPastedText(t))toast('已粘贴文本图层')}
+});
 
 /* ---------------- 评论工具（自研评论交互：画布打点 pin + 输入气泡） ---------------- */
 /* P27：评论按页面存放在 page.comments 中，随 __doc 一起保存/撤销，不再只是运行时数据 */
@@ -2116,14 +2884,24 @@ ctxShow=(x,y,items)=>{window.__ctxItems=items;window.__ctxPos={x:x+8,y:y+8};__ct
   };
 };
 function deleteSel(){
-  state.vecEdit=null;state.vecSel=-1; // P33：删除后退出矢量编辑
+  state.vecEdit=null;state.vecSel=-1;
+  let removed=0,blocked=0;
   for(const id of [...state.sel]){
-    const n=nodeById(id);if(!n)continue;
-    if(n.type==='artboard'){const arr=curPage().artboards;arr.splice(arr.indexOf(n),1)}
-    else if(n.parent){const c=n.parent.children;if(c)c.splice(c.indexOf(n),1)}
-    else{const l=curPage().loose||[];const i=l.indexOf(n);if(i>=0)l.splice(i,1)}
+    const n=nodeById(id);
+    if(!n){state.sel.delete(id);continue}
+    if(n.locked){blocked++;continue}
+    let arr,i=-1;
+    if(n.type==='artboard'){arr=curPage().artboards;i=arr.indexOf(n)}
+    else if(n.parent&&Array.isArray(n.parent.children)){arr=n.parent.children;i=arr.indexOf(n)}
+    else{const pg=curPage();arr=pg.loose=pg.loose||[];i=arr.indexOf(n)}
+    if(i<0){state.sel.delete(id);continue}
+    arr.splice(i,1);state.sel.delete(id);removed++;
   }
-  state.sel.clear();syncSelection();snapshot();toast('已删除');
+  state.enterGroup=state.enterGroup.filter(id=>!!nodeById(id));
+  syncAllGroups();syncSelection();
+  if(removed){snapshot();renderPanel();drawSoon();toast(blocked?'已删除 '+removed+' 项，'+blocked+' 项已锁定':'已删除')}
+  else if(blocked)toast('所选图层已锁定，请先解锁');
+  else toast('没有可删除的图层');
 }
 /* ---------------- P20：剪贴板 / 复制为 / 翻转 / 重命名 ---------------- */
 let clipNodes=[],pasteN=0;
@@ -2330,7 +3108,8 @@ function nodeContextItems(n){
   const items=[{head:'编辑'},
     {label:'剪切',kbds:['Ctrl','X'],act:()=>copySel(true)},
     {label:'复制',kbds:['Ctrl','C'],act:()=>copySel()},
-    {label:'粘贴',kbds:['Ctrl','V'],act:pasteSel},
+    {label:'粘贴',kbds:['Ctrl','V'],act:pasteAny},
+    {label:'粘贴系统剪贴板图片',act:()=>pasteSystemClipboard(true)},
     {label:'复制为图片',act:copyAsImage},
     {label:'复制文本',dis:n.type!=='text',act:()=>copyText(n.text)},
     {label:'复制 CSS',act:()=>copyText(genCss(n))},
@@ -2997,6 +3776,7 @@ function effectBody(n){
 function renderPanel(){
   updateVecTools(); // P34：矢量编辑状态可能经此刷新（dblclick/Esc/按钮切换）
   const p=$('#panel');const nodes=selNodes();
+  if(rtab==='notes'){p.innerHTML=notesPanelHtml();bindNotesPanel();return}
   if(rtab==='assets'){
     p.innerHTML=
       `<div class="search-box" style="margin:0 6px 10px"><input id="compSearch" placeholder="搜索组件"></div>`+
@@ -3893,6 +4673,58 @@ $$('[data-rtab]').forEach(b=>b.addEventListener('click',()=>{
   window.addEventListener('pointerup',()=>{on=false;vs.classList.remove('drag')});
   vs.addEventListener('pointerdown',()=>vs.classList.add('drag'));
 })();
+/* 右栏宽度拖拽（与左栏 vsplitter 对称；宽度持久化） */
+(()=>{
+  const rs=$('#rsplitter'),right=document.querySelector('.right');
+  if(!rs||!right)return;
+  try{const w=+localStorage.getItem('proto.rightWidth');if(w>=252&&w<=560)right.style.width=w+'px'}catch(e){}
+  let sx=0,sw=0,on=false;
+  rs.addEventListener('pointerdown',e=>{
+    on=true;sx=e.clientX;sw=right.offsetWidth;
+    rs.classList.add('drag');document.body.style.cursor='col-resize';e.preventDefault();
+  });
+  window.addEventListener('pointermove',e=>{
+    if(!on)return;
+    right.style.width=Math.max(252,Math.min(560,sw-(e.clientX-sx)))+'px';
+  });
+  window.addEventListener('pointerup',()=>{
+    if(!on)return;on=false;rs.classList.remove('drag');document.body.style.cursor='';
+    try{localStorage.setItem('proto.rightWidth',right.offsetWidth)}catch(e){}
+  });
+})();
+/* 演示逻辑抽屉宽度拖拽（与编辑器右栏 rsplitter 同构；宽度持久化，双击复位） */
+(()=>{
+  const el=$('#demoLogicPanel'),sp=$('#dlpSplitter');
+  if(!el||!sp)return;
+  const KEY='proto.logicPanelWidth',MIN=280,DEF=340;
+  const MAX=()=>Math.max(MIN+80,Math.min(760,Math.round(window.innerWidth*.6)));
+  const clamp=w=>Math.max(MIN,Math.min(MAX(),w));
+  /* 抽屉变宽后画布让位必须同步，否则画板会被抽屉盖住；不重置用户缩放 */
+  const reframe=()=>{if(el.hidden)return;try{applyDemoCam();drawSoon()}catch(e){}};
+  try{const w=+localStorage.getItem(KEY);if(w>=MIN&&w<=MAX())el.style.width=w+'px'}catch(e){}
+  let sx=0,sw=0,on=false;
+  sp.addEventListener('pointerdown',e=>{
+    on=true;sx=e.clientX;sw=el.offsetWidth;
+    sp.classList.add('drag');document.body.style.cursor='col-resize';e.preventDefault();
+  });
+  window.addEventListener('pointermove',e=>{
+    if(!on)return;
+    el.style.width=clamp(sw-(e.clientX-sx))+'px';
+    reframe();
+  });
+  window.addEventListener('pointerup',()=>{
+    if(!on)return;on=false;sp.classList.remove('drag');document.body.style.cursor='';
+    try{localStorage.setItem(KEY,el.offsetWidth)}catch(e){}
+    reframe();
+  });
+  sp.addEventListener('dblclick',()=>{
+    el.style.width=DEF+'px';
+    try{localStorage.removeItem(KEY)}catch(e){}
+    reframe();
+    try{toast('逻辑面板宽度已复位')}catch(e){}
+  });
+})();
+
 
 /* ---------------- Canvas 引擎 ---------------- */
 const wrap=$('#canvasWrap'),canvas=$('#stage');
@@ -4331,7 +5163,8 @@ function draw(){
   const nodes=selNodes();
   if(nodes.length===1){
     const n=nodes[0];
-    if(n.type!=='artboard'){
+    if(n.type==='artboard')drawAbSel(n);
+    else{
       const pts=screenHandlePts(n); // P12-A：旋转后按 OBB 绘制
       ctx.strokeStyle=BRAND;ctx.lineWidth=2;
       ctx.beginPath();
@@ -4399,6 +5232,8 @@ function draw(){
     }
     ctx.setLineDash([]);
   }
+  // P37：说明标记（编辑态极小平点，说明写满后不遮挡画布）
+  if(noteShow){for(const ab of page.artboards){if(!ab.hidden)drawNoteDots([ab])}}
   // 对齐吸附线
   if(guides.length){
     ctx.strokeStyle=PINK;ctx.lineWidth=1;
@@ -5244,6 +6079,40 @@ function setHotspots(v){
 }
 const HANDLE_CUR={nw:'nwse-resize',se:'nwse-resize',ne:'nesw-resize',sw:'nesw-resize',n:'ns-resize',s:'ns-resize',e:'ew-resize',w:'ew-resize',move:'move'};
 
+/* 画板尺寸手柄：只改画板 w/h；从左 / 上拖时补偿子节点坐标，保持其世界位置不变 */
+function drawAbSel(ab){
+  const r=worldRect(ab),p=w2s(r.x,r.y);
+  ctx.strokeStyle=BRAND;ctx.lineWidth=2;
+  ctx.strokeRect(p.x,p.y,r.w*cam.z,r.h*cam.z);
+  drawHandlesRect(r,0);
+}
+function hitAbHandle(sx,sy){
+  const n=single();
+  if(!n||n.type!=='artboard'||n.hidden||n.locked)return null;
+  const pts=rectHandlePts(worldRect(n),0);
+  for(const [d] of HANDLES)if(Math.abs(sx-pts[d].x)<=10&&Math.abs(sy-pts[d].y)<=10)return d;
+  return null;
+}
+function startAbResize(ab,h,sx,sy){
+  return{sx:sx,sy:sy,ab:ab,h:h,moved:false,
+    p0:{x:ab.x,y:ab.y,w:ab.w,h:ab.h},
+    kids:(ab.children||[]).map(c=>({c:c,x:c.x||0,y:c.y||0}))};
+}
+function applyAbResize(start,dxu,dyu){
+  const {ab,h,p0,kids}=start;
+  const dx=dxu/cam.z,dy=dyu/cam.z;
+  let x=p0.x,y=p0.y,w=p0.w,ht=p0.h;
+  if(h.includes('w')){x=p0.x+dx;w=p0.w-dx}
+  if(h.includes('e'))w=p0.w+dx;
+  if(h.includes('n')){y=p0.y+dy;ht=p0.h-dy}
+  if(h.includes('s'))ht=p0.h+dy;
+  if(w<80){if(h.includes('w'))x=p0.x+p0.w-80;w=80}
+  if(ht<60){if(h.includes('n'))y=p0.y+p0.h-60;ht=60}
+  ab.x=Math.round(x);ab.y=Math.round(y);ab.w=Math.round(w);ab.h=Math.round(ht);
+  const ox=ab.x-p0.x,oy=ab.y-p0.y;
+  if(ox||oy)for(const k of kids){k.c.x=k.x-ox;k.c.y=k.y-oy}
+  start.moved=true;
+}
 function hitHandle(sx,sy){
   {const q=unrotPt(sx,sy);sx=q.x;sy=q.y} // P12-D
   const ns=selNodes();
@@ -5357,6 +6226,9 @@ canvas.addEventListener('pointerdown',e=>{
   if(demo.on){demoDown(e);return} // P2
   if(e.button===2)return;
   hideTextEditor(true);
+  // 焦点回收：右栏输入控件持有焦点时，点击画布后快捷键（含 Delete 删除）应恢复
+  const ae=document.activeElement;
+  if(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName))ae.blur();
   const rect=canvas.getBoundingClientRect();
   const sx=e.clientX-rect.left,sy=e.clientY-rect.top;
   try{canvas.setPointerCapture(e.pointerId)}catch(_){}
@@ -5461,8 +6333,13 @@ canvas.addEventListener('pointerdown',e=>{
   if(lbl){
     state.sel.clear();state.sel.add(lbl.id);syncSelection();
     mode='moveAb';
-    start={sx,sy,ab:lbl,ox:lbl.x,oy:lbl.y};
+    start={sx,sy,ab:lbl,ox:lbl.x,oy:lbl.y,loose:looseForBoards([lbl]),looseApplied:{x:0,y:0}};
     return;
+  }
+  const ah=hitAbHandle(sx,sy);
+  if(ah){
+    mode='abResize';start=startAbResize(single(),ah,sx,sy);
+    updateCursor(HANDLE_CUR[ah]||'nwse-resize');return;
   }
   const hd=lineSelNode()?0:hitHandle(sx,sy);
   if(hd){
@@ -5495,6 +6372,20 @@ canvas.addEventListener('pointerdown',e=>{
   }
   const wpt=s2w(sx,sy);
   const hit=hitTest(wpt.x,wpt.y);
+  /* v1.8：整板框选后，从画板内部按下拖拽 = 移动整块画板。
+     挂起 abSelPress：单击仍按常规选中命中的子层，拖过阈值才转 moveAb。 */
+  const selOne=[...state.sel].map(id=>nodeById(id)).filter(Boolean);
+  if(!e.shiftKey&&hit&&selOne.length===1&&selOne[0].type==='artboard'){
+    const ab=selOne[0];
+    let p=hit===ab?ab:hit.parent;
+    while(p&&p!==ab)p=p.type==='artboard'?null:p.parent;
+    if(p===ab){
+      mode='abSelPress';
+      start={sx,sy,ab,ox:ab.x,oy:ab.y,hit:hit.id,
+        loose:looseForBoards([ab]),looseApplied:{x:0,y:0}};
+      return;
+    }
+  }
   /* P14：已选中的对象/组/多选，其包围盒内部（含组空白区）可直接拖动 */
   if(!hit||hit.type==='artboard'){
     const cur=selNodes();
@@ -5503,7 +6394,8 @@ canvas.addEventListener('pointerdown',e=>{
       const pad=6/cam.z; // 抓取容差（屏幕 6px）：避免点在选中对象边缘/组间隙时误触发框选
       if(wpt.x>=b.x-pad&&wpt.y>=b.y-pad&&wpt.x<=b.x+b.w+pad&&wpt.y<=b.y+b.h+pad){
         mode='press';
-        start={sx,sy,moved:false,pos:new Map(cur.map(n=>{const r=worldRect(n);return[n.id,{x:r.x,y:r.y}]}))};
+        start={sx,sy,moved:false,pos:new Map(cur.map(n=>{const r=worldRect(n);return[n.id,{x:r.x,y:r.y}]})),
+          loose:looseForBoards(cur),looseApplied:{x:0,y:0}};
         return;
       }
     }
@@ -5521,7 +6413,8 @@ canvas.addEventListener('pointerdown',e=>{
     syncSelection();
     if(e.altKey&&hit.type!=='artboard'){snapshot();duplicateSel(0)} // P13：Alt 拖拽复制
     mode='press';
-    start={sx,sy,moved:false,pos:new Map(selNodes().map(n=>{const r=worldRect(n);return[n.id,{x:r.x,y:r.y}]}))};
+    start={sx,sy,moved:false,pos:new Map(selNodes().map(n=>{const r=worldRect(n);return[n.id,{x:r.x,y:r.y}]})),
+      loose:looseForBoards(selNodes()),looseApplied:{x:0,y:0}};
   }else{
     mode='marquee';
     start={sx,sy}; // BUG-1 修复：marquee 分支同样初始化拖拽起点，避免 pointermove 读取 start.sx 抛空指针
@@ -5599,6 +6492,10 @@ canvas.addEventListener('pointermove',e=>{
   // P12-D：屏幕位移先反旋（视图旋转后拖拽方向仍与内容一致）
   const q0=unrotPt(start.sx,start.sy),q1=unrotPt(sx,sy);
   const dxu=q1.x-q0.x,dyu=q1.y-q0.y;
+  if(mode==='abSelPress'){ // v1.8：选中画板后按下，拖过阈值才移动整块画板
+    if(Math.abs(dx)>3||Math.abs(dy)>3)mode='moveAb';
+    else return;
+  }
   if(mode==='abPress'){ // BUG-3 修复：画板上按下后拖拽超过阈值 → 转为框选
     if(Math.abs(dx)>3||Math.abs(dy)>3){
       mode='marquee';marquee={x0:start.sx,y0:start.sy,x1:sx,y1:sy};
@@ -5642,6 +6539,7 @@ canvas.addEventListener('pointermove',e=>{
     }
     for(const n of effectiveSel())translateNode(n,tx-ap.x,ty-ap.y);
     start.applied={x:tx,y:ty};
+    moveLoose(start,tx,ty); // v1.8：压在画板上的自由图层（热区/组件）随画板一起移动
     syncAllGroups();
     refreshPanelXY();drawSoon();return;
   }
@@ -5660,6 +6558,7 @@ canvas.addEventListener('pointermove',e=>{
     }
     const gs=state.snapGrid?gridStep():1; // P24：网格吸附
     ab.x=Math.round((x+snapX)/gs)*gs;ab.y=Math.round((y+snapY)/gs)*gs;
+    moveLoose(start,ab.x-start.ox,ab.y-start.oy); // v1.8：自由图层热区同步跟随
     guides=gt;
     refreshPanelXY();drawSoon();return;
   }
@@ -5696,6 +6595,7 @@ canvas.addEventListener('pointermove',e=>{
     }
     start.moved=true;drawSoon();refreshPanelXY();return;
   }
+  if(mode==='abResize'){applyAbResize(start,dxu,dyu);refreshPanelXY();drawSoon();return}
   if(mode==='handle'){
     if(start.ns){ // P14：多选整体缩放
       resizeMultiByHandle(dxu/cam.z,dyu/cam.z,e);
@@ -5816,6 +6716,9 @@ canvas.addEventListener('pointerup',e=>{
     snapshot();drawSoon();return;
   }
   if(mode==='pan'){mode=null;updateCursor();return}
+  if(mode==='abSelPress'){ // v1.8：未拖动 = 常规单击，选中命中的子层
+    mode=null;state.sel.clear();state.sel.add(start.hit);syncSelection();drawSoon();return;
+  }
   if(mode==='abPress'){ // BUG-3 修复：画板上单击（未拖动）→ 选中画板
     mode=null;
     state.sel.clear();state.sel.add(start.ab.id);syncSelection();drawSoon();return;
@@ -5829,6 +6732,7 @@ canvas.addEventListener('pointerup',e=>{
   }
   if(mode==='move'){mode=null;guides=[];snapshot();renderPanel();drawSoon();return}
   if(mode==='grad'){mode=null;updateCursor();if(start&&start.moved){snapshot();renderPanel()}drawSoon();return}
+  if(mode==='abResize'){const moved=start&&start.moved;mode=null;updateCursor();if(moved){syncAllGroups();snapshot();renderPanel();drawSoon()}return}
   if(mode==='handle'){mode=null;guides=[];snapshot();renderPanel();drawSoon();return}
   if(mode==='rotate'){mode=null;updateCursor();snapshot();renderPanel();drawSoon();return}
   if(mode==='marquee'){
@@ -5836,23 +6740,54 @@ canvas.addEventListener('pointerup',e=>{
     const y0=Math.min(marquee.y0,marquee.y1),y1=Math.max(marquee.y0,marquee.y1);
     if(x1-x0>2||y1-y0>2){
       const wb=screenRectToWorld(x0,y0,x1,y1); // P12-D：4 角反算，兼容视图旋转
-      const walk=list=>{ // P14：递归框选——整组在框内则选组，否则下探成员
+      /* v1.9 框选语义：**只选「框内的元素」** —— 节点必须被框选矩形完整框住（贴边 2px 容差）。
+         旧版 v1.8 用「相交即选」+ 实例容器擦到即整组选中，会把跨出框外的大卡片 / 大组整块拖进来；
+         整板选中改为仅在框选矩形几乎盖住整块画板时触发（用户此时的意图是移动画板）。 */
+      const tol=2/cam.z,IN=0.98,WHOLE=0.92;
+      const covered=(r,b)=>{
+        /* 退化矩形（线 / 箭头 / 点，w 或 h 为 0）：两端都落在框内才算选中，避免任何框选都把它们捞进来 */
+        if(!(r.w>0&&r.h>0)){
+          const inBox=(x,y)=>x>=b.x-tol&&x<=b.x1+tol&&y>=b.y-tol&&y<=b.y1+tol;
+          return inBox(r.x,r.y)&&inBox(r.x+r.w,r.y+r.h)?1:0;
+        }
+        const ix=Math.max(0,Math.min(r.x+r.w,b.x1+tol)-Math.max(r.x,b.x-tol));
+        const iy=Math.max(0,Math.min(r.y+r.h,b.y1+tol)-Math.max(r.y,b.y-tol));
+        return (ix*iy)/(r.w*r.h);
+      };
+      const walk=list=>{
         for(const c of list||[]){
           if(c.hidden||c.locked)continue;
-          const r=worldRect(c);
-          if(c.type==='group'){
-            const inside=r.x>=wb.x&&r.y>=wb.y&&r.x+r.w<=wb.x1&&r.y+r.h<=wb.y1;
-            if(inside)state.sel.add(c.id);else walk(c.children);
-          }else if(r.x<wb.x1&&r.y<wb.y1&&r.x+r.w>wb.x&&r.y+r.h>wb.y){
-            state.sel.add(c.id);
-          }
+          const r=worldRect(c),cv=covered(r,wb);
+          /* 容器（语义编组 / 布尔 / 组件实例）：完整框住 → 整组选中；
+             只框到一部分 → 下钻，选中的是真正落在框内的子元素（不会把整个区块一起选走）。 */
+          if(c.type==='group'||c.type==='bool'){
+            if(cv>=IN)state.sel.add(c.id);else walk(c.children);
+          }else if(cv>=IN)state.sel.add(c.id);
         }
       };
-      for(const n of curPage().artboards){
-        if(n.hidden||n.locked)continue; // 框选跳过隐藏/锁定画板
-        walk(n.children);
+      /* v1.9：整板框选 = 框选矩形覆盖画板面积 ≥92% → 选中画板本体（拖动 = 移动整板）。
+         去掉 v1.8 的 allKids 判定：它只看「顶层图层是否都被框住」，元素集中在画板一角时
+         局部框选会被误判成整板，与「框选内的元素一起被选中」冲突。 */
+      const whole=new Set();
+      for(const ab of curPage().artboards){
+        if(ab.hidden||ab.locked)continue;
+        if(covered({x:ab.x,y:ab.y,w:ab.w,h:ab.h},wb)>=WHOLE)whole.add(ab.id);
       }
-      walk(curPage().loose); // P26：画板外自由图层也参与框选
+      for(const ab of curPage().artboards){
+        if(ab.hidden||ab.locked)continue; // 框选跳过隐藏/锁定画板
+        if(whole.has(ab.id)){state.sel.add(ab.id);continue}
+        walk(ab.children);
+      }
+      walk(curPage().loose); // P26：画板外自由图层同样遵循「框内才选」
+      /* 整板选中时清掉同板子层，避免二次变换（Shift 叠加框选同样适用） */
+      if(whole.size){
+        for(const id of [...state.sel]){
+          const n=nodeById(id);
+          if(!n||n.type==='artboard')continue;
+          let p=n.parent;
+          while(p){if(p.type==='artboard'){if(whole.has(p.id))state.sel.delete(id);break}p=p.parent}
+        }
+      }
     }
     marquee=null;mode=null;syncSelection();return;
   }
@@ -5941,7 +6876,8 @@ canvas.addEventListener('contextmenu',e=>{
   if(hit){ ctxShow(e.clientX,e.clientY,nodeContextItems(hit)); }
   else{
     ctxShow(e.clientX,e.clientY,[
-      {label:'粘贴',kbds:['Ctrl','V'],dis:!clipNodes.length,act:pasteSel},
+      {label:'粘贴',kbds:['Ctrl','V'],act:pasteAny},
+      {label:'粘贴系统剪贴板图片',act:()=>pasteSystemClipboard(true)},
       {sep:1},
       {label:'全选',kbds:['Ctrl','A'],act:selectAllAll},
       {label:'取消选择',kbds:['Esc'],act:()=>{state.sel.clear();syncSelection()}},
@@ -6429,6 +7365,7 @@ window.addEventListener('keydown',e=>{
     else if(e.key==='0'){e.preventDefault();demoFit();drawSoon()}
     else if(e.key.toLowerCase()==='f'){e.preventDefault();toggleDemoFullscreen()}
     else if(e.key.toLowerCase()==='t'){e.preventDefault();toggleDemoThumbs()}
+    else if(e.key.toLowerCase()==='l'){e.preventDefault();toggleLogicPanel()}
     return;
   }
   /* P21：Ctrl+F / Ctrl+H 查找替换，Tab 隐藏 UI */
@@ -6477,6 +7414,11 @@ window.addEventListener('keydown',e=>{
         syncAllGroups();
       }
       else if(mode==='moveAb'&&start&&start.ab){start.ab.x=start.ox;start.ab.y=start.oy}
+      else if(mode==='abResize'){
+        const s=start;
+        if(s&&s.ab){s.ab.x=s.p0.x;s.ab.y=s.p0.y;s.ab.w=s.p0.w;s.ab.h=s.p0.h;
+          for(const k of s.kids){k.c.x=k.x;k.c.y=k.y}}
+      }
       else if(mode==='handle'){
         if(start&&start.orig)restoreGeom(start.orig);
         else if(start&&start.n&&start.p0){
@@ -6489,6 +7431,7 @@ window.addEventListener('keydown',e=>{
         if(start.leafState){for(const s of start.leafState){s.n.x=s.ox;s.n.y=s.oy;s.n.rot=s.rot}}
         else start.n.rot=start.rot;
       }
+      if(start&&start.loose)moveLoose(start,0,0); // v1.8：Esc 还原热区/自由图层
       mode=null;marquee=null;guides=[];updateCursor();refreshPanelXY();drawSoon();return;
     }
     if(cmtOpen){closeCommentBox(true);return} // P11：先收评论气泡
@@ -6561,7 +7504,15 @@ window.addEventListener('keydown',e=>{
   /* P20：剪贴板 Ctrl+C / Ctrl+X / Ctrl+V */
   if((e.ctrlKey||e.metaKey)&&key==='c'){e.preventDefault();copySel();return}
   if((e.ctrlKey||e.metaKey)&&key==='x'){e.preventDefault();copySel(true);return}
-  if((e.ctrlKey||e.metaKey)&&key==='v'){e.preventDefault();pasteSel();return}
+  /* v1.8：Ctrl+V —— 内部图层走 pasteSel；系统剪贴板不 preventDefault，
+     让浏览器派发带 clipboardData 的 paste 事件（file:// 下截图也能粘进来）。
+     420ms 内没拿到有效 paste 内容时再用 navigator.clipboard.read() 兜底。 */
+  if((e.ctrlKey||e.metaKey)&&key==='v'){
+    if(clipNodes.length){e.preventDefault();pasteSel();return}
+    const t=++sysPasteSeq;
+    setTimeout(()=>{if(sysPasteSeq===t)pasteSystemClipboard(false)},420);
+    return;
+  }
   if((e.ctrlKey||e.metaKey)&&key==='s'){e.preventDefault();saveDoc(e.shiftKey);return}
   if((e.ctrlKey||e.metaKey)&&key==='o'){e.preventDefault();openDoc();return}
   if((e.ctrlKey||e.metaKey)&&(key==='z'||key==='y')){
@@ -6569,18 +7520,7 @@ window.addEventListener('keydown',e=>{
     if(key==='y'||e.shiftKey)redo();else undo();
     return;
   }
-  if((e.key==='Delete'||e.key==='Backspace')&&state.sel.size){
-    for(const id of state.sel){
-      const n=nodeById(id);if(!n)continue;
-      if(n.type==='artboard'){
-        const arr=curPage().artboards;arr.splice(arr.indexOf(n),1);
-      }else{
-        const c=n.parent.children;c.splice(c.indexOf(n),1);
-      }
-    }
-    state.sel.clear();state.enterGroup=state.enterGroup.filter(id=>!!nodeById(id));syncAllGroups();syncSelection();snapshot();toast('已删除');
-    return;
-  }
+  if((e.key==='Delete'||e.key==='Backspace')&&state.sel.size){e.preventDefault();deleteSel();return}
   if(key==='d'&&(e.ctrlKey||e.metaKey)){
     e.preventDefault();
     if(duplicateSel(16).length)snapshot();
@@ -6660,6 +7600,7 @@ function fitView(keepZ){
 let fileHandle=null; // File System Access API 句柄（打开/另存后可原地覆盖保存）
 let fileName=detectFileName();
 let docTitle=''; // V6：文档内嵌名（__doc.name），面包屑显示优先于文件名
+let docPageSpec=null,docDirection=null; // v1.8：顶层规范字段（persistDoc 必须原样带回）
 const DEFAULT_NAME='默认名称'; // 文档标题缺省值（物理文件名仅用于下载/另存，不参与显示）
 function detectFileName(){
   try{
@@ -6673,7 +7614,10 @@ function detectFileName(){
 function persistDoc(){
   if(!docEl)return;
   const meta=docTitle?{name:docTitle}:{}; // V6：保存时保留文档内嵌名，避免重开丢名
-  docEl.textContent=JSON.stringify({version:DOC_VER,aiHint:AI_HINT,...meta,theme:uiTheme,pages,tree},(k,v)=>k==='parent'?undefined:v);
+  /* v1.8：pageSpec / direction 是顶层规范字段，旧版 persist 会静默丢弃；保存时原样带回 */
+  docEl.textContent=JSON.stringify({version:DOC_VER,aiHint:AI_HINT,...meta,theme:uiTheme,
+    ...(docPageSpec?{pageSpec:docPageSpec}:{}),...(docDirection?{direction:docDirection}:{}),
+    pages,tree},(k,v)=>k==='parent'?undefined:v);
 }
 function bumpUidFromDoc(){
   let mx=__uid;
@@ -6693,6 +7637,7 @@ function bootDoc(){
   }
   if(!doc||!Array.isArray(doc.pages)||!doc.pages.length)doc=defaultDoc();
   docTitle=doc.name||''; // V6：读取文档内嵌名
+  docPageSpec=doc.pageSpec||null;docDirection=doc.direction||null;
   docTheme=doc.theme==='dark'?'dark':(doc.theme==='light'?'light':themeFromStore()); // P31
   pages=doc.pages;
   tree=Array.isArray(doc.tree)&&doc.tree.length?doc.tree:pages.map((p,i)=>({label:p.name,page:i}));
@@ -6709,6 +7654,7 @@ function extractDoc(text){
 function applyDoc(doc){
   history.lock=true;
   docTitle=doc.name||''; // V6：跟随所载文档，刷新面包屑
+  docPageSpec=doc.pageSpec||null;docDirection=doc.direction||null;
   applyTheme(doc.theme==='dark'?'dark':(doc.theme==='light'?'light':uiTheme)); // P31
   pages=doc.pages;
   tree=Array.isArray(doc.tree)&&doc.tree.length?doc.tree:pages.map((p,i)=>({label:p.name,page:i}));
@@ -6818,6 +7764,7 @@ function aiCommonAttr(n){
     if(p.dir&&p.dir!=='任意')t+=' dir='+p.dir;
     return t;
   }).join('; ')+']';
+  if(hasNotes(n))s+=' note='+aiStr(String(n.notes.summary||'').slice(0,60));
   return s;
 }
 /* P35b：字符串值一律输出 JSON 字符串字面量（\n、引号、script 闭合序列全部无损转义，AI 可 JSON.parse 还原） */
@@ -6871,11 +7818,63 @@ function aiWalk(n,ind,out){
     });
   }
 }
+/* v1.8：首版页面规范（platform/standard/viewport...）输出给 AI，改稿/实现须沿用 */
+function genPageSpecView(){
+  const s=docPageSpec;
+  if(!s||typeof s!=='object')return '';
+  const out=['','=== 首版页面规范（pageSpec，已锁定）===',
+    '# 实现 / 改稿 / 续页生成必须沿用同一端型规范；切换端型需用户明确要求',
+    '# version='+(s.version||'v1')+' locked='+(s.locked!==false),
+    '# platform='+(s.platform||'pc')+' standard='+(s.standard||'')+' viewport='+(s.viewport||''),
+    '# grid='+(s.grid||'')+' controls='+(s.controls||'')+' token='+(s.token||'')];
+  if(s.note)out.push('# note='+s.note);
+  if(s.grouping&&typeof s.grouping==='object'){
+    const g=s.grouping;
+    out.push('# grouping='+(g.mode||'semantic')+' locked='+(g.locked!==false)+' sections='
+      +(Array.isArray(g.sections)?g.sections.join('/'):'')
+      +' minGroupRatio='+(g.minGroupRatio??0.8)+' maxTopLevelLoose='+(g.maxTopLevelLoose??3)
+      +' maxDepth='+(g.maxDepth??3)+' maxChildrenPerGroup='+(g.maxChildrenPerGroup??12));
+  }else out.push('# grouping=未声明（历史稿）；首版请用 sections 规划语义编组');
+  if(Array.isArray(s.pages)&&s.pages.length)
+    out.push('# pages: '+s.pages.map(p=>(p.name||'')+'='+(p.platform||'')).join(', '));
+  out.push('=== /pageSpec ===');
+  return out.join('\n');
+}
+
+/* v1.9：首版编组规划（pageSpec.grouping）输出给 AI，改稿/实现须沿用 */
+function genGroupingView(){
+  const g=docPageSpec&&docPageSpec.grouping;
+  if(!g||typeof g!=='object')return '';
+  const out=['','=== 首版编组规划（grouping，已锁定）===',
+    '# 画板顶层只放语义区块 group；业务元素归入所属区块，禁止平铺',
+    '# 改稿 / 实现 / 追加页面沿用同一套区块命名与层级；不得把编组拆散回平铺叶子',
+    '# mode='+(g.mode||'semantic')+' platform='+(g.platform||'pc')+' locked='+(g.locked!==false),
+    '# 基线区块: '+(Array.isArray(g.sections)?g.sections.join(' / '):''),
+    '# 门禁: 编组覆盖率 ≥'+(g.minGroupRatio??0.8)+' · 顶层散落叶子 ≤'+(g.maxTopLevelLoose??3)
+      +' · 嵌套 ≤'+(g.maxDepth??3)+' 层 · 每组直接子元素 ≤'+(g.maxChildrenPerGroup??12)];
+  const unit=n=>n&&(n.type==='group'||n.type==='bool'||!!(n.inst||n.cont));
+  pages.forEach((p,pi)=>{
+    if(p.comp||p.kit)return;
+    (p.artboards||[]).forEach(ab=>{
+      if(ab.master)return;
+      const tops=ab.children||[],gs=tops.filter(unit),loose=tops.filter(n=>!unit(n));
+      out.push('- page '+pi+' / '+aiStr(ab.name||'')+': 顶层 '+tops.length+' · 语义区块 '+gs.length
+        +' · 散落叶子 '+loose.length+' · '+(loose.length<=(g.maxTopLevelLoose??3)?'OK':'需补编组'));
+      gs.slice(0,14).forEach(n=>out.push('    ['+aiStr(n.name||n.type)+'] 直接子元素 '+(n.children||[]).length+' 个'));
+      if(loose.length)out.push('    提示：未编组叶子 '+loose.slice(0,8).map(n=>aiStr(n.name||n.type)).join('、'));
+    });
+  });
+  out.push('=== /grouping ===');
+  return out.join('\n');
+}
+
 function genAIView(){
   const out=[];
   out.push('# AI-VIEW 设计清单（自动生成，勿手改；再生：编辑器保存或 regen-aiview.mjs）');
   out.push('# 用途：空间布局与 UI 元素整体效果参考；实现须遵循项目开发规范（Vue3 标准组件/设计系统 Token），勿逐节点硬编码绝对定位，母版/实例→可复用组件。');
   if(docTitle)out.push('doc: '+docTitle);
+  {const ps=genPageSpecView();if(ps)out.push(ps);} // v1.8：首版页面规范
+  {const gs=genGroupingView();if(gs)out.push(gs);} // v1.9：首版编组规划
   pages.forEach((p,pi)=>{
     out.push('');
     out.push('## page '+pi+': '+(p.name||('页'+(pi+1))));
@@ -6884,6 +7883,7 @@ function genAIView(){
       if(Array.isArray(ab.children))ab.children.forEach(n=>aiWalk(n,'  ',out));
     });
   });
+  out.push(genLogicView()); // P36：LOGIC 说明附录
   return out.join('\n');
 }
 /* 把 #__ai_view 区块同步进 HTML 文本。
@@ -7163,14 +8163,16 @@ window.addEventListener('dragover',e=>{e.preventDefault()});
 window.addEventListener('drop',e=>{
   e.preventDefault();
   const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];
-  if(f&&/\.html?$/i.test(f.name))openFromInput(f);
+  if(!f)return;
+  if(/\.html?$/i.test(f.name))openFromInput(f);
+  else if(/^image\//i.test(f.type))blobToDataURL(f).then(insertImageSrc).then(()=>toast('已插入图片')).catch(()=>toast('图片读取失败'));
 });
 
 /* ================================================================
  * P2 演示模式：全屏播放原型，消费节点 proto 交互数据
  * 复用编辑器渲染管线（临时切换 cam 逐画板绘制），无需第二套渲染器
  * ================================================================ */
-const demo={on:false,pos:0,from:null,anim:null,t0:0,hist:[],hpos:0,overlays:[],scrollT:0,preRot:0,hover:null,down:null,zoom:1,thumbs:false,dur:320,ease:'缓出'};
+const demo={on:false,logic:false,logicScope:'board',logicQuery:'',noteHover:null,badgeHover:null,pos:0,from:null,anim:null,t0:0,hist:[],hpos:0,overlays:[],scrollT:0,preRot:0,hover:null,down:null,zoom:1,thumbs:false,dur:320,ease:'缓出'};
 const DEMO_DUR=320;
 function easeInCubic(t){return t*t*t}
 function easeInOutCubic(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
@@ -7208,6 +8210,9 @@ function demoStart(startId){
   demo.hist=[start];demo.hpos=0;demo.overlays=[];demo.scrollT=0;
   demo.hover=null;demo.down=null;demo.switched=[];
   demo.zoom=1;demo.thumbs=false;
+  demo.logic=false;demo.noteHover=null;demo.badgeHover=null;
+  const lp=$('#demoLogicPanel');if(lp)lp.hidden=true;
+  const lb=$('#demoLogic');if(lb)lb.classList.remove('on');
   demo.preCam={x:cam.x,y:cam.y,z:cam.z};
   demo.preRot=viewRot;viewRot=0; // P28：演示固定为轴对齐视口，保证弹层/热区命中一致
   document.body.classList.add('demo-mode');
@@ -7224,6 +8229,9 @@ function demoExit(){
   demo.hist=[];demo.hpos=0;demo.overlays=[];demo.down=null;
   document.body.classList.remove('demo-mode');
   document.body.classList.remove('thumbs-open');
+  demo.logic=false;demo.noteHover=null;demo.badgeHover=null;
+  const lp=$('#demoLogicPanel');if(lp)lp.hidden=true;
+  const lb=$('#demoLogic');if(lb)lb.classList.remove('on');
   $('#demoSitemap').hidden=true;
   $('#demoUserPop').hidden=true;
   $('#demoThumbsBar').classList.remove('open');
@@ -7240,12 +8248,14 @@ function demoFit(){
 }
 /* P20：演示缩放（在 fit 基础上按倍率缩放，锚定画板中心） */
 function demoCamFor(ab,w,h){
-  /* 顶栏 48px + 底部缩略图条 82px 不遮挡画板（自研演示可用视口） */
+  /* 顶栏 48px + 底部缩略图条 82px + 逻辑抽屉（宽度可拖拽，实时读取）不遮挡画板 */
   const top=52,bot=$('#demoThumbsBar').classList.contains('open')?86:8;
+  const lp=$('#demoLogicPanel');
+  const panelW=demo.logic?((lp&&!lp.hidden?lp.offsetWidth:0)||340):0;
   const availH=Math.max(180,h-top-bot);
-  const base=fitCam(ab,Math.max(200,w-24),availH),z=base.z*demo.zoom;
+  const base=fitCam(ab,Math.max(200,w-24-panelW),availH),z=base.z*demo.zoom;
   const cy=top+availH/2;
-  return{w,h,z,x:w/2-(ab.x+ab.w/2)*z,y:cy-(ab.y+ab.h/2)*z};
+  return{w,h,z,x:(w-panelW)/2-(ab.x+ab.w/2)*z,y:cy-(ab.y+ab.h/2)*z};
 }
 function applyDemoCam(w,h){
   const ab=activeAb();if(!ab)return;
@@ -7457,6 +8467,11 @@ function demoFrame(w,h){
         const hn=flattenLeaves(ab.children).find(n=>n.id===demo.hover&&!n.hidden&&!hiddenByAncestor(n));
         if(hn){const r=worldRect(hn),hp=w2s(r.x,r.y);ctx.strokeStyle='rgba(54,112,247,0.9)';ctx.lineWidth=2;ctx.strokeRect(hp.x,hp.y,r.w*cam.z,r.h*cam.z)}
       }
+      if(demo.noteHover){ // P38：抽屉条目 hover → 画布高亮
+        const hn=flattenLeaves(ab.children).find(n=>n.id===demo.noteHover&&!n.hidden&&!hiddenByAncestor(n))||(ab.id===demo.noteHover?ab:null);
+        if(hn){const r=worldRect(hn),hp=w2s(r.x,r.y);ctx.strokeStyle='#F5A623';ctx.lineWidth=2;ctx.setLineDash([5,3]);ctx.strokeRect(hp.x,hp.y,r.w*cam.z,r.h*cam.z);ctx.setLineDash([])}
+      }
+      if(demo.logic)paintNoteBadges(ab); // P38：画布说明角标
       ctx.restore();
       paintDeviceFrame(ab,s,sw,sh); // P26：设备外框
     });
@@ -7564,6 +8579,8 @@ function demoDown(e){
     const g=geos[geos.length-1];
     backdrop=!(sx>=g.rect.x&&sx<=g.rect.x+g.rect.w&&sy>=g.rect.y&&sy<=g.rect.y+g.rect.h);
   }
+  const badge=backdrop?null:demoBadgeHit(sx,sy);
+  if(badge){demo.down=null;focusLogicItem(badge.id);return} // P38：逻辑视图下角标优先，不触发跳转
   const n=backdrop?null:demoHitNode(sx,sy);
   demo.down={sx,sy,id:n&&n.id,backdrop};
   if(!demo.anim&&n)demoFire(protoOf(n,'按下'),n); // 按下触发
@@ -7593,6 +8610,12 @@ function demoUp(e){
 function demoMove(e){
   if(demo.anim)return;
   const rect=canvas.getBoundingClientRect();
+  const bh=demoBadgeHit(e.clientX-rect.left,e.clientY-rect.top);
+  if(demo.logic&&bh){
+    if(demo.badgeHover!==bh.id){demo.badgeHover=bh.id;drawSoon()}
+    canvas.style.cursor='pointer';return;
+  }
+  if(demo.badgeHover){demo.badgeHover=null;drawSoon()}
   const n=demoHitNode(e.clientX-rect.left,e.clientY-rect.top);
   const hov=n&&n.proto&&n.proto.length?n.id:null;
   if(hov!==demo.hover){demo.hover=hov;drawSoon()}
@@ -7668,6 +8691,7 @@ $('#demoHistFwd').innerHTML=icon('redo',16);
 $('#demoPrev').innerHTML=icon('chevR',16);
 $('#demoNext').innerHTML=icon('chevR',16);
 $('#demoThumbs').innerHTML=icon('grid',16);
+$('#demoLogic').innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3.5h10l4 4v13H5z"/><path d="M15 3.5v4h4"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4"/></svg>';
 $('#demoZoomOut').innerHTML=icon('minus',16);
 $('#demoZoomIn').innerHTML=icon('plus',16);
 $('#demoFit').innerHTML=icon('fit',16);
@@ -7676,6 +8700,85 @@ $('#demoThumbL').innerHTML=icon('chevL',16);
 $('#demoThumbR').innerHTML=icon('chevR',16);
 (function(){const i=$('#demoSitemapBtn').querySelector('i');if(i)i.innerHTML=icon('chevD',12)})();
 $('#demoClose').addEventListener('click',demoExit);
+$('#dlpClose').innerHTML=icon('x',16);
+initLogicPanel();
+/* 最近使用颜色：所有 input[type=color] 共用，localStorage 持久化；右栏顶部常驻色板（不随面板重建消失） */
+(()=>{
+  const KEY='proto.recentColors',MAX=12;
+  let list=(()=>{
+    try{return (JSON.parse(localStorage.getItem(KEY)||'[]')||[])
+      .filter(c=>/^#[0-9a-f]{6}$/i.test(c)).map(c=>c.toUpperCase()).slice(0,MAX)}
+    catch(e){return []}
+  })();
+  let lastInput=null;
+  const bar=$('#rcBar');
+  const swHtml=()=>list.map(c=>'<i data-rc="'+c+'" style="background:'+c+'" title="'+c+'"></i>').join('');
+  // 色板只属于「设计」tab；说明 / 原型 / 组件 tab 不显示，避免与内容区混在一起
+  const refresh=()=>{
+    if(bar){
+      bar.innerHTML=list.length?'<b>最近</b>'+swHtml():'';
+      bar.hidden=(typeof rtab!=='undefined'&&rtab!=='design')||!list.length;
+    }
+    $$('#panel .rc-swatches').forEach(b=>b.innerHTML=swHtml());
+  };
+  document.addEventListener('click',e=>{
+    const b=e.target.closest&&e.target.closest('[data-rtab]');
+    if(b)refresh();
+  });
+  const apply=v=>{
+    const t=(lastInput&&document.contains(lastInput))?lastInput:document.querySelector('#panel input[type=color]');
+    if(t){
+      t.value=v;
+      t.dispatchEvent(new Event('input',{bubbles:true}));
+      t.dispatchEvent(new Event('change',{bubbles:true}));
+      return true;
+    }
+    // 填充区折叠时直接给选中节点上色，保证色板始终可用
+    const n=single();
+    if(!n)return false;
+    const key=n.type==='text'?'color':n.type==='artboard'?'bg':'fill';
+    n[key]=v;
+    if(Array.isArray(n.fills)&&n.fills.length)n.fills[n.fills.length-1].color=v;
+    snapshot();renderPanel();drawSoon();
+    return true;
+  };
+  const record=v=>{
+    if(!/^#[0-9a-f]{6}$/i.test(v||''))return;
+    const u=v.toUpperCase();
+    list=[u,...list.filter(c=>c!==u)].slice(0,MAX);
+    try{localStorage.setItem(KEY,JSON.stringify(list))}catch(e){}
+    refresh();
+  };
+  const mount=inp=>{
+    const host=inp.closest('.crow,.page-bg,.fill-row')||inp.parentElement;
+    const boxEl=host&&(host.closest('.pw')||host.parentElement);
+    if(!boxEl||boxEl.dataset.rcMounted)return;
+    boxEl.dataset.rcMounted='1';
+    const b=document.createElement('div');
+    b.className='rc-swatches';b.title='最近使用，点击应用';b.innerHTML=swHtml();
+    boxEl.appendChild(b);
+    b.addEventListener('click',e=>{
+      const s=e.target.closest('[data-rc]');if(s)apply(s.dataset.rc);
+    });
+  };
+  if(bar)bar.addEventListener('click',e=>{
+    const s=e.target.closest('[data-rc]');if(s)apply(s.dataset.rc);
+  });
+  document.addEventListener('change',e=>{
+    const t=e.target;
+    if(t&&t.tagName==='INPUT'&&t.type==='color'){lastInput=t;record(t.value)}
+  },true);
+  document.addEventListener('focusin',e=>{
+    const t=e.target;
+    if(t&&t.tagName==='INPUT'&&t.type==='color')lastInput=t;
+  },true);
+  const panel=$('#panel');
+  new MutationObserver(()=>panel.querySelectorAll('input[type=color]').forEach(mount))
+    .observe(panel,{childList:true,subtree:true});
+  panel.querySelectorAll('input[type=color]').forEach(mount);
+  refresh();
+})();
+
 $('#demoHistBack').addEventListener('click',()=>demoBack());
 $('#demoHistFwd').addEventListener('click',()=>demoForward());
 $('#demoPrev').addEventListener('click',()=>demoStep(-1));
@@ -7704,8 +8807,10 @@ $('#demoThumbL').addEventListener('click',()=>$('#demoThumbStrip').scrollBy({lef
 $('#demoThumbR').addEventListener('click',()=>$('#demoThumbStrip').scrollBy({left:160,behavior:'smooth'}));
 /* P21-C：分享链接（#demo?a=画板 id，可直接进入演示并定位） */
 function demoShareLink(){
-  const ab=activeAb();
-  return location.href.split('#')[0]+'#demo'+(ab?'?a='+encodeURIComponent(ab.id):'');
+  const ab=activeAb(),q=[];
+  if(ab)q.push('a='+encodeURIComponent(ab.id));
+  if(demo.logic)q.push('logic=1');
+  return location.href.split('#')[0]+'#demo'+(q.length?'?'+q.join('&'):'');
 }
 $('#demoShare').addEventListener('click',()=>{copyText(demoShareLink());toast('已复制演示链接')});
 $('#demoUser').addEventListener('click',e=>{e.stopPropagation();const p=$('#demoUserPop');p.hidden=!p.hidden});
@@ -8616,6 +9721,7 @@ const ProtoAPI=(()=>{
       nodeTypes:{rect:'矩形（卡片/按钮/色块）',text:'文本（text 必填，w/h 自动测量）',ellipse:'圆形/椭圆',artboard:'画板（手机建议 375x812，大屏 1440x1024）'},
       props:{x:'数字',y:'数字',w:'数字',h:'数字',fill:'颜色 #RRGGBB 或 rgba()',stroke:'颜色|null',strokeW:'数字',radius:'圆角数字',text:'文本内容',fontSize:'数字',fontWeight:'数字(300-800)',color:'文字颜色',align:'null|left|center|right',opacity:'0-1',bg:'画板背景色',name:'语义名，供 findNode 引用（建议唯一）'},
       interactions:{trigger:'单击|悬停|按下|拖拽|滚动',anim:'无|淡入|左滑|右滑|上滑|下滑',action:'打开画板|打开弹层|关闭弹层|返回上一页',target:'打开画板/打开弹层时的目标画板 id',dir:'拖拽/滚动触发方向（任意|向左|向右|向上|向下 / 任意|向下|向上）',opos:'弹层位置（居中|左上|右上|底部）',ox:'弹层偏移 X（画板单位）',oy:'弹层偏移 Y',dim:'遮罩不透明度 0-100',bdclose:'点击遮罩是否关闭弹层（默认 true）'},
+      notes:{kind:'page|component|rule',summary:'一句话说明',body:'Markdown 正文',rules:'[{when:条件,then:动作,note:备注}]',tags:'string[]',source:'ai|human',updated:'YYYY-MM-DD'},
       methods:{
         getDoc:'() → {ok,page,doc:{pages:[{name,artboards:[{id,name,x,y,w,h,bg,children:[…]}]}]}}',
         listPages:'() → {ok,pages:[{index,name,artboards:[{id,name,w,h}]}]}',
@@ -8631,6 +9737,10 @@ const ProtoAPI=(()=>{
         insertComp:'(compId, pageIdx?, artboardIdOrName?, x?, y?) → {ok,nodes} 插入组件实例（省略 x/y 时置于画板中央）；改母版（组件库页）会同步全部实例',
         getSelection:'() → {ok,ids}',
         undo:'() → 撤销；redo() → 重做',
+        getNotes:'(idOrName) → {ok,notes} 读取页面/画板/节点说明',
+        setNotes:'(idOrName, notes|null, source?) → {ok} 写入/删除说明（null 删除）',
+        listNotes:'(scope=all|cur) → {ok,items} 聚合说明清单',
+        exportLogic:'() → {ok,logic} 导出 LOGIC 附录文本',
         help:'() → 本 schema'
       },
       examples:[
@@ -8642,7 +9752,9 @@ const ProtoAPI=(()=>{
         "ProtoAPI.setProto('告警入口',[{trigger:'单击',action:'打开弹层',target:'<弹层画板id>',opos:'居中',dim:40,bdclose:true}])",
         "ProtoAPI.setProto('抽屉把手',[{trigger:'拖拽',dir:'向上',action:'打开弹层',target:'<画板id>'}])",
         "ProtoAPI.listComps() → 预设组件；ProtoAPI.insertComp('navbar',0,'首页',0,0) 插入导航栏实例",
-        "ProtoAPI.exportPNG('首页',2) → dataUrl"
+        "ProtoAPI.exportPNG('首页',2) → dataUrl",
+        "ProtoAPI.setNotes('登录按钮',{kind:'component',summary:'提交登录',body:'## 触发条件\\n单击',rules:[{when:'校验通过',then:'跳转首页'}],tags:['表单']},'ai')",
+        "ProtoAPI.listNotes('all') → 全量说明；ProtoAPI.exportLogic() → LOGIC 附录"
       ]
     },
     help(){return JSON.parse(JSON.stringify(api.__schema))},
@@ -8808,10 +9920,27 @@ const ProtoAPI=(()=>{
       afterChange();
       return {ok:true,nodes:nodes.map(snapOf)};
     }catch(e){return err(e.message)}},
+    getNotes(ref){try{
+      const e=ref==null?null:findAnywhere(ref);
+      const n=e?e.n:(ref==null?curPage():null);
+      return {ok:true,ref:ref||'(当前页面)',notes:notesOf(n)?JSON.parse(JSON.stringify(notesOf(n))):null};
+    }catch(e){return err(e.message)}},
+    setNotes(ref,obj,source){try{
+      const e=ref==null?null:findAnywhere(ref);
+      const n=e?e.n:(ref==null?curPage():null);
+      if(!n)return err('未找到：'+ref);
+      setNotesObj(n,obj,source||'ai');
+      afterChange();return {ok:true,notes:notesOf(n)?JSON.parse(JSON.stringify(notesOf(n))):null};
+    }catch(e){return err(e.message)}},
+    listNotes(scope){try{
+      return {ok:true,items:JSON.parse(JSON.stringify(collectNotes(scope==='cur'?'cur':'all'),REPL))};
+    }catch(e){return err(e.message)}},
+    exportLogic(){try{return {ok:true,logic:genLogicView()}}catch(e){return err(e.message)}},
     getSelection(){return {ok:true,ids:[...state.sel]}},
     exportAI(){try{ // P35：一次给齐 AI 所需三件套（清单 + 完整文档 JSON）
       return {ok:true,
         ai_view:genAIView(),
+        logic:genLogicView(),
         doc:JSON.parse(JSON.stringify({version:DOC_VER,aiHint:AI_HINT,theme:uiTheme,pages,tree},(k,v)=>k==='parent'?undefined:v))};
     }catch(e){return err(e.message)}},
     undo(){try{undo();return {ok:true}}catch(e){return err(e.message)}},
@@ -8857,8 +9986,10 @@ drawSoon();
 (function demoFromHash(){
   const h=location.hash||'';
   if(!/^#demo/.test(h))return;
-  const m=/a=([^&]+)/.exec(h.split('?')[1]||'');
+  const qs=h.split('?')[1]||'';
+  const m=/a=([^&]+)/.exec(qs);
   demoStart(m?decodeURIComponent(m[1]):null);
+  if(/logic=1/.test(qs))toggleLogicPanel(true);
 })();
 </script>
 </body>
