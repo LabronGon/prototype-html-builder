@@ -1,0 +1,4109 @@
+{
+  "name": "机器狗巡检",
+  "platform": "pc",
+  "theme": "light",
+  "kit": false,
+  "direction": {
+    "product": "机器狗巡检管理平台，给变电站与厂区运维人员远程监控和操控巡检机器狗",
+    "character": [
+      "精密",
+      "冷静",
+      "硬朗"
+    ],
+    "world": "变电站夜巡、机器人本体与雷达热成像的控制台",
+    "moments": [
+      "实时监控主视图",
+      "巡检航线地图"
+    ],
+    "signature": "机器狗状态呼吸灯（绿在线/蓝巡检/灰待机/橙告警）"
+  },
+  "components": [
+    {
+      "id": "nav-item",
+      "name": "导航项",
+      "w": 200,
+      "h": 36,
+      "nodes": [
+        {
+          "type": "rect",
+          "name": "底",
+          "x": 0,
+          "y": 0,
+          "w": 200,
+          "h": 36,
+          "fill": "#FFFFFF",
+          "radius": 8
+        },
+        {
+          "type": "rect",
+          "name": "选中条",
+          "x": 0,
+          "y": 9,
+          "w": 3,
+          "h": 18,
+          "radius": 2,
+          "fill": "#FFFFFF"
+        },
+        {
+          "type": "icon",
+          "name": "图标",
+          "icon": "ep/monitor",
+          "size": 16,
+          "x": 24,
+          "y": 10,
+          "color": "#4E5969"
+        },
+        {
+          "type": "text",
+          "name": "文字",
+          "x": 50,
+          "y": 10,
+          "text": "菜单项",
+          "fontSize": 13,
+          "fontWeight": 500,
+          "color": "#1F2329"
+        }
+      ]
+    },
+    {
+      "id": "dog-chip",
+      "name": "机器狗指示chip",
+      "w": 96,
+      "h": 30,
+      "nodes": [
+        {
+          "type": "rect",
+          "name": "底",
+          "x": 0,
+          "y": 0,
+          "w": 96,
+          "h": 30,
+          "radius": 15,
+          "fill": "#FFFFFF",
+          "stroke": "#E5E6EB",
+          "strokeW": 1
+        },
+        {
+          "type": "rect",
+          "name": "呼吸灯",
+          "x": 10,
+          "y": 11,
+          "w": 8,
+          "h": 8,
+          "radius": 4,
+          "fill": "#00B42A"
+        },
+        {
+          "type": "text",
+          "name": "编号",
+          "x": 24,
+          "y": 8,
+          "text": "X20-07",
+          "fontSize": 12,
+          "fontWeight": 600,
+          "color": "#1F2329"
+        }
+      ]
+    },
+    {
+      "id": "metric",
+      "name": "遥测指标",
+      "w": 184,
+      "h": 72,
+      "nodes": [
+        {
+          "type": "ellipse",
+          "name": "图标底",
+          "x": 0,
+          "y": 18,
+          "w": 36,
+          "h": 36,
+          "fill": "#3670F7",
+          "opacity": 0.1
+        },
+        {
+          "type": "icon",
+          "name": "图标",
+          "icon": "ep/data-line",
+          "size": 20,
+          "x": 8,
+          "y": 26,
+          "color": "#3670F7"
+        },
+        {
+          "type": "text",
+          "name": "标签",
+          "x": 48,
+          "y": 8,
+          "text": "指标",
+          "fontSize": 11,
+          "fontWeight": 400,
+          "color": "#86909C"
+        },
+        {
+          "type": "text",
+          "name": "数值",
+          "x": 48,
+          "y": 30,
+          "text": "0",
+          "fontSize": 22,
+          "fontWeight": 600,
+          "color": "#1F2329"
+        }
+      ]
+    },
+    {
+      "id": "alert-row",
+      "name": "告警行",
+      "w": 384,
+      "h": 44,
+      "nodes": [
+        {
+          "type": "rect",
+          "name": "状态条",
+          "x": 0,
+          "y": 0,
+          "w": 3,
+          "h": 44,
+          "fill": "#FF7D00",
+          "rc": [
+            2,
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "type": "rect",
+          "name": "底",
+          "x": 0,
+          "y": 0,
+          "w": 384,
+          "h": 44,
+          "radius": 8,
+          "fill": "#F7F8FA",
+          "stroke": "#E5E6EB",
+          "strokeW": 1
+        },
+        {
+          "type": "rect",
+          "name": "呼吸灯",
+          "x": 14,
+          "y": 19,
+          "w": 6,
+          "h": 6,
+          "radius": 3,
+          "fill": "#FF7D00"
+        },
+        {
+          "type": "text",
+          "name": "文案",
+          "x": 30,
+          "y": 8,
+          "text": "告警内容",
+          "fontSize": 12,
+          "fontWeight": 500,
+          "color": "#1F2329"
+        },
+        {
+          "type": "text",
+          "name": "时间",
+          "x": 30,
+          "y": 26,
+          "text": "16:21",
+          "fontSize": 11,
+          "fontWeight": 400,
+          "color": "#86909C"
+        }
+      ]
+    },
+    {
+      "id": "bind-row",
+      "name": "绑定行",
+      "w": 688,
+      "h": 48,
+      "nodes": [
+        {
+          "type": "rect",
+          "name": "底",
+          "x": 0,
+          "y": 0,
+          "w": 688,
+          "h": 48,
+          "radius": 8,
+          "fill": "#FFFFFF",
+          "stroke": "#E5E6EB",
+          "strokeW": 1
+        },
+        {
+          "type": "text",
+          "name": "编号",
+          "x": 16,
+          "y": 16,
+          "text": "X20-07",
+          "fontSize": 13,
+          "fontWeight": 600,
+          "color": "#1F2329"
+        },
+        {
+          "type": "text",
+          "name": "型号",
+          "x": 110,
+          "y": 17,
+          "text": "Unitree X20",
+          "fontSize": 12,
+          "fontWeight": 400,
+          "color": "#4E5969"
+        },
+        {
+          "type": "text",
+          "name": "固件",
+          "x": 232,
+          "y": 17,
+          "text": "v2.3.1",
+          "fontSize": 12,
+          "fontWeight": 400,
+          "color": "#4E5969"
+        },
+        {
+          "type": "text",
+          "name": "绑定人",
+          "x": 330,
+          "y": 17,
+          "text": "王工",
+          "fontSize": 12,
+          "fontWeight": 400,
+          "color": "#4E5969"
+        },
+        {
+          "type": "rect",
+          "name": "呼吸灯",
+          "x": 424,
+          "y": 21,
+          "w": 6,
+          "h": 6,
+          "radius": 3,
+          "fill": "#3670F7"
+        },
+        {
+          "type": "text",
+          "name": "状态",
+          "x": 438,
+          "y": 17,
+          "text": "巡检中",
+          "fontSize": 12,
+          "fontWeight": 400,
+          "color": "#4E5969"
+        },
+        {
+          "type": "text",
+          "name": "操作",
+          "x": 620,
+          "y": 17,
+          "text": "解绑",
+          "fontSize": 12,
+          "fontWeight": 500,
+          "color": "#F53F3F"
+        }
+      ]
+    },
+    {
+      "id": "top-bar",
+      "name": "顶栏",
+      "w": 1440,
+      "h": 56,
+      "nodes": [
+        {
+          "type": "rect",
+          "name": "底",
+          "x": 0,
+          "y": 0,
+          "w": 1440,
+          "h": 56,
+          "fill": "#FFFFFF"
+        },
+        {
+          "type": "rect",
+          "name": "分割线",
+          "x": 0,
+          "y": 55,
+          "w": 1440,
+          "h": 1,
+          "fill": "#E5E6EB"
+        },
+        {
+          "type": "rect",
+          "name": "Logo底",
+          "x": 20,
+          "y": 14,
+          "w": 28,
+          "h": 28,
+          "radius": 7,
+          "fill": "#3670F7"
+        },
+        {
+          "type": "icon",
+          "name": "Logo图标",
+          "icon": "ep/cpu",
+          "size": 16,
+          "x": 26,
+          "y": 20,
+          "color": "#FFFFFF"
+        },
+        {
+          "type": "text",
+          "name": "Logo文字",
+          "x": 58,
+          "y": 18,
+          "text": "铁脊巡检",
+          "fontSize": 15,
+          "fontWeight": 700,
+          "color": "#1F2329"
+        },
+        {
+          "type": "text",
+          "name": "副标",
+          "x": 122,
+          "y": 21,
+          "text": "RobotDog OS",
+          "fontSize": 11,
+          "fontWeight": 400,
+          "color": "#86909C"
+        },
+        {
+          "type": "rect",
+          "name": "顶栏呼吸灯",
+          "x": 1268,
+          "y": 24,
+          "w": 8,
+          "h": 8,
+          "radius": 4,
+          "fill": "#00B42A"
+        },
+        {
+          "type": "text",
+          "name": "值班员",
+          "x": 1284,
+          "y": 19,
+          "text": "值班员 · 王工",
+          "fontSize": 12,
+          "fontWeight": 400,
+          "color": "#4E5969"
+        },
+        {
+          "type": "text",
+          "name": "时间",
+          "x": 1368,
+          "y": 19,
+          "text": "16:42",
+          "fontSize": 12,
+          "fontWeight": 400,
+          "color": "#86909C"
+        },
+        {
+          "type": "rect",
+          "name": "高亮线",
+          "x": 0,
+          "y": 54,
+          "w": 1440,
+          "h": 2,
+          "grad": {
+            "type": "linear",
+            "angle": 0,
+            "stops": [
+              "#3670F7",
+              {
+                "color": "#3670F7",
+                "opacity": 0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "side-nav",
+      "name": "侧栏",
+      "w": 200,
+      "h": 844,
+      "nodes": [
+        {
+          "type": "rect",
+          "name": "底",
+          "x": 0,
+          "y": 0,
+          "w": 200,
+          "h": 844,
+          "fill": "#FFFFFF"
+        },
+        {
+          "type": "rect",
+          "name": "分割线",
+          "x": 199,
+          "y": 0,
+          "w": 1,
+          "h": 844,
+          "fill": "#E5E6EB"
+        },
+        {
+          "type": "text",
+          "name": "分组标题",
+          "x": 24,
+          "y": 30,
+          "text": "巡检作业",
+          "fontSize": 11,
+          "fontWeight": 400,
+          "color": "#86909C"
+        }
+      ]
+    },
+    {
+      "id": "video-frame",
+      "name": "视频画面",
+      "w": 760,
+      "h": 424,
+      "nodes": [
+        {
+          "type": "rect",
+          "name": "底",
+          "x": 0,
+          "y": 0,
+          "w": 760,
+          "h": 424,
+          "radius": 12,
+          "fill": "#0B1220"
+        },
+        {
+          "type": "rect",
+          "name": "地面线1",
+          "x": 16,
+          "y": 340,
+          "w": 728,
+          "h": 1,
+          "fill": "#1A2438"
+        },
+        {
+          "type": "rect",
+          "name": "地面线2",
+          "x": 16,
+          "y": 372,
+          "w": 728,
+          "h": 1,
+          "fill": "#16202F"
+        },
+        {
+          "type": "rect",
+          "name": "地面线3",
+          "x": 16,
+          "y": 396,
+          "w": 728,
+          "h": 1,
+          "fill": "#121B29"
+        },
+        {
+          "type": "text",
+          "name": "位置标注",
+          "x": 20,
+          "y": 16,
+          "text": "X20-07 · 3 号厂房东侧",
+          "fontSize": 12,
+          "fontWeight": 500,
+          "color": "#E8F0FF"
+        },
+        {
+          "type": "rect",
+          "name": "REC灯",
+          "x": 706,
+          "y": 20,
+          "w": 8,
+          "h": 8,
+          "radius": 4,
+          "fill": "#F53F3F"
+        },
+        {
+          "type": "text",
+          "name": "REC文字",
+          "x": 720,
+          "y": 16,
+          "text": "REC",
+          "fontSize": 11,
+          "fontWeight": 600,
+          "color": "#E8F0FF"
+        },
+        {
+          "type": "ellipse",
+          "name": "投影",
+          "x": 300,
+          "y": 336,
+          "w": 180,
+          "h": 22,
+          "fill": "rgba(0,0,0,0.4)"
+        },
+        {
+          "type": "rect",
+          "name": "躯干",
+          "x": 284,
+          "y": 278,
+          "w": 180,
+          "h": 52,
+          "radius": 18,
+          "fill": "#2C3A55"
+        },
+        {
+          "type": "rect",
+          "name": "头部",
+          "x": 440,
+          "y": 270,
+          "w": 56,
+          "h": 44,
+          "radius": 12,
+          "fill": "#33425F"
+        },
+        {
+          "type": "rect",
+          "name": "头灯",
+          "x": 480,
+          "y": 286,
+          "w": 12,
+          "h": 8,
+          "radius": 2,
+          "fill": "#E8F0FF"
+        },
+        {
+          "type": "ellipse",
+          "name": "雷达顶",
+          "x": 330,
+          "y": 250,
+          "w": 32,
+          "h": 16,
+          "fill": "#4A5A7D"
+        },
+        {
+          "type": "rect",
+          "name": "传感支架",
+          "x": 336,
+          "y": 264,
+          "w": 20,
+          "h": 16,
+          "fill": "#3A4A6B"
+        },
+        {
+          "type": "rect",
+          "name": "前腿1",
+          "x": 300,
+          "y": 322,
+          "w": 12,
+          "h": 52,
+          "radius": 5,
+          "fill": "#243049"
+        },
+        {
+          "type": "rect",
+          "name": "前腿2",
+          "x": 336,
+          "y": 322,
+          "w": 12,
+          "h": 56,
+          "radius": 5,
+          "fill": "#243049"
+        },
+        {
+          "type": "rect",
+          "name": "后腿1",
+          "x": 408,
+          "y": 322,
+          "w": 12,
+          "h": 56,
+          "radius": 5,
+          "fill": "#243049"
+        },
+        {
+          "type": "rect",
+          "name": "后腿2",
+          "x": 444,
+          "y": 322,
+          "w": 12,
+          "h": 50,
+          "radius": 5,
+          "fill": "#243049"
+        },
+        {
+          "type": "rect",
+          "name": "本体呼吸灯",
+          "x": 296,
+          "y": 292,
+          "w": 10,
+          "h": 10,
+          "radius": 5,
+          "fill": "#00B42A"
+        },
+        {
+          "type": "icon",
+          "name": "截图",
+          "icon": "ep/camera",
+          "size": 18,
+          "x": 24,
+          "y": 380,
+          "color": "#9FB3D9"
+        },
+        {
+          "type": "icon",
+          "name": "播放",
+          "icon": "ep/video-pause",
+          "size": 18,
+          "x": 64,
+          "y": 380,
+          "color": "#9FB3D9"
+        },
+        {
+          "type": "icon",
+          "name": "画面",
+          "icon": "ep/view",
+          "size": 18,
+          "x": 104,
+          "y": 380,
+          "color": "#9FB3D9"
+        },
+        {
+          "type": "rect",
+          "name": "画质chip",
+          "x": 656,
+          "y": 376,
+          "w": 52,
+          "h": 24,
+          "radius": 12,
+          "fill": "#1A2438"
+        },
+        {
+          "type": "text",
+          "name": "画质文字",
+          "x": 664,
+          "y": 381,
+          "text": "1080P",
+          "fontSize": 11,
+          "fontWeight": 400,
+          "color": "#9FB3D9"
+        },
+        {
+          "type": "text",
+          "name": "时间戳",
+          "x": 508,
+          "y": 381,
+          "text": "2026-11-11 16:42:31 · 25FPS",
+          "fontSize": 10,
+          "fontWeight": 400,
+          "color": "#5A6B87"
+        },
+        {
+          "type": "rect",
+          "name": "取景框",
+          "x": 12,
+          "y": 14,
+          "w": 16,
+          "h": 16,
+          "fill": null,
+          "stroke": "#E8F0FF",
+          "strokeW": 2,
+          "radius": 3,
+          "opacity": 0.75
+        },
+        {
+          "type": "rect",
+          "name": "取景框",
+          "x": 732,
+          "y": 14,
+          "w": 16,
+          "h": 16,
+          "fill": null,
+          "stroke": "#E8F0FF",
+          "strokeW": 2,
+          "radius": 3,
+          "opacity": 0.75
+        },
+        {
+          "type": "rect",
+          "name": "取景框",
+          "x": 12,
+          "y": 344,
+          "w": 16,
+          "h": 16,
+          "fill": null,
+          "stroke": "#E8F0FF",
+          "strokeW": 2,
+          "radius": 3,
+          "opacity": 0.75
+        },
+        {
+          "type": "rect",
+          "name": "取景框",
+          "x": 732,
+          "y": 344,
+          "w": 16,
+          "h": 16,
+          "fill": null,
+          "stroke": "#E8F0FF",
+          "strokeW": 2,
+          "radius": 3,
+          "opacity": 0.75
+        },
+        {
+          "type": "rect",
+          "name": "扫描线1",
+          "x": 12,
+          "y": 120,
+          "w": 736,
+          "h": 1,
+          "fill": "#E8F0FF",
+          "opacity": 0.07
+        },
+        {
+          "type": "rect",
+          "name": "扫描线2",
+          "x": 12,
+          "y": 240,
+          "w": 736,
+          "h": 1,
+          "fill": "#E8F0FF",
+          "opacity": 0.05
+        }
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "巡检平台",
+      "bg": "#F5F7FA",
+      "artboards": [
+        {
+          "name": "设备监控",
+          "x": 0,
+          "y": 0,
+          "w": 1440,
+          "h": 900,
+          "bg": "#F5F7FA",
+          "nodes": [
+            {
+              "type": "instance",
+              "comp": "top-bar",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "type": "instance",
+              "comp": "side-nav",
+              "x": 0,
+              "y": 56
+            },
+            {
+              "type": "instance",
+              "comp": "nav-item",
+              "x": 0,
+              "y": 64,
+              "overrides": {
+                "底": {
+                  "fill": "#EBF1FE"
+                },
+                "选中条": {
+                  "fill": "#3670F7"
+                },
+                "图标": {
+                  "color": "#3670F7"
+                },
+                "文字": {
+                  "text": "设备监控",
+                  "color": "#3670F7"
+                }
+              }
+            },
+            {
+              "type": "instance",
+              "comp": "nav-item",
+              "x": 0,
+              "y": 104,
+              "overrides": {
+                "文字": {
+                  "text": "远程控制"
+                },
+                "图标": {
+                  "icon": "ep/aim"
+                }
+              },
+              "click": {
+                "action": "打开画板",
+                "target": "远程控制"
+              }
+            },
+            {
+              "type": "instance",
+              "comp": "nav-item",
+              "x": 0,
+              "y": 144,
+              "overrides": {
+                "文字": {
+                  "text": "设备绑定"
+                },
+                "图标": {
+                  "icon": "ep/link"
+                }
+              },
+              "click": {
+                "action": "打开画板",
+                "target": "设备绑定"
+              }
+            },
+            {
+              "type": "text",
+              "name": "在线统计",
+              "x": 24,
+              "y": 760,
+              "text": "机器狗在线 3/4",
+              "fontSize": 12,
+              "fontWeight": 500,
+              "color": "#4E5969"
+            },
+            {
+              "type": "rect",
+              "name": "在线灯",
+              "x": 112,
+              "y": 764,
+              "w": 6,
+              "h": 6,
+              "radius": 3,
+              "fill": "#00B42A"
+            },
+            {
+              "type": "text",
+              "name": "版本",
+              "x": 24,
+              "y": 782,
+              "text": "v2.3.1",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#C9CDD4"
+            },
+            {
+              "type": "rect",
+              "name": "页面标题竖条",
+              "x": 212,
+              "y": 84,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "页面标题",
+              "x": 224,
+              "y": 84,
+              "text": "设备监控",
+              "fontSize": 20,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "页面副标",
+              "x": 330,
+              "y": 92,
+              "text": "4 台机器狗 · 1 台执行任务 · 1 条未确认告警",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "icon",
+              "name": "刷新图标",
+              "icon": "ep/refresh",
+              "size": 14,
+              "x": 1392,
+              "y": 88,
+              "color": "#4E5969"
+            },
+            {
+              "type": "instance",
+              "comp": "video-frame",
+              "x": 224,
+              "y": 120,
+              "notes": {
+                "kind": "component",
+                "summary": "主视频画面组件：夜视基调 + 机器狗剪影 + REC/时间戳/控制条",
+                "body": "## 用途\n巡检现场第一视野。深色夜视基调与浅色工作台形成对比，剪影本体的呼吸灯颜色与设备状态联动。\n\n## 状态\n- 正常：左上设备名 + 右上 REC 红点闪烁，底部控制条可截图/暂停/全屏。\n- 离线：定格最后一帧 + 重连提示。",
+                "rules": [
+                  {
+                    "when": "点击全屏",
+                    "then": "视频铺满画板其余区域",
+                    "note": "ESC 退出"
+                  },
+                  {
+                    "when": "视频流中断超 5s",
+                    "then": "定格最后一帧并显示重连提示",
+                    "note": "遥测不受影响"
+                  }
+                ],
+                "tags": [
+                  "视频",
+                  "signature复用"
+                ],
+                "source": "ai",
+                "updated": "2026-11-11"
+              }
+            },
+            {
+              "type": "rect",
+              "name": "任务卡",
+              "x": 224,
+              "y": 560,
+              "w": 760,
+              "h": 116,
+              "radius": 12,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB",
+              "strokeW": 1,
+              "shadow": {
+                "y": 2,
+                "blur": 8,
+                "color": "#101828",
+                "opacity": 0.06
+              }
+            },
+            {
+              "type": "rect",
+              "name": "任务标题竖条",
+              "x": 228,
+              "y": 576,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "任务标题",
+              "x": 240,
+              "y": 576,
+              "text": "执行中任务 · 3 号厂房日常巡检",
+              "fontSize": 14,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "rect",
+              "name": "进度条底",
+              "x": 240,
+              "y": 608,
+              "w": 728,
+              "h": 6,
+              "radius": 3,
+              "fill": "#F2F3F5"
+            },
+            {
+              "type": "rect",
+              "name": "进度条",
+              "x": 240,
+              "y": 608,
+              "w": 442,
+              "h": 6,
+              "radius": 3,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "进度文字",
+              "x": 240,
+              "y": 626,
+              "text": "航点 12/18 · 67%",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "预计完成",
+              "x": 788,
+              "y": 626,
+              "text": "预计 17:12 完成 · 查看航线",
+              "fontSize": 12,
+              "fontWeight": 500,
+              "color": "#3670F7",
+              "w": 180,
+              "align": "right"
+            },
+            {
+              "type": "rect",
+              "name": "航线卡",
+              "x": 224,
+              "y": 692,
+              "w": 760,
+              "h": 152,
+              "radius": 12,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB",
+              "strokeW": 1,
+              "shadow": {
+                "y": 2,
+                "blur": 8,
+                "color": "#101828",
+                "opacity": 0.06
+              }
+            },
+            {
+              "type": "rect",
+              "name": "航线标题竖条",
+              "x": 228,
+              "y": 706,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "航线标题",
+              "x": 240,
+              "y": 706,
+              "text": "巡检航线 · 3 号厂房",
+              "fontSize": 13,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "航线图例",
+              "x": 788,
+              "y": 707,
+              "text": "当前位置 · 剩余 6 个航点",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C",
+              "w": 180,
+              "align": "right"
+            },
+            {
+              "type": "line",
+              "name": "航线段1",
+              "x": 264,
+              "y": 760,
+              "w": 96,
+              "h": 50,
+              "dir": "/",
+              "stroke": "#3670F7",
+              "strokeW": 2
+            },
+            {
+              "type": "line",
+              "name": "航线段2",
+              "x": 360,
+              "y": 760,
+              "w": 112,
+              "h": 28,
+              "dir": "\\",
+              "stroke": "#3670F7",
+              "strokeW": 2
+            },
+            {
+              "type": "line",
+              "name": "航线段3",
+              "x": 472,
+              "y": 744,
+              "w": 124,
+              "h": 44,
+              "dir": "/",
+              "stroke": "#3670F7",
+              "strokeW": 2
+            },
+            {
+              "type": "line",
+              "name": "航线段4",
+              "x": 596,
+              "y": 744,
+              "w": 130,
+              "h": 52,
+              "dir": "\\",
+              "stroke": "#3670F7",
+              "strokeW": 2
+            },
+            {
+              "type": "line",
+              "name": "航线段5",
+              "x": 726,
+              "y": 768,
+              "w": 104,
+              "h": 28,
+              "dir": "/",
+              "stroke": "#3670F7",
+              "strokeW": 2
+            },
+            {
+              "type": "line",
+              "name": "航线段6",
+              "x": 830,
+              "y": 768,
+              "w": 114,
+              "h": 36,
+              "dir": "\\",
+              "stroke": "#3670F7",
+              "strokeW": 2
+            },
+            {
+              "type": "ellipse",
+              "name": "航点1",
+              "x": 260,
+              "y": 806,
+              "w": 8,
+              "h": 8,
+              "fill": "#C9CDD4"
+            },
+            {
+              "type": "ellipse",
+              "name": "航点2",
+              "x": 356,
+              "y": 756,
+              "w": 8,
+              "h": 8,
+              "fill": "#C9CDD4"
+            },
+            {
+              "type": "ellipse",
+              "name": "航点3",
+              "x": 468,
+              "y": 784,
+              "w": 8,
+              "h": 8,
+              "fill": "#C9CDD4"
+            },
+            {
+              "type": "ellipse",
+              "name": "航点4",
+              "x": 592,
+              "y": 740,
+              "w": 8,
+              "h": 8,
+              "fill": "#C9CDD4"
+            },
+            {
+              "type": "ellipse",
+              "name": "当前位置",
+              "x": 719,
+              "y": 789,
+              "w": 14,
+              "h": 14,
+              "fill": "#00B42A",
+              "stroke": "#FFFFFF",
+              "strokeW": 2
+            },
+            {
+              "type": "ellipse",
+              "name": "航点6",
+              "x": 822,
+              "y": 760,
+              "w": 8,
+              "h": 8,
+              "fill": "#C9CDD4"
+            },
+            {
+              "type": "ellipse",
+              "name": "航点7",
+              "x": 936,
+              "y": 796,
+              "w": 8,
+              "h": 8,
+              "fill": "#C9CDD4"
+            },
+            {
+              "type": "instance",
+              "comp": "dog-chip",
+              "x": 1000,
+              "y": 120,
+              "overrides": {
+                "底": {
+                  "fill": "#EBF1FE"
+                },
+                "呼吸灯": {
+                  "fill": "#3670F7"
+                },
+                "编号": {
+                  "text": "X20-07"
+                }
+              }
+            },
+            {
+              "type": "instance",
+              "comp": "dog-chip",
+              "x": 1104,
+              "y": 120,
+              "overrides": {
+                "呼吸灯": {
+                  "fill": "#00B42A"
+                },
+                "编号": {
+                  "text": "X20-03"
+                }
+              }
+            },
+            {
+              "type": "instance",
+              "comp": "dog-chip",
+              "x": 1208,
+              "y": 120,
+              "overrides": {
+                "呼吸灯": {
+                  "fill": "#86909C"
+                },
+                "编号": {
+                  "text": "X20-09"
+                }
+              }
+            },
+            {
+              "type": "instance",
+              "comp": "dog-chip",
+              "x": 1312,
+              "y": 120,
+              "overrides": {
+                "呼吸灯": {
+                  "fill": "#C9CDD4"
+                },
+                "编号": {
+                  "text": "X20-11"
+                }
+              }
+            },
+            {
+              "type": "rect",
+              "name": "状态卡",
+              "x": 1000,
+              "y": 166,
+              "w": 416,
+              "h": 224,
+              "radius": 12,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB",
+              "strokeW": 1,
+              "shadow": {
+                "y": 2,
+                "blur": 8,
+                "color": "#101828",
+                "opacity": 0.06
+              }
+            },
+            {
+              "type": "rect",
+              "name": "状态卡标题竖条",
+              "x": 1004,
+              "y": 182,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "状态卡标题",
+              "x": 1016,
+              "y": 182,
+              "text": "实时状态 · X20-07",
+              "fontSize": 13,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "instance",
+              "comp": "metric",
+              "x": 1016,
+              "y": 214,
+              "overrides": {
+                "标签": {
+                  "text": "电池电量"
+                },
+                "数值": {
+                  "text": "78%",
+                  "color": "#3670F7"
+                }
+              }
+            },
+            {
+              "type": "instance",
+              "comp": "metric",
+              "x": 1216,
+              "y": 214,
+              "overrides": {
+                "标签": {
+                  "text": "链路信号"
+                },
+                "数值": {
+                  "text": "-52dBm"
+                }
+              }
+            },
+            {
+              "type": "instance",
+              "comp": "metric",
+              "x": 1016,
+              "y": 302,
+              "overrides": {
+                "标签": {
+                  "text": "本体温度"
+                },
+                "数值": {
+                  "text": "42.1℃"
+                }
+              }
+            },
+            {
+              "type": "instance",
+              "comp": "metric",
+              "x": 1216,
+              "y": 302,
+              "overrides": {
+                "标签": {
+                  "text": "运动速度"
+                },
+                "数值": {
+                  "text": "1.2 m/s"
+                }
+              }
+            },
+            {
+              "type": "rect",
+              "name": "姿态卡",
+              "x": 1000,
+              "y": 406,
+              "w": 416,
+              "h": 104,
+              "radius": 12,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB",
+              "strokeW": 1,
+              "shadow": {
+                "y": 2,
+                "blur": 8,
+                "color": "#101828",
+                "opacity": 0.06
+              }
+            },
+            {
+              "type": "rect",
+              "name": "姿态标题竖条",
+              "x": 1004,
+              "y": 422,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "姿态标题",
+              "x": 1016,
+              "y": 422,
+              "text": "当前姿态",
+              "fontSize": 13,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "姿态值",
+              "x": 1016,
+              "y": 450,
+              "text": "站立 · 步态 trot",
+              "fontSize": 16,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "四腿负载",
+              "x": 1016,
+              "y": 478,
+              "text": "四腿负载均衡",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "rect",
+              "name": "腿1",
+              "x": 1256,
+              "y": 454,
+              "w": 10,
+              "h": 28,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "rect",
+              "name": "腿2",
+              "x": 1274,
+              "y": 446,
+              "w": 10,
+              "h": 36,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "rect",
+              "name": "腿3",
+              "x": 1292,
+              "y": 458,
+              "w": 10,
+              "h": 24,
+              "radius": 2,
+              "fill": "#C9DDFB"
+            },
+            {
+              "type": "rect",
+              "name": "腿4",
+              "x": 1310,
+              "y": 450,
+              "w": 10,
+              "h": 32,
+              "radius": 2,
+              "fill": "#C9DDFB"
+            },
+            {
+              "type": "rect",
+              "name": "告警卡",
+              "x": 1000,
+              "y": 526,
+              "w": 416,
+              "h": 318,
+              "radius": 12,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB",
+              "strokeW": 1,
+              "shadow": {
+                "y": 2,
+                "blur": 8,
+                "color": "#101828",
+                "opacity": 0.06
+              }
+            },
+            {
+              "type": "rect",
+              "name": "告警标题竖条",
+              "x": 1004,
+              "y": 542,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "告警标题",
+              "x": 1016,
+              "y": 542,
+              "text": "今日告警 · 3",
+              "fontSize": 13,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "告警全部",
+              "x": 1320,
+              "y": 542,
+              "text": "全部",
+              "fontSize": 12,
+              "fontWeight": 500,
+              "color": "#3670F7",
+              "w": 80,
+              "align": "right"
+            },
+            {
+              "type": "instance",
+              "comp": "alert-row",
+              "x": 1016,
+              "y": 574,
+              "overrides": {
+                "呼吸灯": {
+                  "fill": "#FF7D00"
+                },
+                "文案": {
+                  "text": "本体温度 45.2℃ 越限 · X20-07"
+                },
+                "时间": {
+                  "text": "16:21 · 已派处理"
+                },
+                "状态条": {
+                  "fill": "#FF7D00"
+                }
+              }
+            },
+            {
+              "type": "instance",
+              "comp": "alert-row",
+              "x": 1016,
+              "y": 634,
+              "overrides": {
+                "呼吸灯": {
+                  "fill": "#F53F3F"
+                },
+                "文案": {
+                  "text": "避障急停触发 1 次 · X20-03"
+                },
+                "时间": {
+                  "text": "15:48 · 已恢复"
+                },
+                "状态条": {
+                  "fill": "#F53F3F"
+                }
+              }
+            },
+            {
+              "type": "instance",
+              "comp": "alert-row",
+              "x": 1016,
+              "y": 694,
+              "overrides": {
+                "呼吸灯": {
+                  "fill": "#C9CDD4"
+                },
+                "文案": {
+                  "text": "离线超过 2 小时 · X20-11"
+                },
+                "时间": {
+                  "text": "14:02 · 待回联"
+                },
+                "状态条": {
+                  "fill": "#C9CDD4"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "name": "告警提示",
+              "x": 1016,
+              "y": 760,
+              "text": "温度越限告警未确认，确认后进入今日报告",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "rect",
+              "name": "确认按钮",
+              "x": 1016,
+              "y": 796,
+              "w": 120,
+              "h": 32,
+              "radius": 6,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "确认文字",
+              "x": 1048,
+              "y": 805,
+              "text": "确认告警",
+              "fontSize": 12,
+              "fontWeight": 500,
+              "color": "#FFFFFF"
+            },
+            {
+              "type": "rect",
+              "name": "派单按钮",
+              "x": 1148,
+              "y": 796,
+              "w": 120,
+              "h": 32,
+              "radius": 6,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB"
+            },
+            {
+              "type": "text",
+              "name": "派单文字",
+              "x": 1184,
+              "y": 805,
+              "text": "派单处理",
+              "fontSize": 12,
+              "fontWeight": 500,
+              "color": "#4E5969"
+            }
+          ],
+          "notes": {
+            "kind": "page",
+            "summary": "设备监控主视图：视频画面 + 执行中任务进度 + 巡检航线地图 + 实时状态/步态/告警，巡检值班的第一屏",
+            "body": "## 用途\n实时掌握单台机器狗的巡检现场：看得到画面、追得到进度、读得到姿态、盯得住告警。\n\n## 入口与前置\n导航「设备监控」；顶部设备 chip 切换 X20-07/03/09/11，默认选中巡检中的设备。\n\n## 主流程\n1. 顶部 chip 切换目标设备，视频画面与右侧状态卡随之联动刷新。\n2. 执行中任务卡显示航点进度（12/18 · 67%）与预计完成时间，可跳转查看航线。\n3. 航线地图展示 6 段折线航点，绿色亮点为当前位置，灰色为已通过航点。\n4. 右下告警列表按时间倒序，单条可「确认告警」或「忽略处理」。\n\n## 字段与口径\n- 电量/信号/本体温度/运动速度来自 2s 遥测；温度按腿关节最高值上报。\n- 步态字段：站立 / 小跑 trot / 趴下，与遥控姿态动作一一对应。\n- 告警级别：高温=橙、通信异常=红、离线=灰；已确认的置灰保留当日。\n\n## 异常与边界\n- 视频流中断：画面定格 + 「重连中」提示，遥测继续刷新。\n- 全部设备离线：chip 区显示空态引导去设备绑定页。",
+            "rules": [
+              {
+                "when": "点击顶部设备 chip",
+                "then": "视频流、状态卡、航线地图全部切换到目标设备",
+                "note": "当前 chip 高亮描边"
+              },
+              {
+                "when": "点击「查看航线」",
+                "then": "航线卡片滚动进入视野并闪烁当前位置点",
+                "note": "同画板内锚点滚动"
+              },
+              {
+                "when": "点击「确认告警」",
+                "then": "该条告警置灰并更新顶栏告警计数",
+                "note": "写入控制日志"
+              },
+              {
+                "when": "点击「忽略处理」",
+                "then": "告警移入「已忽略」折叠区，当日可恢复",
+                "note": "误报不删记录"
+              },
+              {
+                "when": "本体温度 >55°C 持续 10s",
+                "then": "自动生成高温告警并呼吸灯转橙",
+                "note": "阈值来自设备标定"
+              }
+            ],
+            "tags": [
+              "主视图",
+              "视频流",
+              "航线",
+              "告警"
+            ],
+            "source": "ai",
+            "updated": "2026-11-11"
+          }
+        },
+        {
+          "name": "远程控制",
+          "x": 1540,
+          "y": 0,
+          "w": 1440,
+          "h": 900,
+          "bg": "#F5F7FA",
+          "nodes": [
+            {
+              "type": "instance",
+              "comp": "top-bar",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "type": "instance",
+              "comp": "side-nav",
+              "x": 0,
+              "y": 56
+            },
+            {
+              "type": "instance",
+              "comp": "nav-item",
+              "x": 0,
+              "y": 64,
+              "overrides": {
+                "文字": {
+                  "text": "设备监控"
+                },
+                "图标": {
+                  "icon": "ep/monitor"
+                }
+              },
+              "click": {
+                "action": "打开画板",
+                "target": "设备监控"
+              }
+            },
+            {
+              "type": "instance",
+              "comp": "nav-item",
+              "x": 0,
+              "y": 104,
+              "overrides": {
+                "底": {
+                  "fill": "#EBF1FE"
+                },
+                "选中条": {
+                  "fill": "#3670F7"
+                },
+                "图标": {
+                  "icon": "ep/aim",
+                  "color": "#3670F7"
+                },
+                "文字": {
+                  "text": "远程控制",
+                  "color": "#3670F7"
+                }
+              }
+            },
+            {
+              "type": "instance",
+              "comp": "nav-item",
+              "x": 0,
+              "y": 144,
+              "overrides": {
+                "文字": {
+                  "text": "设备绑定"
+                },
+                "图标": {
+                  "icon": "ep/link"
+                }
+              },
+              "click": {
+                "action": "打开画板",
+                "target": "设备绑定"
+              }
+            },
+            {
+              "type": "text",
+              "name": "在线统计",
+              "x": 24,
+              "y": 760,
+              "text": "机器狗在线 3/4",
+              "fontSize": 12,
+              "fontWeight": 500,
+              "color": "#4E5969"
+            },
+            {
+              "type": "rect",
+              "name": "在线灯",
+              "x": 112,
+              "y": 764,
+              "w": 6,
+              "h": 6,
+              "radius": 3,
+              "fill": "#00B42A"
+            },
+            {
+              "type": "text",
+              "name": "版本",
+              "x": 24,
+              "y": 782,
+              "text": "v2.3.1",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#C9CDD4"
+            },
+            {
+              "type": "rect",
+              "name": "页面标题竖条",
+              "x": 212,
+              "y": 84,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "页面标题",
+              "x": 224,
+              "y": 84,
+              "text": "远程控制",
+              "fontSize": 20,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "页面副标",
+              "x": 330,
+              "y": 92,
+              "text": "X20-07 · 手动模式 · 链路延迟 86ms · 控制权：值班员王工",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "rect",
+              "name": "小视频底",
+              "x": 224,
+              "y": 120,
+              "w": 400,
+              "h": 232,
+              "radius": 12,
+              "fill": "#0B1220"
+            },
+            {
+              "type": "text",
+              "name": "小视频标注",
+              "x": 240,
+              "y": 136,
+              "text": "X20-07 前置双目",
+              "fontSize": 12,
+              "fontWeight": 500,
+              "color": "#E8F0FF"
+            },
+            {
+              "type": "rect",
+              "name": "小视频REC",
+              "x": 584,
+              "y": 140,
+              "w": 8,
+              "h": 8,
+              "radius": 4,
+              "fill": "#F53F3F"
+            },
+            {
+              "type": "text",
+              "name": "小视频REC文字",
+              "x": 598,
+              "y": 136,
+              "text": "REC",
+              "fontSize": 11,
+              "fontWeight": 600,
+              "color": "#E8F0FF"
+            },
+            {
+              "type": "rect",
+              "name": "小视频狗身",
+              "x": 372,
+              "y": 250,
+              "w": 104,
+              "h": 34,
+              "radius": 12,
+              "fill": "#2C3A55"
+            },
+            {
+              "type": "rect",
+              "name": "小视频狗头",
+              "x": 464,
+              "y": 244,
+              "w": 32,
+              "h": 28,
+              "radius": 8,
+              "fill": "#33425F"
+            },
+            {
+              "type": "rect",
+              "name": "小视频腿1",
+              "x": 384,
+              "y": 282,
+              "w": 8,
+              "h": 30,
+              "radius": 3,
+              "fill": "#243049"
+            },
+            {
+              "type": "rect",
+              "name": "小视频腿2",
+              "x": 452,
+              "y": 282,
+              "w": 8,
+              "h": 28,
+              "radius": 3,
+              "fill": "#243049"
+            },
+            {
+              "type": "text",
+              "name": "小视频时间",
+              "x": 240,
+              "y": 322,
+              "text": "16:42:31",
+              "fontSize": 10,
+              "fontWeight": 400,
+              "color": "#5A6B87"
+            },
+            {
+              "type": "rect",
+              "name": "云台卡",
+              "x": 224,
+              "y": 368,
+              "w": 400,
+              "h": 284,
+              "radius": 12,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB",
+              "strokeW": 1,
+              "shadow": {
+                "y": 2,
+                "blur": 8,
+                "color": "#101828",
+                "opacity": 0.06
+              }
+            },
+            {
+              "type": "rect",
+              "name": "云台标题竖条",
+              "x": 228,
+              "y": 384,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "云台标题",
+              "x": 240,
+              "y": 384,
+              "text": "云台控制",
+              "fontSize": 13,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "俯仰标签",
+              "x": 240,
+              "y": 418,
+              "text": "俯仰",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "俯仰值",
+              "x": 560,
+              "y": 418,
+              "text": "+12°",
+              "fontSize": 12,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "rect",
+              "name": "俯仰槽",
+              "x": 240,
+              "y": 440,
+              "w": 352,
+              "h": 6,
+              "radius": 3,
+              "fill": "#F2F3F5"
+            },
+            {
+              "type": "rect",
+              "name": "俯仰滑块",
+              "x": 452,
+              "y": 434,
+              "w": 18,
+              "h": 18,
+              "radius": 9,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "偏航标签",
+              "x": 240,
+              "y": 478,
+              "text": "偏航",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "偏航值",
+              "x": 560,
+              "y": 478,
+              "text": "217°",
+              "fontSize": 12,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "rect",
+              "name": "偏航槽",
+              "x": 240,
+              "y": 500,
+              "w": 352,
+              "h": 6,
+              "radius": 3,
+              "fill": "#F2F3F5"
+            },
+            {
+              "type": "rect",
+              "name": "偏航滑块",
+              "x": 512,
+              "y": 494,
+              "w": 18,
+              "h": 18,
+              "radius": 9,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "刻度负",
+              "x": 240,
+              "y": 524,
+              "text": "-30°",
+              "fontSize": 10,
+              "fontWeight": 400,
+              "color": "#C9CDD4"
+            },
+            {
+              "type": "text",
+              "name": "刻度零",
+              "x": 408,
+              "y": 524,
+              "text": "0°",
+              "fontSize": 10,
+              "fontWeight": 400,
+              "color": "#C9CDD4"
+            },
+            {
+              "type": "text",
+              "name": "刻度正",
+              "x": 568,
+              "y": 516,
+              "text": "+30°",
+              "fontSize": 10,
+              "fontWeight": 400,
+              "color": "#C9CDD4"
+            },
+            {
+              "type": "rect",
+              "name": "回中按钮",
+              "x": 240,
+              "y": 548,
+              "w": 96,
+              "h": 32,
+              "radius": 6,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB"
+            },
+            {
+              "type": "text",
+              "name": "回中文字",
+              "x": 272,
+              "y": 557,
+              "text": "云台回中",
+              "fontSize": 12,
+              "fontWeight": 500,
+              "color": "#4E5969"
+            },
+            {
+              "type": "rect",
+              "name": "跟踪按钮",
+              "x": 348,
+              "y": 548,
+              "w": 120,
+              "h": 32,
+              "radius": "6",
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB"
+            },
+            {
+              "type": "text",
+              "name": "跟踪文字",
+              "x": 384,
+              "y": 557,
+              "text": "目标跟踪 开",
+              "fontSize": 12,
+              "fontWeight": 500,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "云台提示",
+              "x": 240,
+              "y": 612,
+              "text": "变焦 2.4× · 红外成像 已关闭",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "rect",
+              "name": "模式卡",
+              "x": 224,
+              "y": 668,
+              "w": 400,
+              "h": 176,
+              "radius": 12,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB",
+              "strokeW": 1,
+              "shadow": {
+                "y": 2,
+                "blur": 8,
+                "color": "#101828",
+                "opacity": 0.06
+              }
+            },
+            {
+              "type": "rect",
+              "name": "模式标题竖条",
+              "x": 228,
+              "y": 684,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "模式标题",
+              "x": 240,
+              "y": 684,
+              "text": "控制模式",
+              "fontSize": 13,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "模式值",
+              "x": 240,
+              "y": 716,
+              "text": "手动遥控",
+              "fontSize": 16,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "模式提示",
+              "x": 240,
+              "y": 752,
+              "text": "接管自 16:38，自动巡航任务已暂停",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "rect",
+              "name": "自动按钮",
+              "x": 240,
+              "y": 796,
+              "w": 140,
+              "h": 32,
+              "radius": 6,
+              "fill": "#FFFFFF",
+              "stroke": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "自动文字",
+              "x": 272,
+              "y": 805,
+              "text": "返回自动巡航",
+              "fontSize": 12,
+              "fontWeight": 500,
+              "color": "#3670F7"
+            },
+            {
+              "type": "rect",
+              "name": "方向卡",
+              "x": 648,
+              "y": 120,
+              "w": 384,
+              "h": 300,
+              "radius": 12,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB",
+              "strokeW": 1,
+              "shadow": {
+                "y": 2,
+                "blur": 8,
+                "color": "#101828",
+                "opacity": 0.06
+              }
+            },
+            {
+              "type": "rect",
+              "name": "方向标题竖条",
+              "x": 652,
+              "y": 136,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "方向标题",
+              "x": 664,
+              "y": 136,
+              "text": "方向控制",
+              "fontSize": 13,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "rect",
+              "name": "上按钮",
+              "x": 819,
+              "y": 172,
+              "w": 42,
+              "h": 42,
+              "radius": 8,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB"
+            },
+            {
+              "type": "icon",
+              "name": "上图标",
+              "icon": "ep/arrow-up",
+              "size": 18,
+              "x": 831,
+              "y": 184,
+              "color": "#4E5969"
+            },
+            {
+              "type": "rect",
+              "name": "左按钮",
+              "x": 769,
+              "y": 222,
+              "w": 42,
+              "h": 42,
+              "radius": 8,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB"
+            },
+            {
+              "type": "icon",
+              "name": "左图标",
+              "icon": "ep/arrow-left",
+              "size": 18,
+              "x": 781,
+              "y": 234,
+              "color": "#4E5969"
+            },
+            {
+              "type": "rect",
+              "name": "停按钮",
+              "x": 819,
+              "y": 222,
+              "w": 42,
+              "h": 42,
+              "radius": 8,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "停文字",
+              "x": 833,
+              "y": 236,
+              "text": "停",
+              "fontSize": 15,
+              "fontWeight": 600,
+              "color": "#FFFFFF"
+            },
+            {
+              "type": "rect",
+              "name": "右按钮",
+              "x": 869,
+              "y": 222,
+              "w": 42,
+              "h": 42,
+              "radius": 8,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB"
+            },
+            {
+              "type": "icon",
+              "name": "右图标",
+              "icon": "ep/arrow-right",
+              "size": 18,
+              "x": 881,
+              "y": 234,
+              "color": "#4E5969"
+            },
+            {
+              "type": "rect",
+              "name": "下按钮",
+              "x": 819,
+              "y": 272,
+              "w": 42,
+              "h": 42,
+              "radius": 8,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB"
+            },
+            {
+              "type": "icon",
+              "name": "下图标",
+              "icon": "ep/arrow-down",
+              "size": 18,
+              "x": 831,
+              "y": 284,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "方向提示",
+              "x": 664,
+              "y": 330,
+              "text": "点按步进 0.3m · 长按持续行走",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "text",
+              "name": "转向提示",
+              "x": 664,
+              "y": 354,
+              "text": "原地转向 ±30°/次",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "rect",
+              "name": "速度卡",
+              "x": 648,
+              "y": 436,
+              "w": 384,
+              "h": 96,
+              "radius": 12,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB",
+              "strokeW": 1,
+              "shadow": {
+                "y": 2,
+                "blur": 8,
+                "color": "#101828",
+                "opacity": 0.06
+              }
+            },
+            {
+              "type": "rect",
+              "name": "速度标题竖条",
+              "x": 652,
+              "y": 452,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "速度标题",
+              "x": 664,
+              "y": 452,
+              "text": "速度档位",
+              "fontSize": 13,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "rect",
+              "name": "低速chip",
+              "x": 664,
+              "y": 480,
+              "w": 112,
+              "h": 30,
+              "radius": 15,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB"
+            },
+            {
+              "type": "text",
+              "name": "低速文字",
+              "x": 688,
+              "y": 488,
+              "text": "低速 0.8m/s",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "rect",
+              "name": "中速chip",
+              "x": 788,
+              "y": 480,
+              "w": 112,
+              "h": 30,
+              "radius": 15,
+              "fill": "#EBF1FE",
+              "stroke": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "中速文字",
+              "x": 812,
+              "y": 488,
+              "text": "中速 1.5m/s",
+              "fontSize": 12,
+              "fontWeight": 600,
+              "color": "#3670F7"
+            },
+            {
+              "type": "rect",
+              "name": "高速chip",
+              "x": 912,
+              "y": 480,
+              "w": 112,
+              "h": 30,
+              "radius": 15,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB"
+            },
+            {
+              "type": "text",
+              "name": "高速文字",
+              "x": 936,
+              "y": 488,
+              "text": "高速 2.5m/s",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "rect",
+              "name": "姿态卡",
+              "x": 648,
+              "y": 548,
+              "w": 384,
+              "h": 180,
+              "radius": 12,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB",
+              "strokeW": 1,
+              "shadow": {
+                "y": 2,
+                "blur": 8,
+                "color": "#101828",
+                "opacity": 0.06
+              }
+            },
+            {
+              "type": "rect",
+              "name": "姿态卡标题竖条",
+              "x": 652,
+              "y": 564,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "姿态卡标题",
+              "x": 664,
+              "y": 564,
+              "text": "姿态动作",
+              "fontSize": 13,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "rect",
+              "name": "站立按钮",
+              "x": 664,
+              "y": 600,
+              "w": 168,
+              "h": 48,
+              "radius": 8,
+              "fill": "#EBF1FE"
+            },
+            {
+              "type": "text",
+              "name": "站立文字",
+              "x": 734,
+              "y": 616,
+              "text": "站立",
+              "fontSize": 13,
+              "fontWeight": 600,
+              "color": "#3670F7"
+            },
+            {
+              "type": "rect",
+              "name": "趴下按钮",
+              "x": 848,
+              "y": 600,
+              "w": 168,
+              "h": 48,
+              "radius": 8,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB"
+            },
+            {
+              "type": "text",
+              "name": "趴下文字",
+              "x": 918,
+              "y": 616,
+              "text": "趴下",
+              "fontSize": 13,
+              "fontWeight": 500,
+              "color": "#4E5969"
+            },
+            {
+              "type": "rect",
+              "name": "跳跃按钮",
+              "x": 664,
+              "y": 664,
+              "w": 168,
+              "h": 48,
+              "radius": 8,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB"
+            },
+            {
+              "type": "text",
+              "name": "跳跃文字",
+              "x": 734,
+              "y": 680,
+              "text": "跳跃",
+              "fontSize": 13,
+              "fontWeight": 500,
+              "color": "#4E5969"
+            },
+            {
+              "type": "rect",
+              "name": "自恢复按钮",
+              "x": 848,
+              "y": 664,
+              "w": 168,
+              "h": 48,
+              "radius": 8,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB"
+            },
+            {
+              "type": "text",
+              "name": "自恢复文字",
+              "x": 897,
+              "y": 680,
+              "text": "摔倒自恢复",
+              "fontSize": 13,
+              "fontWeight": 500,
+              "color": "#4E5969"
+            },
+            {
+              "type": "rect",
+              "name": "安全条",
+              "x": 648,
+              "y": 768,
+              "w": 384,
+              "h": 76,
+              "radius": 8,
+              "fill": "#FFF7E8"
+            },
+            {
+              "type": "icon",
+              "name": "安全图标",
+              "icon": "ep/warning",
+              "size": 16,
+              "x": 664,
+              "y": 784,
+              "color": "#FF7D00"
+            },
+            {
+              "type": "text",
+              "name": "安全文字1",
+              "x": 688,
+              "y": 784,
+              "text": "遥控指令实时下发，误操作可能碰撞设备",
+              "fontSize": 11,
+              "fontWeight": 500,
+              "color": "#8C5A1D"
+            },
+            {
+              "type": "text",
+              "name": "安全文字2",
+              "x": 688,
+              "y": 804,
+              "text": "急停后电机断电，需现场复位才能恢复遥控",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#8C5A1D"
+            },
+            {
+              "type": "rect",
+              "name": "急停卡",
+              "x": 1056,
+              "y": 120,
+              "w": 360,
+              "h": 128,
+              "radius": 12,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB",
+              "strokeW": 1,
+              "shadow": {
+                "y": 2,
+                "blur": 8,
+                "color": "#101828",
+                "opacity": 0.06
+              }
+            },
+            {
+              "type": "rect",
+              "name": "急停标题竖条",
+              "x": 1060,
+              "y": 136,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "急停标题",
+              "x": 1072,
+              "y": 136,
+              "text": "紧急停止",
+              "fontSize": 13,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "rect",
+              "name": "急停按钮",
+              "x": 1072,
+              "y": 162,
+              "w": 328,
+              "h": 48,
+              "radius": 8,
+              "fill": "#F53F3F",
+              "notes": {
+                "kind": "component",
+                "summary": "急停 STOP：唯一永不置灰的操控控件，一键锁死全部驱动",
+                "body": "## 用途\n安全兜底控件。任何状态（未接管/信号丢失/动作执行中）均可触发。\n\n## 状态\n- 常态：红色实心大按钮，悬停加深。\n- 已急停：变为「长按 3s 解除」，需远程+现场双确认。",
+                "rules": [
+                  {
+                    "when": "点击急停",
+                    "then": "锁死驱动并强制日志留痕",
+                    "note": "记录保留 30 天"
+                  },
+                  {
+                    "when": "长按 3s 且双确认",
+                    "then": "解除急停并恢复上次步态",
+                    "note": "日志记录解除人与时间"
+                  }
+                ],
+                "tags": [
+                  "安全",
+                  "急停"
+                ],
+                "source": "ai",
+                "updated": "2026-11-11"
+              }
+            },
+            {
+              "type": "text",
+              "name": "急停文字",
+              "x": 1180,
+              "y": 178,
+              "text": "急停 STOP",
+              "fontSize": 16,
+              "fontWeight": 700,
+              "color": "#FFFFFF"
+            },
+            {
+              "type": "text",
+              "name": "急停提示",
+              "x": 1072,
+              "y": 220,
+              "text": "按下后四电机断电 · 需现场复位",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "rect",
+              "name": "遥测卡",
+              "x": 1056,
+              "y": 264,
+              "w": 360,
+              "h": 368,
+              "radius": 12,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB",
+              "strokeW": 1,
+              "shadow": {
+                "y": 2,
+                "blur": 8,
+                "color": "#101828",
+                "opacity": 0.06
+              }
+            },
+            {
+              "type": "rect",
+              "name": "遥测标题竖条",
+              "x": 1060,
+              "y": 280,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "遥测标题",
+              "x": 1072,
+              "y": 280,
+              "text": "实时遥测",
+              "fontSize": 13,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "遥测更新",
+              "x": 1300,
+              "y": 281,
+              "text": "16:42:31 更新",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#C9CDD4",
+              "w": 100,
+              "align": "right"
+            },
+            {
+              "type": "text",
+              "name": "遥测1标签",
+              "x": 1072,
+              "y": 316,
+              "text": "左前腿关节",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "遥测1值",
+              "x": 1264,
+              "y": 316,
+              "text": "41.3℃",
+              "fontSize": 12,
+              "fontWeight": 600,
+              "color": "#1F2329",
+              "w": 136,
+              "align": "right"
+            },
+            {
+              "type": "text",
+              "name": "遥测2标签",
+              "x": 1072,
+              "y": 352,
+              "text": "右前腿关节",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "遥测2值",
+              "x": 1264,
+              "y": 352,
+              "text": "39.8℃",
+              "fontSize": 12,
+              "fontWeight": 600,
+              "color": "#1F2329",
+              "w": 136,
+              "align": "right"
+            },
+            {
+              "type": "text",
+              "name": "遥测3标签",
+              "x": 1072,
+              "y": 388,
+              "text": "左后腿关节",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "遥测3值",
+              "x": 1264,
+              "y": 388,
+              "text": "44.1℃",
+              "fontSize": 12,
+              "fontWeight": 600,
+              "color": "#1F2329",
+              "w": 136,
+              "align": "right"
+            },
+            {
+              "type": "text",
+              "name": "遥测4标签",
+              "x": 1072,
+              "y": 424,
+              "text": "右后腿关节",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "遥测4值",
+              "x": 1264,
+              "y": 424,
+              "text": "40.6℃",
+              "fontSize": 12,
+              "fontWeight": 600,
+              "color": "#1F2329",
+              "w": 136,
+              "align": "right"
+            },
+            {
+              "type": "text",
+              "name": "遥测5标签",
+              "x": 1072,
+              "y": 460,
+              "text": "电池电流",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "遥测5值",
+              "x": 1264,
+              "y": 460,
+              "text": "6.4A",
+              "fontSize": 12,
+              "fontWeight": 600,
+              "color": "#1F2329",
+              "w": 136,
+              "align": "right"
+            },
+            {
+              "type": "text",
+              "name": "遥测6标签",
+              "x": 1072,
+              "y": 496,
+              "text": "剩余续航",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "遥测6值",
+              "x": 1264,
+              "y": 496,
+              "text": "2h18m",
+              "fontSize": 12,
+              "fontWeight": 600,
+              "color": "#1F2329",
+              "w": 136,
+              "align": "right"
+            },
+            {
+              "type": "rect",
+              "name": "遥测分割线",
+              "x": 1072,
+              "y": 536,
+              "w": 328,
+              "h": 1,
+              "fill": "#F2F3F5"
+            },
+            {
+              "type": "text",
+              "name": "姿态Roll",
+              "x": 1072,
+              "y": 552,
+              "text": "Roll -1.2°",
+              "fontSize": 12,
+              "fontWeight": 600,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "姿态Pitch",
+              "x": 1190,
+              "y": 552,
+              "text": "Pitch 3.4°",
+              "fontSize": 12,
+              "fontWeight": 600,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "姿态Yaw",
+              "x": 1310,
+              "y": 552,
+              "text": "Yaw 217°",
+              "fontSize": 12,
+              "fontWeight": 600,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "姿态提示",
+              "x": 1072,
+              "y": 580,
+              "text": "姿态平稳 · 零点漂移正常范围内",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "rect",
+              "name": "日志卡",
+              "x": 1056,
+              "y": 648,
+              "w": 360,
+              "h": 196,
+              "radius": 12,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB",
+              "strokeW": 1,
+              "shadow": {
+                "y": 2,
+                "blur": 8,
+                "color": "#101828",
+                "opacity": 0.06
+              }
+            },
+            {
+              "type": "rect",
+              "name": "日志标题竖条",
+              "x": 1060,
+              "y": 664,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "日志标题",
+              "x": 1072,
+              "y": 664,
+              "text": "控制日志",
+              "fontSize": 13,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "日志1",
+              "x": 1072,
+              "y": 696,
+              "text": "16:42  姿态切换 trot（手动）",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "日志2",
+              "x": 1072,
+              "y": 724,
+              "text": "16:40  速度切换 中速 1.5m/s",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "日志3",
+              "x": 1072,
+              "y": 752,
+              "text": "16:38  王工接管控制权（自动→手动）",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "日志4",
+              "x": 1072,
+              "y": 780,
+              "text": "16:35  云台目标跟踪 开启",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            }
+          ],
+          "notes": {
+            "kind": "page",
+            "summary": "远程控制操控台：云台/方向/速度/姿态/急停五组操控 + 关节遥测 + 控制日志，人工接管后的安全操作页",
+            "body": "## 用途\n巡检异常或定点作业时，人工远程接管机器狗：调云台、走位、变姿态、随时急停。\n\n## 入口与前置\n导航「远程控制」；必须先确认「人工接管」生效（页面顶部提示条），操控区才可用。\n\n## 主流程\n1. 左侧小视频确认现场 → 云台滑条调俯仰（±45°）/偏航（±180°）。\n2. 中部 D-pad 控制方向，中心「停」键立即停止位移；速度三档 0.8/1.5/2.5 m/s。\n3. 姿态动作四选一：站立 / 趴下 / 跳跃 / 降阻自恢复；执行中按钮锁定。\n4. 右上红色「急停 STOP」任何时候可点，一键锁死全部驱动。\n5. 右下控制日志全量留痕：时间 + 指令 + 触发方式（手动/自动）。\n\n## 字段与口径\n- 遥测含左右前后腿关节温度、电流、续航、Roll/Pitch/Yaw 姿态角。\n- 云台回中误差 ±0.5°；速度档切换需机器狗处于站立或小跑步态。\n- 控制日志保留 7 天，急停记录强制保留 30 天。\n\n## 异常与边界\n- 遥测中断 5s：操控区置灰并提示「信号丢失」，急停按钮永不置灰。\n- 姿态切换冲突（如趴下中点跳跃）：按钮锁定 + 日志记录被拒指令。\n- 急停后需现场/远程双确认才能解除。",
+            "rules": [
+              {
+                "when": "进入本页且未接管",
+                "then": "操控区整体置灰并显示「请先开启人工接管」",
+                "note": "接管开关在顶部提示条"
+              },
+              {
+                "when": "点击「急停 STOP」",
+                "then": "锁死全部驱动、视频标注急停态、日志强制留痕",
+                "note": "任何状态下可用"
+              },
+              {
+                "when": "拖动云台滑条",
+                "then": "实时下发角度指令并显示当前角度值",
+                "note": "±45°/±180° 越界自动截断"
+              },
+              {
+                "when": "点击姿态动作",
+                "then": "执行对应动作并锁定按钮至动作完成",
+                "note": "冲突姿态直接拒绝"
+              },
+              {
+                "when": "切换速度档",
+                "then": "步态同步切换（0.8 步行 / 1.5 小跑 / 2.5 奔跑）",
+                "note": "趴下时不可切换"
+              },
+              {
+                "when": "遥测中断超 5s",
+                "then": "操控区置灰并提示信号丢失，急停除外",
+                "note": "恢复后自动解锁"
+              }
+            ],
+            "tags": [
+              "远程控制",
+              "急停",
+              "人工接管"
+            ],
+            "source": "ai",
+            "updated": "2026-11-11"
+          }
+        },
+        {
+          "name": "设备绑定",
+          "x": 3080,
+          "y": 0,
+          "w": 1440,
+          "h": 900,
+          "bg": "#F5F7FA",
+          "nodes": [
+            {
+              "type": "instance",
+              "comp": "top-bar",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "type": "instance",
+              "comp": "side-nav",
+              "x": 0,
+              "y": 56
+            },
+            {
+              "type": "instance",
+              "comp": "nav-item",
+              "x": 0,
+              "y": 64,
+              "overrides": {
+                "文字": {
+                  "text": "设备监控"
+                },
+                "图标": {
+                  "icon": "ep/monitor"
+                }
+              },
+              "click": {
+                "action": "打开画板",
+                "target": "设备监控"
+              }
+            },
+            {
+              "type": "instance",
+              "comp": "nav-item",
+              "x": 0,
+              "y": 104,
+              "overrides": {
+                "文字": {
+                  "text": "远程控制"
+                },
+                "图标": {
+                  "icon": "ep/aim"
+                }
+              },
+              "click": {
+                "action": "打开画板",
+                "target": "远程控制"
+              }
+            },
+            {
+              "type": "instance",
+              "comp": "nav-item",
+              "x": 0,
+              "y": 144,
+              "overrides": {
+                "底": {
+                  "fill": "#EBF1FE"
+                },
+                "选中条": {
+                  "fill": "#3670F7"
+                },
+                "图标": {
+                  "icon": "ep/link",
+                  "color": "#3670F7"
+                },
+                "文字": {
+                  "text": "设备绑定",
+                  "color": "#3670F7"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "name": "在线统计",
+              "x": 24,
+              "y": 760,
+              "text": "机器狗在线 3/4",
+              "fontSize": 12,
+              "fontWeight": 500,
+              "color": "#4E5969"
+            },
+            {
+              "type": "rect",
+              "name": "在线灯",
+              "x": 112,
+              "y": 764,
+              "w": 6,
+              "h": 6,
+              "radius": 3,
+              "fill": "#00B42A"
+            },
+            {
+              "type": "text",
+              "name": "版本",
+              "x": 24,
+              "y": 782,
+              "text": "v2.3.1",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#C9CDD4"
+            },
+            {
+              "type": "rect",
+              "name": "页面标题竖条",
+              "x": 212,
+              "y": 84,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "页面标题",
+              "x": 224,
+              "y": 84,
+              "text": "设备绑定",
+              "fontSize": 20,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "页面副标",
+              "x": 330,
+              "y": 92,
+              "text": "已绑定 4 台 · 发现 1 台待绑定 · 今日新增 1 台",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "rect",
+              "name": "表格卡",
+              "x": 224,
+              "y": 120,
+              "w": 720,
+              "h": 404,
+              "radius": 12,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB",
+              "strokeW": 1,
+              "shadow": {
+                "y": 2,
+                "blur": 8,
+                "color": "#101828",
+                "opacity": 0.06
+              }
+            },
+            {
+              "type": "rect",
+              "name": "表格标题竖条",
+              "x": 228,
+              "y": 136,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "表格标题",
+              "x": 240,
+              "y": 136,
+              "text": "已绑定机器狗",
+              "fontSize": 14,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "表格导出",
+              "x": 892,
+              "y": 138,
+              "text": "导出清单",
+              "fontSize": 12,
+              "fontWeight": 500,
+              "color": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "表头编号",
+              "x": 240,
+              "y": 176,
+              "text": "编号",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "text",
+              "name": "表头型号",
+              "x": 334,
+              "y": 176,
+              "text": "型号",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "text",
+              "name": "表头固件",
+              "x": 456,
+              "y": 176,
+              "text": "固件版本",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "text",
+              "name": "表头绑定人",
+              "x": 554,
+              "y": 176,
+              "text": "绑定人",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "text",
+              "name": "表头状态",
+              "x": 648,
+              "y": 176,
+              "text": "状态",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "text",
+              "name": "表头操作",
+              "x": 832,
+              "y": 176,
+              "text": "操作",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "rect",
+              "name": "表头线",
+              "x": 240,
+              "y": 196,
+              "w": 688,
+              "h": 1,
+              "fill": "#F2F3F5"
+            },
+            {
+              "type": "instance",
+              "comp": "bind-row",
+              "x": 240,
+              "y": 204,
+              "overrides": {
+                "编号": {
+                  "text": "X20-07"
+                },
+                "型号": {
+                  "text": "Unitree X20"
+                },
+                "固件": {
+                  "text": "v2.3.1"
+                },
+                "呼吸灯": {
+                  "fill": "#3670F7"
+                },
+                "状态": {
+                  "text": "巡检中"
+                }
+              }
+            },
+            {
+              "type": "instance",
+              "comp": "bind-row",
+              "x": 240,
+              "y": 260,
+              "overrides": {
+                "编号": {
+                  "text": "X20-03"
+                },
+                "呼吸灯": {
+                  "fill": "#00B42A"
+                },
+                "状态": {
+                  "text": "在线待命"
+                },
+                "绑定人": {
+                  "text": "李工"
+                },
+                "底": {
+                  "fill": "#FAFBFC"
+                }
+              }
+            },
+            {
+              "type": "instance",
+              "comp": "bind-row",
+              "x": 240,
+              "y": 316,
+              "overrides": {
+                "编号": {
+                  "text": "X20-09"
+                },
+                "固件": {
+                  "text": "v2.2.8"
+                },
+                "呼吸灯": {
+                  "fill": "#86909C"
+                },
+                "状态": {
+                  "text": "待机充电"
+                }
+              }
+            },
+            {
+              "type": "instance",
+              "comp": "bind-row",
+              "x": 240,
+              "y": 372,
+              "overrides": {
+                "编号": {
+                  "text": "X20-11"
+                },
+                "型号": {
+                  "text": "Unitree Go2"
+                },
+                "固件": {
+                  "text": "v2.2.4"
+                },
+                "绑定人": {
+                  "text": "赵工"
+                },
+                "呼吸灯": {
+                  "fill": "#C9CDD4"
+                },
+                "状态": {
+                  "text": "离线 2h+"
+                },
+                "底": {
+                  "fill": "#FAFBFC"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "name": "表格提示",
+              "x": 240,
+              "y": 448,
+              "text": "解绑需二次确认并下发解绑证书，离线设备解绑后进入待恢复队列",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "rect",
+              "name": "记录卡",
+              "x": 224,
+              "y": 540,
+              "w": 720,
+              "h": 304,
+              "radius": 12,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB",
+              "strokeW": 1,
+              "shadow": {
+                "y": 2,
+                "blur": 8,
+                "color": "#101828",
+                "opacity": 0.06
+              }
+            },
+            {
+              "type": "rect",
+              "name": "记录标题竖条",
+              "x": 228,
+              "y": 556,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "记录标题",
+              "x": 240,
+              "y": 556,
+              "text": "绑定记录",
+              "fontSize": 14,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "记录1",
+              "x": 240,
+              "y": 602,
+              "text": "16:31  X20-09 重新绑定成功 · 操作人 王工",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "记录2",
+              "x": 240,
+              "y": 646,
+              "text": "11:20  X20-11 固件升级后自动重连失败，转入离线",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "记录3",
+              "x": 240,
+              "y": 690,
+              "text": "09:05  发现新设备 X20-12（SN GD-X20-0442）",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "rect",
+              "name": "向导卡",
+              "x": 968,
+              "y": 120,
+              "w": 448,
+              "h": 428,
+              "radius": 12,
+              "fill": "#FFFFFF",
+              "notes": {
+                "kind": "component",
+                "summary": "四步绑定向导：发现设备→校验 SN→下载证书→激活",
+                "body": "## 用途\n新设备入网唯一通道。步骤条实时推进，已完成步骤可回看不可回改。\n\n## 边界\nSN 连续 3 次校验失败锁定向导 5 分钟；证书有效期 365 天，临期 30 天提醒续期。",
+                "rules": [
+                  {
+                    "when": "步骤完成",
+                    "then": "进度条自动前移且前序步骤打勾",
+                    "note": "不可跳步"
+                  },
+                  {
+                    "when": "连续 3 次 SN 校验失败",
+                    "then": "锁定向导 5 分钟",
+                    "note": "防暴力枚举"
+                  }
+                ],
+                "tags": [
+                  "向导",
+                  "入网"
+                ],
+                "source": "ai",
+                "updated": "2026-11-11"
+              },
+              "stroke": "#E5E6EB",
+              "strokeW": 1,
+              "shadow": {
+                "y": 2,
+                "blur": 8,
+                "color": "#101828",
+                "opacity": 0.06
+              }
+            },
+            {
+              "type": "rect",
+              "name": "向导标题竖条",
+              "x": 972,
+              "y": 136,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "向导标题",
+              "x": 984,
+              "y": 136,
+              "text": "绑定新设备",
+              "fontSize": 14,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "ellipse",
+              "name": "步1",
+              "x": 1000,
+              "y": 172,
+              "w": 20,
+              "h": 20,
+              "fill": "#00B42A"
+            },
+            {
+              "type": "text",
+              "name": "步1字",
+              "x": 1006,
+              "y": 175,
+              "text": "1",
+              "fontSize": 11,
+              "fontWeight": 600,
+              "color": "#FFFFFF"
+            },
+            {
+              "type": "rect",
+              "name": "步线1",
+              "x": 1024,
+              "y": 181,
+              "w": 88,
+              "h": 2,
+              "fill": "#00B42A"
+            },
+            {
+              "type": "ellipse",
+              "name": "步2",
+              "x": 1116,
+              "y": 172,
+              "w": 20,
+              "h": 20,
+              "fill": "#00B42A"
+            },
+            {
+              "type": "text",
+              "name": "步2字",
+              "x": 1122,
+              "y": 175,
+              "text": "2",
+              "fontSize": 11,
+              "fontWeight": 600,
+              "color": "#FFFFFF"
+            },
+            {
+              "type": "rect",
+              "name": "步线2",
+              "x": 1140,
+              "y": 181,
+              "w": 88,
+              "h": 2,
+              "fill": "#00B42A"
+            },
+            {
+              "type": "ellipse",
+              "name": "步3",
+              "x": 1232,
+              "y": 172,
+              "w": 20,
+              "h": 20,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "步3字",
+              "x": 1238,
+              "y": 175,
+              "text": "3",
+              "fontSize": 11,
+              "fontWeight": 600,
+              "color": "#FFFFFF"
+            },
+            {
+              "type": "rect",
+              "name": "步线3",
+              "x": 1256,
+              "y": 181,
+              "w": 88,
+              "h": 2,
+              "fill": "#E5E6EB"
+            },
+            {
+              "type": "ellipse",
+              "name": "步4",
+              "x": 1348,
+              "y": 172,
+              "w": 20,
+              "h": 20,
+              "fill": "#F2F3F5"
+            },
+            {
+              "type": "text",
+              "name": "步4字",
+              "x": 1354,
+              "y": 175,
+              "text": "4",
+              "fontSize": 11,
+              "fontWeight": 600,
+              "color": "#86909C"
+            },
+            {
+              "type": "text",
+              "name": "步标1",
+              "x": 1000,
+              "y": 200,
+              "text": "连接热点",
+              "fontSize": 10,
+              "fontWeight": 400,
+              "color": "#00B42A"
+            },
+            {
+              "type": "text",
+              "name": "步标2",
+              "x": 1116,
+              "y": 200,
+              "text": "校验 SN",
+              "fontSize": 10,
+              "fontWeight": 400,
+              "color": "#00B42A"
+            },
+            {
+              "type": "text",
+              "name": "步标3",
+              "x": 1232,
+              "y": 200,
+              "text": "下发证书",
+              "fontSize": 10,
+              "fontWeight": 600,
+              "color": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "步标4",
+              "x": 1348,
+              "y": 200,
+              "text": "绑定完成",
+              "fontSize": 10,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "text",
+              "name": "发现标题",
+              "x": 984,
+              "y": 240,
+              "text": "发现的设备",
+              "fontSize": 12,
+              "fontWeight": 600,
+              "color": "#4E5969"
+            },
+            {
+              "type": "rect",
+              "name": "发现卡",
+              "x": 984,
+              "y": 264,
+              "w": 416,
+              "h": 64,
+              "radius": 8,
+              "fill": "#F7F8FA"
+            },
+            {
+              "type": "rect",
+              "name": "发现图标底",
+              "x": 996,
+              "y": 276,
+              "w": 40,
+              "h": 40,
+              "radius": 8,
+              "fill": "#EBF1FE"
+            },
+            {
+              "type": "icon",
+              "name": "发现图标",
+              "icon": "ep/cpu",
+              "size": 20,
+              "x": 1006,
+              "y": 286,
+              "color": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "发现名称",
+              "x": 1048,
+              "y": 276,
+              "text": "X20-12 · Unitree Go2",
+              "fontSize": 13,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "发现信息",
+              "x": 1048,
+              "y": 298,
+              "text": "信号 -48dBm · SN GD-X20-0442",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "rect",
+              "name": "绑定按钮",
+              "x": 1316,
+              "y": 280,
+              "w": 72,
+              "h": 32,
+              "radius": 6,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "绑定文字",
+              "x": 1338,
+              "y": 289,
+              "text": "绑定",
+              "fontSize": 12,
+              "fontWeight": 600,
+              "color": "#FFFFFF"
+            },
+            {
+              "type": "rect",
+              "name": "SN输入框",
+              "x": 984,
+              "y": 352,
+              "w": 416,
+              "h": 40,
+              "radius": 8,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB"
+            },
+            {
+              "type": "text",
+              "name": "SN占位",
+              "x": 1000,
+              "y": 365,
+              "text": "或手动输入 SN，如 GD-X20-0442",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#C9CDD4"
+            },
+            {
+              "type": "rect",
+              "name": "校验按钮",
+              "x": 984,
+              "y": 408,
+              "w": 96,
+              "h": 32,
+              "radius": 6,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB"
+            },
+            {
+              "type": "text",
+              "name": "校验文字",
+              "x": 1008,
+              "y": 417,
+              "text": "校验 SN",
+              "fontSize": 12,
+              "fontWeight": 500,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "校验状态",
+              "x": 1092,
+              "y": 417,
+              "text": "SN 格式正确，等待下发证书",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#00B42A"
+            },
+            {
+              "type": "rect",
+              "name": "证书条底",
+              "x": 984,
+              "y": 464,
+              "w": 416,
+              "h": 6,
+              "radius": 3,
+              "fill": "#F2F3F5"
+            },
+            {
+              "type": "rect",
+              "name": "证书条",
+              "x": 984,
+              "y": 464,
+              "w": 250,
+              "h": 6,
+              "radius": 3,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "证书文字",
+              "x": 984,
+              "y": 482,
+              "text": "正在下发设备证书 · 已用时 6s",
+              "fontSize": 11,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "rect",
+              "name": "帮助卡",
+              "x": 968,
+              "y": 564,
+              "w": 448,
+              "h": 140,
+              "radius": 12,
+              "fill": "#FFFFFF",
+              "stroke": "#E5E6EB",
+              "strokeW": 1,
+              "shadow": {
+                "y": 2,
+                "blur": 8,
+                "color": "#101828",
+                "opacity": 0.06
+              }
+            },
+            {
+              "type": "rect",
+              "name": "帮助标题竖条",
+              "x": 972,
+              "y": 580,
+              "w": 4,
+              "h": 16,
+              "radius": 2,
+              "fill": "#3670F7"
+            },
+            {
+              "type": "text",
+              "name": "帮助标题",
+              "x": 984,
+              "y": 580,
+              "text": "无法发现设备？",
+              "fontSize": 13,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "帮助1",
+              "x": 984,
+              "y": 608,
+              "text": "确认机器狗开机并已进入配网模式（背部灯快闪）",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "帮助2",
+              "x": 984,
+              "y": 632,
+              "text": "检查控制端与机器狗是否在同一网段 192.168.12.x",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "帮助3",
+              "x": 984,
+              "y": 656,
+              "text": "仍无法解决可联系现场保障：内线 8210",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "rect",
+              "name": "成功卡",
+              "x": 968,
+              "y": 720,
+              "w": 448,
+              "h": 124,
+              "radius": 12,
+              "fill": "#E8FFEA"
+            },
+            {
+              "type": "icon",
+              "name": "成功图标",
+              "icon": "ep/check",
+              "size": 24,
+              "x": 996,
+              "y": 780,
+              "color": "#00B42A"
+            },
+            {
+              "type": "text",
+              "name": "成功文字",
+              "x": 1048,
+              "y": 774,
+              "text": "绑定成功 · X20-12 已激活",
+              "fontSize": 14,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "分页文字",
+              "x": 240,
+              "y": 472,
+              "text": "上一页  ·  1 / 1  ·  下一页",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "text",
+              "name": "分页总数",
+              "x": 768,
+              "y": 472,
+              "w": 160,
+              "align": "right",
+              "text": "共 4 台设备",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "text",
+              "name": "记录4",
+              "x": 240,
+              "y": 734,
+              "text": "X20-09 固件升级 v2.2.3 → v2.2.4 · 昨天 18:32",
+              "fontSize": 13,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "记录5",
+              "x": 240,
+              "y": 778,
+              "text": "X20-11 解绑 · 03-09 10:15 · 操作人：龚值班",
+              "fontSize": 13,
+              "fontWeight": 400,
+              "color": "#4E5969"
+            },
+            {
+              "type": "text",
+              "name": "查看全部",
+              "x": 768,
+              "y": 557,
+              "text": "查看全部绑定记录 →",
+              "fontSize": 12,
+              "fontWeight": 500,
+              "color": "#3670F7",
+              "w": 160,
+              "align": "right"
+            },
+            {
+              "type": "ellipse",
+              "name": "成功图标底",
+              "x": 984,
+              "y": 768,
+              "w": 48,
+              "h": 48,
+              "fill": "#00B42A",
+              "opacity": 0.12
+            },
+            {
+              "type": "text",
+              "name": "成功标题",
+              "x": 1048,
+              "y": 774,
+              "text": "绑定成功 · X20-12 已激活",
+              "fontSize": 14,
+              "fontWeight": 600,
+              "color": "#1F2329"
+            },
+            {
+              "type": "text",
+              "name": "成功副文",
+              "x": 1048,
+              "y": 798,
+              "text": "证书已下载 · 设备进入待机，可在设备监控中查看",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "color": "#86909C"
+            },
+            {
+              "type": "text",
+              "name": "查看设备",
+              "x": 1304,
+              "y": 788,
+              "w": 96,
+              "align": "right",
+              "text": "查看设备 →",
+              "fontSize": 13,
+              "fontWeight": 500,
+              "color": "#3670F7"
+            }
+          ],
+          "notes": {
+            "kind": "page",
+            "summary": "设备绑定台账与向导：已绑定机器狗列表、绑定记录审计、四步绑定向导（发现→校验→证书→激活）",
+            "body": "## 用途\n管理机器狗与平台账号/航线资产的绑定关系：谁绑的、什么时候绑的、当前绑给谁，新设备入网走向导。\n\n## 入口与前置\n导航「设备绑定」；绑定操作需「巡检管理员」权限，查看对所有运维开放。\n\n## 主流程\n1. 左侧「已绑定机器狗」表格：编号/型号/固件版本/使用人/状态，行尾「解绑」。\n2. 解绑需二次确认；解绑后设备进入「待分配」并写入绑定记录。\n3. 右侧绑定向导四步：发现设备（同网段扫描 5s）→ 校验 SN（GD-XD-XXX-0442 格式）→ 下载证书 → 激活完成。\n4. 绑定记录按时间倒序全量展示：动作 + 设备 SN + 操作人。\n\n## 字段与口径\n- 设备编号规则：X20-两位序号，与机身铭牌一致，不可自拟。\n- 固件版本 v2.2.4+ 才允许绑定新航线资产；低于该版本提示先升级。\n- 证书有效期 365 天，到期前 30 天在绑定记录顶部提醒续期。\n\n## 异常与边界\n- SN 校验失败：禁止下一步并提示检查铭牌，连续 3 次失败锁定向导 5 分钟。\n- 扫描不到设备：展开「无法发现设备？」帮助（配网模式/同网段/防火墙）。\n- 解绑在途巡检任务中的设备：强制先停止任务。",
+            "rules": [
+              {
+                "when": "点击行尾「解绑」",
+                "then": "弹出二次确认，确认后设备进入待分配并记录日志",
+                "note": "在途任务需先停止"
+              },
+              {
+                "when": "点击发现设备卡「绑定」",
+                "then": "进入 SN 校验步骤，输入 SN 实时格式校验",
+                "note": "GD-XD-XXX-XXXX"
+              },
+              {
+                "when": "SN 校验通过",
+                "then": "自动下载证书并推进到激活步骤，进度条前移",
+                "note": "证书有效期 365 天"
+              },
+              {
+                "when": "连续 3 次 SN 校验失败",
+                "then": "锁定向导 5 分钟并提示联系管理员",
+                "note": "防暴力枚举"
+              },
+              {
+                "when": "绑定完成",
+                "then": "底部绿色成功横幅展示，列表与记录同步刷新",
+                "note": "新设备默认灰灯待机"
+              },
+              {
+                "when": "证书临期 30 天内",
+                "then": "绑定记录顶部出现续期提醒",
+                "note": "临期横幅可关闭"
+              }
+            ],
+            "tags": [
+              "设备绑定",
+              "向导",
+              "审计"
+            ],
+            "source": "ai",
+            "updated": "2026-11-11"
+          }
+        }
+      ],
+      "notes": {
+        "kind": "page",
+        "summary": "机器狗巡检管理平台（RobotDog OS）：设备监控、远程控制、设备绑定三大模块，面向变电站与厂区运维人员的夜间巡检操作台",
+        "body": "## 用途\n为运维人员提供机器狗（四足巡检机器人）机队的统一操作台：看状态、控姿态、管绑定。覆盖 X20 系列 4 台在册设备。\n\n## 入口与前置\n顶栏常驻设备健康呼吸灯与当班时间；左侧导航三模块互通；需持有「巡检运维」角色权限。\n\n## 模块分工\n1. 设备监控——默认落地页，看视频流、任务进度、航线、实时状态与告警。\n2. 远程控制——人工接管后的操控页，云台/方向/速度/姿态/急停。\n3. 设备绑定——设备与账号/航线的绑定台账与绑定向导。\n\n## 全局约定\n- 状态色即呼吸灯语义：绿=在线、蓝=巡检中、灰=待机、橙=告警，全站复用。\n- 任何操控动作先校验「人工接管」开关，未接管时按钮置灰。\n- 遥测刷新周期 2s，控制日志全量留痕可回溯。",
+        "rules": [
+          {
+            "when": "点击左侧导航任一模块",
+            "then": "切换到对应画板并保持当前选中设备上下文",
+            "note": "跨模块记忆 X20 编号"
+          },
+          {
+            "when": "任一设备告警触发",
+            "then": "顶栏呼吸灯转橙并常驻告警计数",
+            "note": "监控页告警列表同步置顶"
+          },
+          {
+            "when": "进入远程控制页",
+            "then": "校验人工接管开关，未接管时操控区整体置灰",
+            "note": "防止误操作"
+          },
+          {
+            "when": "设备离线超 30s",
+            "then": "视频流定格最后一帧并显示重连提示",
+            "note": "离线狗仍保留历史遥测"
+          }
+        ],
+        "tags": [
+          "巡检平台",
+          "机器狗",
+          "四模块互通"
+        ],
+        "source": "ai",
+        "updated": "2026-11-11"
+      }
+    }
+  ]
+}
