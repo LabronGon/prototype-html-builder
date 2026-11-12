@@ -45,6 +45,8 @@ git status --short
 
 - 壳一致性：master 与 `editor-prototype/` 两份副本的 `PROTOTYPE-AI-GUIDE` / `aiHint` / `#__ai_view` 头部一致。
 - 浏览器冒烟：打开 master，控制台零报错，`ProtoAPI.exportAI()` 可用。
+- **说明闭环**：`__doc` 中 `page/artboard/node` 的 `notes` 通过 `validate-doc.mjs` 结构校验；`apply-doc.mjs` 合入后人工说明未丢；`#__ai_view` 文末含 LOGIC 段；`ProtoAPI.exportLogic()` 可用。
+- **演示逻辑抽屉**：全部 `.chao.html` 浏览器冒烟，「说明」tab / 逻辑抽屉 / 画布角标 / `L` 快捷键 / 分享链接 `logic=1` 均可用。
 - **全部样本的运行时壳**：`空白原型.chao.html`、`选矿设备管理.chao.html`、live skill 的 `assets/` 与 `examples/` 产物，浏览器里 `ProtoAPI.exportAI()` 都必须可用。**静态 AI 块（GUIDE / aiHint / `__ai_view`）齐全 ≠ 运行时壳最新**——旧壳文件也可以被补嵌上新版静态块，两者必须分别验证；发现不一致用 `tools/regen-aiview.mjs --shell sample.chao.html <目标>` 只换壳、保留设计数据。
 - 幂等：`tools/regen-aiview.mjs` 连续运行两次，文件字节数不变。
 
@@ -54,6 +56,7 @@ git status --short
 2. 全部 `.chao.html`（用 `tools/regen-aiview.mjs` 再生 AI 块）
 3. live skill 的 `scripts/ai-view.mjs` 与 `assets/` / `examples/` 产物
 4. 版本号 / CHANGELOG / `skill-versions/` 归档 —— **仅功能变更升版本，纯文案修订不升版本**
+5. 规范入口四处一致：master 的 GUIDE/NOTICE/meta/`AI_HINT` 与 live skill `ai-view.mjs`、`tools/regen-aiview.mjs` 逐字一致；`genAIView` / `genAIViewDoc` 均追加 LOGIC 附录
 
 ## 四、提交信息
 
